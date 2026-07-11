@@ -100,6 +100,7 @@ in
     ./scripts/network-menus.nix
     ./scripts/package-installer.nix
     ./starship/starship.nix
+    ./telegram/telegram.nix
     ./waybar/waybar.nix
     ./wlogout/wlogout.nix
   ];

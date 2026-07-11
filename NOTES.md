@@ -93,6 +93,7 @@ nixosConfigurations.nixos
     ├── scripts/network-menus.nix
     ├── scripts/package-installer.nix
     ├── starship/starship.nix
+    ├── telegram/telegram.nix
     ├── waybar/waybar.nix
     └── wlogout/wlogout.nix
 ```
@@ -270,6 +271,7 @@ Fish включен системно через `programs.fish.enable = true`.
 - network menus
 - package installer
 - Starship
+- Telegram Hyprland wrapper
 - Waybar
 - Wlogout
 
@@ -586,6 +588,29 @@ Hyprland does not launch plain `firefox` from `SUPER+B`; it launches:
 
 Цена решения: Hyprland Firefox profile отдельный. Cookies, extensions и login
 state не общие с обычным KDE Firefox profile.
+
+## Telegram
+
+Файл: `home/ilya/telegram/telegram.nix`.
+
+Telegram установлен как обычный `telegram-desktop`, но пользовательский desktop
+entry `org.telegram.desktop.desktop` переопределен через Home Manager. Он
+запускает wrapper:
+
+```text
+/home/ilya/.local/bin/telegram-hyprland
+```
+
+Wrapper проверяет `XDG_CURRENT_DESKTOP` / `XDG_SESSION_DESKTOP`. В Hyprland он
+экспортирует:
+
+```text
+QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+```
+
+и затем запускает `Telegram`. Это нужно, чтобы убрать window decoration/buttons
+у Telegram в Hyprland. В KDE Plasma переменная не выставляется, поэтому fallback
+сессия сохраняет обычное поведение Telegram.
 
 ## Waybar
 
