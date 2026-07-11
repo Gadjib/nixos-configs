@@ -1,0 +1,64 @@
+* {
+  bg: #24273acc;
+  surface: #363a4fd9;
+  text: #cad3f5;
+  muted: #a5adcb;
+  accent: #8aadf4;
+  urgent: #ed8796;
+}
+
+window {
+  width: 42%;
+  border: 2px;
+  border-color: @accent;
+  border-radius: 8px;
+  background-color: @bg;
+}
+
+mainbox {
+  padding: 14px;
+  spacing: 10px;
+}
+
+inputbar {
+  padding: 10px;
+  border-radius: 6px;
+  background-color: @surface;
+  text-color: @text;
+}
+
+prompt {
+  text-color: @accent;
+  margin: 0 8px 0 0;
+}
+
+entry {
+  text-color: @text;
+}
+
+listview {
+  lines: 10;
+  columns: 1;
+  spacing: 4px;
+  fixed-height: true;
+}
+
+element {
+  padding: 8px;
+  border-radius: 6px;
+  text-color: @muted;
+}
+
+element selected {
+  background-color: @accent;
+  text-color: @bg;
+}
+
+element-icon {
+  size: 24px;
+  margin: 0 10px 0 0;
+}
+
+element-text {
+  vertical-align: 0.5;
+}
