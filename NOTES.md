@@ -612,6 +612,17 @@ QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 у Telegram в Hyprland. В KDE Plasma переменная не выставляется, поэтому fallback
 сессия сохраняет обычное поведение Telegram.
 
+Так как Telegram не всегда уважает эту Qt-переменную для собственных окон, в
+`home/ilya/hypr/hyprland.nix` дополнительно есть Hyprland rules:
+
+```text
+match:class ^(TelegramDesktop)$, decorate off
+match:class ^(org.telegram.desktop)$, decorate off
+```
+
+Именно эти правила отключают compositor-side window decorations/buttons у
+Telegram в Hyprland. KDE Plasma fallback они не затрагивают.
+
 ## Waybar
 
 Файл: `home/ilya/waybar/waybar.nix`.
