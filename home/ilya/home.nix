@@ -130,6 +130,8 @@ in
     catppuccinGtk
     catppuccinKde
     catppuccinKvantum
+    kdePackages.plasma-integration
+    kdePackages.qqc2-desktop-style
     kdePackages.qtstyleplugin-kvantum
     libsForQt5.qtstyleplugin-kvantum
 
@@ -169,8 +171,8 @@ in
     XCURSOR_SIZE = "30";
     GTK_THEME = "catppuccin-macchiato-blue-standard";
     ADW_DEBUG_COLOR_SCHEME = "prefer-dark";
-    QT_QPA_PLATFORMTHEME = "qt6ct";
-    QT_STYLE_OVERRIDE = "kvantum";
+    QT_QPA_PLATFORMTHEME = "kde";
+    QT_QUICK_CONTROLS_STYLE = "org.kde.desktop";
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_DESKTOP = "Hyprland";
     SSH_AUTH_SOCK = "/home/ilya/.bitwarden-ssh-agent.sock";

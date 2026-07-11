@@ -280,7 +280,8 @@ Home Manager также задает session variables:
 - `BROWSER = "firefox"`
 - cursor theme/size
 - GTK dark preference
-- Qt platform theme `qt6ct`
+- Qt platform theme `kde`
+- Qt Quick Controls style `org.kde.desktop`
 - `XDG_CURRENT_DESKTOP = "Hyprland"`
 - `XDG_SESSION_DESKTOP = "Hyprland"`
 
@@ -295,9 +296,17 @@ Cursor size is `30`, matching the enlarged Hyprland scale.
   с `variant = "macchiato"`, `accents = [ "blue" ]`, `size = "standard"`.
 - dconf: `org/gnome/desktop/interface color-scheme = prefer-dark` и тот же
   GTK theme name.
-- Qt 5/6: `QT_QPA_PLATFORMTHEME=qt6ct`, `QT_STYLE_OVERRIDE=kvantum`.
-  Generated `qt5ct.conf` / `qt6ct.conf` use `style=kvantum` with local
-  `catppuccin-macchiato.conf` color schemes.
+- Qt/KDE apps in Hyprland use `QT_QPA_PLATFORMTHEME=kde` and
+  `QT_QUICK_CONTROLS_STYLE=org.kde.desktop`. This is intentional: KDE/Kirigami
+  apps such as Plasma System Monitor need KDE platform integration to consume
+  `kdeglobals` and the dark Catppuccin palette reliably. Earlier global
+  `QT_QPA_PLATFORMTHEME=qt6ct` plus `QT_STYLE_OVERRIDE=kvantum` made some
+  KDE/QtQuick surfaces fall back to light colors.
+- `kdePackages.plasma-integration` and `kdePackages.qqc2-desktop-style` are
+  installed explicitly for KDE apps launched outside Plasma.
+- Generated `qt5ct.conf` / `qt6ct.conf` still exist and use `style=kvantum`
+  with local `catppuccin-macchiato.conf` color schemes, but they are no longer
+  the global platform theme for the Hyprland session.
 - Kvantum is installed for both Qt 5 and Qt 6 via `libsForQt5.qtstyleplugin-kvantum`
   and `kdePackages.qtstyleplugin-kvantum`. The active Kvantum theme is
   `catppuccin-macchiato-blue` from `catppuccin-kvantum`.
