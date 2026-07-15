@@ -648,7 +648,8 @@ Layout:
 - power profile indicator is custom: `custom/power-profile` uses
   `/home/ilya/.local/bin/waybar-power-profile`. Click/scroll cycling is ordered
   so the previous/left step from balanced is `power-saver` and balanced is the
-  top/center step. The bar shows icon-only labels.
+  top/center step. The bar shows icon-only labels: `power-saver` uses the
+  10-o'clock gauge icon, `balanced` uses the 12-o'clock gauge icon.
 
 Bar layout is tuned for current Hyprland scale `1.25`:
 
