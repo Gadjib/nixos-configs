@@ -194,7 +194,7 @@ Audio:
 SMB mount:
 
 - `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/mnt/home` using
-  SMB port `5000`.
+  the standard SMB port.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
 - Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
