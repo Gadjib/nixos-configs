@@ -12,5 +12,6 @@
     vscode
     stress-ng
     texliveFull
+    prismlauncher
   ];
 }

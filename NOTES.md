@@ -365,7 +365,7 @@ home/ilya/packages/manual.nix
 ```
 
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
-`vlc`, `vscode`, `stress-ng`, `texliveFull`.
+`vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`.
 
 `bitwarden-desktop` установлен через nixpkgs по явному решению пользователя.
 В текущем nixpkgs пакет тянет insecure EOL `electron-39.8.10`, поэтому в
