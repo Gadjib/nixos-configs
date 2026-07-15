@@ -3,7 +3,7 @@
   stdenvNoCC,
   fetchurl,
   unzip,
-  makeWrapper,
+  runtimeShell,
   desktop-file-utils,
   jre,
 }:
@@ -19,7 +19,6 @@ stdenvNoCC.mkDerivation {
 
   nativeBuildInputs = [
     unzip
-    makeWrapper
     desktop-file-utils
   ];
 
@@ -31,8 +30,32 @@ stdenvNoCC.mkDerivation {
     mkdir -p "$out/share/tlauncher" "$out/bin" "$out/share/applications"
     unzip -j "$src" TLauncher.jar -d "$out/share/tlauncher"
 
-    makeWrapper ${jre}/bin/java "$out/bin/tlauncher" \
-      --add-flags "-jar $out/share/tlauncher/TLauncher.jar"
+    cat > "$out/bin/tlauncher" <<EOF
+#!${runtimeShell}
+set -euo pipefail
+
+runtime_dir="\''${XDG_DATA_HOME:-\$HOME/.local/share}/tlauncher"
+runtime_jar="\$runtime_dir/TLauncher.jar"
+store_jar="$out/share/tlauncher/TLauncher.jar"
+bundled_java="\$HOME/.tlauncher/starter/jre_default/jre-21.0.11-linux-x64/bin/java"
+
+mkdir -p "\$runtime_dir"
+if [[ ! -f "\$runtime_jar" ]] || ! cmp -s "\$store_jar" "\$runtime_jar"; then
+  cp -f "\$store_jar" "\$runtime_jar"
+  chmod u+w "\$runtime_jar"
+fi
+
+mkdir -p "\$(dirname "\$bundled_java")"
+if [[ ! -L "\$bundled_java" ]]; then
+  if [[ -e "\$bundled_java" ]]; then
+    mv -f "\$bundled_java" "\$bundled_java.upstream"
+  fi
+  ln -s ${jre}/bin/java "\$bundled_java"
+fi
+
+exec ${jre}/bin/java -Dfile.encoding=UTF-8 -jar "\$runtime_jar" "\$@"
+EOF
+    chmod +x "$out/bin/tlauncher"
 
     cat > "$out/share/applications/tlauncher.desktop" <<'EOF'
 [Desktop Entry]
