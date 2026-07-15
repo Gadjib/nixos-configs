@@ -200,6 +200,8 @@ SMB mount:
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
 - `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
+- Avahi with `nssmdns4` is enabled so `.local` names such as `vault.local`
+  resolve for the CIFS mount.
 
 Закрытие крышки явно отправляет ноут в сон:
 
