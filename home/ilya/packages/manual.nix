@@ -14,6 +14,7 @@
     texliveFull
     prismlauncher
     (callPackage ./tlauncher.nix { })
+    (callPackage ./incy.nix { })
     qbittorrent
     zip
   ];

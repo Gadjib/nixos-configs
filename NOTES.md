@@ -379,7 +379,13 @@ home/ilya/packages/manual.nix
 
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
 `vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
-`qbittorrent`, `zip`.
+`incy`, `qbittorrent`, `zip`.
+
+`incy` не приходит из nixpkgs и установлен локальным derivation
+`home/ilya/packages/incy.nix` из official GitHub release
+`desktop-v3.3.2`. Пакет скачивает `incy-linux-x64-portable.zip`, проверяет
+pinned SHA-256, распаковывает bundled Java desktop application, патчит ELF через
+`autoPatchelfHook`, добавляет wrapper `incy` и `incy.desktop` для launcher-а.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
