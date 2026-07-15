@@ -78,6 +78,7 @@ nixosConfigurations.nixos
 │   ├── desktop.nix
 │   ├── nix.nix
 │   ├── packages.nix
+│   ├── compat.nix
 │   ├── smb.nix
 │   └── users.nix
 └── home/ilya/
@@ -388,13 +389,16 @@ home/ilya/packages/manual.nix
 `tlauncher.desktop`, чтобы приложение появлялось в launcher-е. Wrapper перед
 запуском копирует jar в writable
 `$XDG_DATA_HOME/tlauncher/TLauncher.jar`, потому что стартер пытается обновлять
-свой jar и не может писать в `/nix/store`. Он также подменяет скачанный
-TLauncher-ом generic Linux JRE
-`~/.tlauncher/starter/jre_default/jre-21.0.11-linux-x64/bin/java` на symlink к
-nixpkgs Java: иначе этот JRE падает на NixOS из-за отсутствующего generic
-dynamic linker `/lib64/ld-linux-x86-64.so.2`. Если upstream заменит jar на том
-же URL, сборка намеренно упадет на hash mismatch; тогда нужно отдельно
-проверить новый файл и обновить hash.
+свой jar и не может писать в `/nix/store`.
+
+TLauncher отдельно скачивает generic Linux JRE в
+`~/.tlauncher/starter/jre_default/...`. На чистой NixOS такие бинарники падают
+на stub-ld из-за отсутствующего generic dynamic linker
+`/lib64/ld-linux-x86-64.so.2`, поэтому `modules/nixos/compat.nix` включает
+`programs.nix-ld` с минимальным набором desktop/Java библиотек. Это нужно не
+для Nix-пакетов, а именно для внешних бинарников, которые скачивает сам
+TLauncher. Если upstream заменит jar на том же URL, сборка намеренно упадет на
+hash mismatch; тогда нужно отдельно проверить новый файл и обновить hash.
 
 `bitwarden-desktop` установлен через nixpkgs по явному решению пользователя.
 В текущем nixpkgs пакет тянет insecure EOL `electron-39.8.10`, поэтому в
