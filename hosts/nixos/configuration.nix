@@ -6,6 +6,7 @@
     ../../modules/nixos/nix.nix
     ../../modules/nixos/desktop.nix
     ../../modules/nixos/packages.nix
+    ../../modules/nixos/smb.nix
     ../../modules/nixos/users.nix
   ];
 
