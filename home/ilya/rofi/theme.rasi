@@ -1,8 +1,8 @@
 * {
-  bg: #24273acc;
-  mantle: #1e2030f2;
-  surface: #363a4ff2;
-  surface2: #494d64f2;
+  bg: #24273a;
+  mantle: #1e2030;
+  surface: #363a4f;
+  surface2: #494d64;
   text: #cad3f5;
   muted: #a5adcb;
   accent: #8aadf4;

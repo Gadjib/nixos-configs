@@ -705,7 +705,7 @@ tray applets. Скрипты остаются ручными helper-команд
 Файлы: `home/ilya/rofi/rofi.nix` и `home/ilya/rofi/theme.rasi`.
 
 `SUPER+D` запускает `rofi -show drun`. Тема задается декларативно через Home
-Manager и является полной Catppuccin Macchiato Blue схемой с прозрачным темным
+Manager и является полной Catppuccin Macchiato Blue схемой с непрозрачным темным
 фоном, синим акцентом, Papirus icons и JetBrainsMono Nerd Font.
 
 `wifi-menu`:
@@ -786,8 +786,7 @@ Launcher behavior:
 - Goal: `SUPER+D` should prefer frequently/recently launched apps near the top
   while keeping the implementation inside native Rofi config.
 
-Rofi theme uses visible transparency for the launcher background:
-`bg = #24273acc`, `surface = #363a4fd9`.
+Rofi theme is opaque: `bg = #24273a`, `surface = #363a4f`.
 
 ## Kitty
 
