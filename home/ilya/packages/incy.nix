@@ -60,6 +60,7 @@ stdenv.mkDerivation {
       "$out/share/incy/lib/runtime/lib/jspawnhelper"
     cat >> "$out/share/incy/lib/app/incy.cfg" <<'EOF'
 java-options=-Dsun.java2d.uiScale=1.25
+java-options=-Djdk.lang.Process.launchMechanism=VFORK
 EOF
 
     makeWrapper "$out/share/incy/bin/incy" "$out/bin/incy"

@@ -394,6 +394,13 @@ polkit видел `share/polkit-1/actions/cc.incy.vpn.policy`. В package policy
 патчится с upstream `/usr/lib/incy/incy-helper-linux.sh` на фактический store
 path helper-а, а `incy-helper-linux.sh`, `xray` и `jspawnhelper` получают
 execute bit, потому что portable zip хранит их как обычные `0644` файлы.
+В bundled `incy.cfg` также добавлен
+`-Djdk.lang.Process.launchMechanism=VFORK`, потому что helper spawn через
+`pkexec` может падать с `posix_spawn failed, error: 13` в bundled JDK.
+Home Manager activation удаляет stale
+`~/.local/share/applications/incy.desktop`: приложение создает этот файл само,
+и он может указывать на старый `/nix/store/...-incy-3.3.2`, перекрывая
+актуальный desktop entry из Nix profile в Rofi.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
