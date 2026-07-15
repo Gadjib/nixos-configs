@@ -379,7 +379,7 @@ home/ilya/packages/manual.nix
 
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
 `vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
-`zip`.
+`qbittorrent`, `zip`.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
