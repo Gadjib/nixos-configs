@@ -11,5 +11,6 @@
     vlc
     vscode
     stress-ng
+    texliveFull
   ];
 }
