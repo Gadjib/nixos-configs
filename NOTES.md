@@ -536,6 +536,8 @@ Touchpad:
 - tap-to-click
 - tap-and-drag
 - drag lock
+- disable while typing is off, so the touchpad keeps working while keyboard
+  keys are pressed
 - clickfinger behavior
 - middle button emulation
 - scroll factor `0.9`

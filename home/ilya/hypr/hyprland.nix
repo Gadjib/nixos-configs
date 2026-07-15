@@ -47,6 +47,7 @@ in
           tap-to-click = true;
           tap-and-drag = true;
           drag_lock = 1;
+          disable_while_typing = false;
           clickfinger_behavior = true;
           middle_button_emulation = true;
           scroll_factor = 0.9;
