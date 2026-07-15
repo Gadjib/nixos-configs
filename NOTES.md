@@ -196,9 +196,9 @@ SMB mount:
 - `modules/nixos/smb.nix` mounts `//vault.local/home` at `/mnt/home`.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
-- Current auth mode is `guest`. If the NAS requires credentials, add a
-  credentials file outside git and replace the `guest` option with
-  `credentials=/path/to/file`.
+- Auth uses `/etc/samba/vault-home.credentials`, which must stay outside git.
+  It should contain `username=...`, `password=...`, and optionally
+  `domain=WORKGROUP`.
 - `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
 
 Закрытие крышки явно отправляет ноут в сон:

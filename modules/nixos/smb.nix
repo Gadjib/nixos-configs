@@ -14,7 +14,7 @@
       "x-systemd.idle-timeout=10min"
       "_netdev"
       "nofail"
-      "guest"
+      "credentials=/etc/samba/vault-home.credentials"
       "vers=3.1.1"
       "iocharset=utf8"
       "uid=1000"
