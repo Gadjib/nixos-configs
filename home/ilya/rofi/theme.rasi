@@ -1,14 +1,19 @@
 * {
   bg: #24273acc;
-  surface: #363a4fd9;
+  mantle: #1e2030f2;
+  surface: #363a4ff2;
+  surface2: #494d64f2;
   text: #cad3f5;
   muted: #a5adcb;
   accent: #8aadf4;
-  urgent: #ed8796;
+  lavender: #b7bdf8;
+  red: #ed8796;
+
+  font: "JetBrainsMono Nerd Font 13";
 }
 
 window {
-  width: 42%;
+  width: 44%;
   border: 2px;
   border-color: @accent;
   border-radius: 8px;
@@ -16,49 +21,83 @@ window {
 }
 
 mainbox {
-  padding: 14px;
-  spacing: 10px;
+  padding: 16px;
+  spacing: 12px;
+  background-color: transparent;
 }
 
 inputbar {
-  padding: 10px;
-  border-radius: 6px;
+  children: [ prompt, entry ];
+  padding: 11px 12px;
+  spacing: 10px;
+  border-radius: 7px;
   background-color: @surface;
-  text-color: @text;
 }
 
 prompt {
   text-color: @accent;
-  margin: 0 8px 0 0;
 }
 
 entry {
+  placeholder: "Search";
+  placeholder-color: @muted;
+  text-color: @text;
+}
+
+message {
+  padding: 10px;
+  border-radius: 7px;
+  background-color: @surface;
   text-color: @text;
 }
 
 listview {
   lines: 10;
   columns: 1;
-  spacing: 4px;
+  spacing: 6px;
   fixed-height: true;
+  background-color: transparent;
 }
 
 element {
-  padding: 8px;
-  border-radius: 6px;
+  padding: 9px 10px;
+  spacing: 10px;
+  border-radius: 7px;
+  background-color: transparent;
   text-color: @muted;
 }
 
 element selected {
   background-color: @accent;
-  text-color: @bg;
+  text-color: @mantle;
+}
+
+element urgent {
+  text-color: @red;
 }
 
 element-icon {
   size: 24px;
-  margin: 0 10px 0 0;
+  background-color: transparent;
 }
 
 element-text {
   vertical-align: 0.5;
+  background-color: transparent;
+}
+
+mode-switcher {
+  spacing: 6px;
+}
+
+button {
+  padding: 8px 10px;
+  border-radius: 7px;
+  background-color: @surface;
+  text-color: @muted;
+}
+
+button selected {
+  background-color: @surface2;
+  text-color: @lavender;
 }

@@ -700,6 +700,14 @@ Waybar больше не вызывает эти скрипты: Wi-Fi и Blueto
 tray applets. Скрипты остаются ручными helper-командами на случай, если нужно
 быстро открыть rofi-меню из терминала или вернуть бинды в будущем.
 
+## Rofi
+
+Файлы: `home/ilya/rofi/rofi.nix` и `home/ilya/rofi/theme.rasi`.
+
+`SUPER+D` запускает `rofi -show drun`. Тема задается декларативно через Home
+Manager и является полной Catppuccin Macchiato Blue схемой с прозрачным темным
+фоном, синим акцентом, Papirus icons и JetBrainsMono Nerd Font.
+
 `wifi-menu`:
 
 - использует `nmcli`;
