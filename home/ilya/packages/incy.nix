@@ -54,6 +54,9 @@ stdenv.mkDerivation {
     mkdir -p "$out/share/incy" "$out/bin" "$out/share/applications" "$out/share/icons/hicolor/256x256/apps"
     cp -R . "$out/share/incy/"
     chmod +x "$out/share/incy/bin/incy"
+    cat >> "$out/share/incy/lib/app/incy.cfg" <<'EOF'
+java-options=-Dsun.java2d.uiScale=1.25
+EOF
 
     makeWrapper "$out/share/incy/bin/incy" "$out/bin/incy"
     cp "$out/share/incy/lib/incy.png" "$out/share/icons/hicolor/256x256/apps/incy.png"

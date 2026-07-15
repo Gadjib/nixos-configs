@@ -386,6 +386,9 @@ home/ilya/packages/manual.nix
 `desktop-v3.3.2`. Пакет скачивает `incy-linux-x64-portable.zip`, проверяет
 pinned SHA-256, распаковывает bundled Java desktop application, патчит ELF через
 `autoPatchelfHook`, добавляет wrapper `incy` и `incy.desktop` для launcher-а.
+Для Hyprland scale `1.25` в bundled `incy.cfg` дописывается
+`-Dsun.java2d.uiScale=1.25`, иначе Compose Desktop/Skiko может выглядеть как
+нормального размера окно с низким внутренним разрешением под XWayland.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
