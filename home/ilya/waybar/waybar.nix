@@ -273,9 +273,9 @@
       esac
 
       case "$current" in
-        power-saver) text="󰾅"; tooltip="Power saver"; class="power-saver" ;;
-        performance) text="󰓅"; tooltip="Performance"; class="performance" ;;
-        *) text="󰾆"; tooltip="Balanced"; class="balanced" ;;
+        power-saver) text="󰾅 eco"; tooltip="Current: power-saver. Order: eco -> bal -> perf"; class="power-saver" ;;
+        performance) text="󰓅 perf"; tooltip="Current: performance. Order: eco -> bal -> perf"; class="performance" ;;
+        *) text="󰾆 bal"; tooltip="Current: balanced. Order: eco -> bal -> perf"; class="balanced" ;;
       esac
 
       printf '{"text":"%s","tooltip":"Power profile: %s","class":"%s"}\n' "$text" "$tooltip" "$class"
