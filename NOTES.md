@@ -384,10 +384,10 @@ home/ilya/packages/manual.nix
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
 локальным derivation в `home/ilya/packages/tlauncher.nix`: Nix скачивает
 официальный `https://tlauncher.org/jar`, проверяет pinned SHA-256, достает
-`TLauncher.jar`, делает wrapper `tlauncher` через Java и кладет `.desktop`,
-чтобы приложение появлялось в launcher-е. Если upstream заменит jar на том же
-URL, сборка намеренно упадет на hash mismatch; тогда нужно отдельно проверить
-новый файл и обновить hash.
+`TLauncher.jar`, делает wrapper `tlauncher` через Java и кладет валидированный
+`tlauncher.desktop`, чтобы приложение появлялось в launcher-е. Если upstream
+заменит jar на том же URL, сборка намеренно упадет на hash mismatch; тогда
+нужно отдельно проверить новый файл и обновить hash.
 
 `bitwarden-desktop` установлен через nixpkgs по явному решению пользователя.
 В текущем nixpkgs пакет тянет insecure EOL `electron-39.8.10`, поэтому в
@@ -804,9 +804,13 @@ Launcher behavior:
 - Rofi history is enabled.
 - `max-history-size = 100`.
 - `sort = true`, `sorting-method = "fzf"`, `matching = "fuzzy"`.
-- `drun-use-desktop-cache = true`.
+- `drun-use-desktop-cache = false`.
 - Goal: `SUPER+D` should prefer frequently/recently launched apps near the top
-  while keeping the implementation inside native Rofi config.
+  while keeping the implementation inside native Rofi config. The desktop cache
+  is intentionally disabled because it can keep stale application lists after
+  Home Manager package changes; `home.activation.clearRofiDrunCache` also
+  removes old `~/.cache/rofi-drun-desktop.cache` and `~/.cache/rofi3.druncache`
+  on activation.
 
 Rofi theme is opaque: `bg = #24273a`, `surface = #363a4f`.
 

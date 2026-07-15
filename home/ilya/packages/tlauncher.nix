@@ -4,24 +4,10 @@
   fetchurl,
   unzip,
   makeWrapper,
-  makeDesktopItem,
+  desktop-file-utils,
   jre,
 }:
 
-let
-  desktopItem = makeDesktopItem {
-    name = "tlauncher";
-    desktopName = "TLauncher";
-    genericName = "Minecraft launcher";
-    comment = "TLauncher Minecraft launcher";
-    exec = "tlauncher";
-    icon = "applications-games";
-    categories = [
-      "Game"
-    ];
-    startupWMClass = "TLauncher";
-  };
-in
 stdenvNoCC.mkDerivation {
   pname = "tlauncher";
   version = "2026-01-06";
@@ -34,6 +20,7 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [
     unzip
     makeWrapper
+    desktop-file-utils
   ];
 
   dontUnpack = true;
@@ -47,7 +34,23 @@ stdenvNoCC.mkDerivation {
     makeWrapper ${jre}/bin/java "$out/bin/tlauncher" \
       --add-flags "-jar $out/share/tlauncher/TLauncher.jar"
 
-    cp ${desktopItem}/share/applications/*.desktop "$out/share/applications/"
+    cat > "$out/share/applications/tlauncher.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=TLauncher
+GenericName=Minecraft launcher
+Comment=TLauncher Minecraft launcher
+Exec=tlauncher
+Icon=applications-games
+Terminal=false
+StartupNotify=true
+StartupWMClass=TLauncher
+Categories=Game;
+Keywords=Minecraft;Launcher;Game;
+EOF
+
+    desktop-file-validate "$out/share/applications/tlauncher.desktop"
 
     runHook postInstall
   '';

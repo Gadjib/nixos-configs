@@ -14,7 +14,7 @@
       sort = true;
       sorting-method = "fzf";
       matching = "fuzzy";
-      drun-use-desktop-cache = true;
+      drun-use-desktop-cache = false;
       drun-display-format = "{name}";
       display-drun = "Apps";
       display-run = "Run";

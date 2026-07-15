@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   catppuccinGtk = pkgs.catppuccin-gtk.override {
@@ -211,6 +211,12 @@ in
     defaultApplications = defaultApplications;
     associations.added = defaultApplications;
   };
+
+  home.activation.clearRofiDrunCache = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f \
+      "$HOME/.cache/rofi-drun-desktop.cache" \
+      "$HOME/.cache/rofi3.druncache"
+  '';
 
   xdg.configFile = {
     "gtk-4.0/gtk.css".source =
