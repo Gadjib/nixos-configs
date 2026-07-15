@@ -14,7 +14,7 @@
         "power-profiles-daemon"
         "cpu"
         "memory"
-        "temperature"
+        "custom/cpu-temp"
         "tray"
         "pulseaudio"
         "battery"
@@ -53,9 +53,9 @@
         tooltip-format = "Memory: {used:0.1f}G used / {total:0.1f}G total";
         interval = 2;
       };
-      temperature = {
-        format = " {temperatureC}°C";
-        critical-threshold = 85;
+      "custom/cpu-temp" = {
+        exec = "/home/ilya/.local/bin/waybar-cpu-temp";
+        return-type = "json";
         tooltip = true;
         interval = 3;
       };
@@ -113,7 +113,7 @@
       #language,
       #cpu,
       #memory,
-      #temperature,
+      #custom-cpu-temp,
       #pulseaudio,
       #battery,
       #custom-power,
@@ -189,11 +189,11 @@
         color: #c6a0f6;
       }
 
-      #temperature {
+      #custom-cpu-temp {
         color: #eed49f;
       }
 
-      #temperature.critical {
+      #custom-cpu-temp.critical {
         color: #24273a;
         background: #ed8796;
       }
@@ -201,6 +201,45 @@
       #battery {
         color: #eed49f;
       }
+    '';
+  };
+
+  home.file.".local/bin/waybar-cpu-temp" = {
+    executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      read_temp() {
+        local name file
+        for name in /sys/class/hwmon/hwmon*/name; do
+          [[ -r "$name" ]] || continue
+          case "$(cat "$name")" in
+            coretemp)
+              file="''${name%/name}/temp1_input"
+              [[ -r "$file" ]] && cat "$file" && return 0
+              ;;
+            thinkpad)
+              for file in "''${name%/name}"/temp*_label; do
+                [[ -r "$file" ]] || continue
+                if [[ "$(cat "$file")" == "CPU" ]]; then
+                  cat "''${file%_label}_input" && return 0
+                fi
+              done
+              ;;
+          esac
+        done
+        for file in /sys/class/thermal/thermal_zone*/temp; do
+          [[ -r "$file" ]] && cat "$file" && return 0
+        done
+        return 1
+      }
+
+      temp_milli="$(read_temp || echo 0)"
+      temp_c=$((temp_milli / 1000))
+      class=""
+      [[ "$temp_c" -ge 85 ]] && class="critical"
+      printf '{"text":" %s°C","tooltip":"CPU temperature: %s°C","class":"%s"}\n' "$temp_c" "$temp_c" "$class"
     '';
   };
 }

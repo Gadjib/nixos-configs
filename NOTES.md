@@ -115,6 +115,10 @@ nixosConfigurations.nixos
 Home Manager встроен как NixOS module. Основной workflow - `nh os switch`, а не
 отдельный `home-manager switch`.
 
+`home-manager.backupFileExtension = "hm-backup-v2"` задан в `flake.nix`.
+Это нужно, потому что в `$HOME` уже есть старые `.hm-backup` файлы, и Home
+Manager отказывается активироваться, если новый backup clobber-ит старый.
+
 Корневой `configuration.nix` - thin wrapper для совместимости:
 
 ```nix

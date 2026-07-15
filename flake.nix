@@ -25,7 +25,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup";
+            home-manager.backupFileExtension = "hm-backup-v2";
             home-manager.users.ilya = import ./home/ilya/home.nix;
           }
         ];

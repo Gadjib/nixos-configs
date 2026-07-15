@@ -10,5 +10,6 @@
     glow
     vlc
     vscode
+    stress-ng
   ];
 }
