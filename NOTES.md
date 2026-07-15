@@ -196,7 +196,7 @@ SMB mount:
 - `modules/nixos/smb.nix` mounts `//vault.local/home` at `/mnt/home`.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
-- Auth uses `/etc/samba/vault-home.credentials`, which must stay outside git.
+- Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
 - `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
