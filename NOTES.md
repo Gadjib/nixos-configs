@@ -193,15 +193,14 @@ Audio:
 
 SMB mount:
 
-- `modules/nixos/smb.nix` mounts `//vault.local/home` at `/mnt/home`.
+- `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/mnt/home` using
+  SMB port `5000`.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
 - Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
 - `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
-- Avahi with `nssmdns4` is enabled so `.local` names such as `vault.local`
-  resolve for the CIFS mount.
 
 Закрытие крышки явно отправляет ноут в сон:
 
