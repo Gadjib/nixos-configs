@@ -645,6 +645,9 @@ Layout:
   - volume
   - battery
 - custom power button
+- power profile indicator is custom: `custom/power-profile` uses
+  `/home/ilya/.local/bin/waybar-power-profile` with fixed order
+  `power-saver -> balanced -> performance` for click/scroll cycling.
 
 Bar layout is tuned for current Hyprland scale `1.25`:
 

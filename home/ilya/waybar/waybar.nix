@@ -11,7 +11,7 @@
       modules-center = [ "clock" ];
       modules-right = [
         "hyprland/language"
-        "power-profiles-daemon"
+        "custom/power-profile"
         "cpu"
         "memory"
         "custom/cpu-temp"
@@ -81,15 +81,14 @@
         format-plugged = "󰚥 {capacity}%";
         format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
       };
-      power-profiles-daemon = {
-        format = "{icon}";
-        tooltip-format = "Power profile: {profile}";
-        format-icons = {
-          default = "󰾆";
-          performance = "󰓅";
-          balanced = "󰾆";
-          power-saver = "󰾅";
-        };
+      "custom/power-profile" = {
+        exec = "/home/ilya/.local/bin/waybar-power-profile";
+        return-type = "json";
+        interval = 5;
+        tooltip = true;
+        on-click = "/home/ilya/.local/bin/waybar-power-profile next";
+        on-scroll-up = "/home/ilya/.local/bin/waybar-power-profile next";
+        on-scroll-down = "/home/ilya/.local/bin/waybar-power-profile prev";
       };
     };
     style = ''
@@ -117,7 +116,7 @@
       #pulseaudio,
       #battery,
       #custom-power,
-      #power-profiles-daemon {
+      #custom-power-profile {
         padding: 0 10px;
         margin: 4px 0;
         background: rgba(54, 58, 79, 0.86);
@@ -240,6 +239,46 @@
       class=""
       [[ "$temp_c" -ge 85 ]] && class="critical"
       printf '{"text":" %s°C","tooltip":"CPU temperature: %s°C","class":"%s"}\n' "$temp_c" "$temp_c" "$class"
+    '';
+  };
+
+  home.file.".local/bin/waybar-power-profile" = {
+    executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      profiles=(power-saver balanced performance)
+
+      current="$(powerprofilesctl get 2>/dev/null || echo balanced)"
+
+      set_profile() {
+        powerprofilesctl set "$1" >/dev/null 2>&1 || true
+      }
+
+      case "''${1:-}" in
+        next|prev)
+          index=1
+          for i in "''${!profiles[@]}"; do
+            [[ "''${profiles[$i]}" == "$current" ]] && index="$i"
+          done
+          if [[ "''${1:-}" == "next" ]]; then
+            index=$(((index + 1) % ''${#profiles[@]}))
+          else
+            index=$(((index + ''${#profiles[@]} - 1) % ''${#profiles[@]}))
+          fi
+          set_profile "''${profiles[$index]}"
+          exit 0
+          ;;
+      esac
+
+      case "$current" in
+        power-saver) text="󰾅"; tooltip="Power saver"; class="power-saver" ;;
+        performance) text="󰓅"; tooltip="Performance"; class="performance" ;;
+        *) text="󰾆"; tooltip="Balanced"; class="balanced" ;;
+      esac
+
+      printf '{"text":"%s","tooltip":"Power profile: %s","class":"%s"}\n' "$text" "$tooltip" "$class"
     '';
   };
 }
