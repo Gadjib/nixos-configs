@@ -377,7 +377,17 @@ home/ilya/packages/manual.nix
 ```
 
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
-`vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`.
+`vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
+`zip`.
+
+`tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
+`atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
+локальным derivation в `home/ilya/packages/tlauncher.nix`: Nix скачивает
+официальный `https://tlauncher.org/jar`, проверяет pinned SHA-256, достает
+`TLauncher.jar`, делает wrapper `tlauncher` через Java и кладет `.desktop`,
+чтобы приложение появлялось в launcher-е. Если upstream заменит jar на том же
+URL, сборка намеренно упадет на hash mismatch; тогда нужно отдельно проверить
+новый файл и обновить hash.
 
 `bitwarden-desktop` установлен через nixpkgs по явному решению пользователя.
 В текущем nixpkgs пакет тянет insecure EOL `electron-39.8.10`, поэтому в

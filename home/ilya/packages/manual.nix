@@ -13,5 +13,7 @@
     stress-ng
     texliveFull
     prismlauncher
+    (callPackage ./tlauncher.nix { })
+    zip
   ];
 }
