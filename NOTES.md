@@ -389,6 +389,11 @@ pinned SHA-256, распаковывает bundled Java desktop application, п�
 Для Hyprland scale `1.25` в bundled `incy.cfg` дописывается
 `-Dsun.java2d.uiScale=1.25`, иначе Compose Desktop/Skiko может выглядеть как
 нормального размера окно с низким внутренним разрешением под XWayland.
+`modules/nixos/incy.nix` также добавляет тот же package в system profile, чтобы
+polkit видел `share/polkit-1/actions/cc.incy.vpn.policy`. В package policy
+патчится с upstream `/usr/lib/incy/incy-helper-linux.sh` на фактический store
+path helper-а, а `incy-helper-linux.sh`, `xray` и `jspawnhelper` получают
+execute bit, потому что portable zip хранит их как обычные `0644` файлы.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
