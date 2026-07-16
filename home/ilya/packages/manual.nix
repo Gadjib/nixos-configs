@@ -17,6 +17,6 @@
     (callPackage ./incy.nix { })
     qbittorrent
     zip
-    spotify
+    (callPackage ./spotify.nix { })
   ];
 }

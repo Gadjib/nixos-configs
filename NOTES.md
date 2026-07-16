@@ -388,6 +388,14 @@ home/ilya/packages/manual.nix
 `vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
 `incy`, `qbittorrent`, `zip`, `spotify`.
 
+`spotify` в этом списке - не прямой `pkgs.spotify`, а локальный wrapper
+`home/ilya/packages/spotify.nix`. Он оставляет upstream пакет из nixpkgs, но
+подменяет `bin/spotify` и desktop entry так, чтобы Spotify запускался с
+`NIXOS_OZONE_WL=1`, `--ozone-platform=wayland` и
+`--force-device-scale-factor=1.25`. Это нужно под текущий Hyprland scale `1.25`:
+иначе Spotify может стартовать через XWayland и выглядеть как окно нормального
+размера, отрисованное в низком внутреннем разрешении.
+
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
 `Happ-proxy/happ-desktop` версии `3.1.0`. Пакет использует upstream asset
@@ -587,6 +595,11 @@ chosen step is the more conventional `1.25`. Avoid also adding `QT_SCALE_FACTOR`
 because that can double-scale parts of the UI and make layouts drift. KDE may
 still have its own scaling behavior because it is preserved as a separate
 fallback session.
+
+For specific applications that are blurry or pixelated under this compositor
+scale, prefer a per-application wrapper over global scale environment variables.
+Current example: `home/ilya/packages/spotify.nix` forces Spotify to use native
+Wayland/Ozone and the matching `1.25` device scale factor.
 
 Keyboard:
 
