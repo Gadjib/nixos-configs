@@ -58,7 +58,13 @@ stdenv.mkDerivation {
     cp -R opt/happ "$out/share/happ"
 
     makeWrapper "$out/share/happ/bin/Happ" "$out/bin/happ" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ openssl ]}"
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ openssl ]}" \
+      --unset QT_QPA_PLATFORMTHEME \
+      --unset QT_STYLE_OVERRIDE \
+      --unset QT_PLUGIN_PATH \
+      --unset QML2_IMPORT_PATH \
+      --set QT_QUICK_CONTROLS_STYLE Basic \
+      --set QT_IM_MODULE compose
     makeWrapper "$out/share/happ/bin/happd" "$out/bin/happd" \
       --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ openssl ]}"
 

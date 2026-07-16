@@ -394,6 +394,12 @@ libssl/libcrypto` и не может выполнять HTTPS-запросы. Т
 backend грузит эти библиотеки через `dlopen`, wrapper-ы `happ` и `happd`
 добавляют OpenSSL в `LD_LIBRARY_PATH`; `happd.service` запускает именно wrapper,
 а не raw binary из `share/happ/bin`.
+GUI wrapper также изолирует Happ от глобальных Qt-переменных Hyprland-сессии:
+сбрасывает `QT_QPA_PLATFORMTHEME`, `QT_STYLE_OVERRIDE`, `QT_PLUGIN_PATH`,
+`QML2_IMPORT_PATH`, ставит `QT_QUICK_CONTROLS_STYLE=Basic` и
+`QT_IM_MODULE=compose`. Это нужно, потому что Happ поставляется с bundled Qt/QML
+и может падать при вводе текста или ломать QML-стили, если наследует KDE/Qt
+platform theme из пользовательской сессии.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
