@@ -118,6 +118,10 @@ in
         force_default_wallpaper = 0;
       };
 
+      xwayland = {
+        force_zero_scaling = true;
+      };
+
       bind = [
         "$mod, Return, exec, $terminal"
         "$mod, D, exec, $launcher"

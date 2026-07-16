@@ -603,6 +603,18 @@ scale, prefer a per-application wrapper over global scale environment variables.
 Current example: `home/ilya/packages/spotify.nix` forces Spotify to use native
 Wayland/Ozone while keeping Spotify's own device scale factor at `1.10`.
 
+XWayland bitmap scaling is disabled globally:
+
+```nix
+xwayland.force_zero_scaling = true;
+```
+
+This is intentional for the current `1.25` monitor scale. Without it, legacy
+XWayland apps can be rendered at a lower internal resolution and then enlarged
+by Hyprland, which makes text and UI look pixelated. With zero scaling, Hyprland
+does not blur XWayland windows; individual legacy apps may look smaller if they
+do not have their own HiDPI support.
+
 Keyboard:
 
 - layouts: `us,ru`
