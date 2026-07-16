@@ -76,6 +76,7 @@ nixosConfigurations.nixos
 ├── hosts/nixos/configuration.nix
 ├── modules/nixos/
 │   ├── desktop.nix
+│   ├── incy.nix
 │   ├── nix.nix
 │   ├── packages.nix
 │   ├── compat.nix
@@ -390,10 +391,14 @@ pinned SHA-256, распаковывает bundled Java desktop application, п�
 `-Dsun.java2d.uiScale=1.25`, иначе Compose Desktop/Skiko может выглядеть как
 нормального размера окно с низким внутренним разрешением под XWayland.
 `modules/nixos/incy.nix` также добавляет тот же package в system profile, чтобы
-polkit видел `share/polkit-1/actions/cc.incy.vpn.policy`. В package policy
-патчится с upstream `/usr/lib/incy/incy-helper-linux.sh` на фактический store
-path helper-а, а `incy-helper-linux.sh`, `xray` и `jspawnhelper` получают
-execute bit, потому что portable zip хранит их как обычные `0644` файлы.
+polkit видел `share/polkit-1/actions/cc.incy.vpn.policy`. Этот модуль содержит
+узкое polkit-правило для `cc.incy.vpn.run-helper`: активная локальная сессия
+пользователя `ilya` может запускать INCY helper без повторного ввода пароля.
+Правило ограничено одним action id и не является общим passwordless sudo.
+В package policy патчится с upstream `/usr/lib/incy/incy-helper-linux.sh` на
+фактический store path helper-а, а `incy-helper-linux.sh`, `xray` и
+`jspawnhelper` получают execute bit, потому что portable zip хранит их как
+обычные `0644` файлы.
 В bundled `incy.cfg` также добавлен
 `-Djdk.lang.Process.launchMechanism=VFORK`, потому что helper spawn через
 `pkexec` может падать с `posix_spawn failed, error: 13` в bundled JDK.
@@ -402,12 +407,13 @@ Home Manager activation удаляет stale
 и он может указывать на старый `/nix/store/...-incy-3.3.2`, перекрывая
 актуальный desktop entry из Nix profile в Rofi.
 
-Hyprland запускает `hyprpolkitagent` через `exec-once`. Это нужно INCY и другим
-программам, которые вызывают `pkexec`: вместо текстового prompt-а в терминале
-появляется графическое окно авторизации. Пароль в этом окне - пароль локального
-пользователя `ilya`, потому что `ilya` состоит в группе `wheel`. Не возвращать
-KDE polkit agent для Hyprland без причины: KDE Plasma остается fallback-сессией,
-но Hyprland не должен зависеть от KDE agent-а для повседневной авторизации.
+Hyprland запускает `hyprpolkitagent` через `exec-once`. Это нужно программам,
+которые вызывают `pkexec`: вместо текстового prompt-а в терминале появляется
+графическое окно авторизации. INCY при этом отдельно разрешен через
+`modules/nixos/incy.nix`, потому что его helper часто вызывается при включении
+туннеля и не должен зависеть от KDE agent-а. Не возвращать KDE polkit agent для
+Hyprland без причины: KDE Plasma остается fallback-сессией, но Hyprland не
+должен зависеть от KDE agent-а для повседневной авторизации.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
