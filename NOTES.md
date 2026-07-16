@@ -119,9 +119,14 @@ nixosConfigurations.nixos
 Home Manager встроен как NixOS module. Основной workflow - `nh os switch`, а не
 отдельный `home-manager switch`.
 
-`home-manager.backupFileExtension = "hm-backup-v2"` задан в `flake.nix`.
-Это нужно, потому что в `$HOME` уже есть старые `.hm-backup` файлы, и Home
-Manager отказывается активироваться, если новый backup clobber-ит старый.
+`home-manager.backupCommand` задан в `flake.nix` через
+`pkgs.writeShellScript "home-manager-timestamped-backup"`. При конфликте
+управляемого Home Manager файла с уже существующим обычным файлом скрипт
+переносит существующий файл в уникальное имя рядом:
+`<file>.hm-backup.<UTC timestamp>`. Это заменяет старый фиксированный
+`backupFileExtension = "hm-backup-v2"`, который периодически ломал activation:
+Home Manager пытался создать один и тот же backup-файл повторно и падал с
+ошибкой вида `Existing file ... would be clobbered`.
 
 Корневой `configuration.nix` - thin wrapper для совместимости:
 

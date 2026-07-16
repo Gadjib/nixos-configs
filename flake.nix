@@ -22,12 +22,26 @@
         modules = [
           ./hosts/nixos/configuration.nix
           home-manager.nixosModules.home-manager
-          {
+          ({ pkgs, ... }: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup-v2";
+            home-manager.backupCommand = pkgs.writeShellScript "home-manager-timestamped-backup" ''
+              set -euo pipefail
+
+              target="$1"
+              timestamp="$(${pkgs.coreutils}/bin/date -u +%Y%m%dT%H%M%SZ)"
+              backup="$target.hm-backup.$timestamp"
+              counter=0
+
+              while [ -e "$backup" ]; do
+                counter=$((counter + 1))
+                backup="$target.hm-backup.$timestamp.$counter"
+              done
+
+              ${pkgs.coreutils}/bin/mv -- "$target" "$backup"
+            '';
             home-manager.users.ilya = import ./home/ilya/home.nix;
-          }
+          })
         ];
       };
     };
