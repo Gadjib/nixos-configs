@@ -16,7 +16,7 @@ symlinkJoin {
       --set NIXOS_OZONE_WL 1 \
       --add-flags "--enable-features=UseOzonePlatform" \
       --add-flags "--ozone-platform=wayland" \
-      --add-flags "--force-device-scale-factor=1"
+      --add-flags "--force-device-scale-factor=1.10"
 
     if [ -f "$out/share/applications/spotify.desktop" ]; then
       rm -f "$out/share/applications/spotify.desktop"
