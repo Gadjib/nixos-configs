@@ -381,7 +381,7 @@ home/ilya/packages/manual.nix
 
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
 `vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
-`incy`, `qbittorrent`, `zip`.
+`incy`, `qbittorrent`, `zip`, `spotify`.
 
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
