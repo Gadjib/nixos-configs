@@ -13,6 +13,7 @@
   libgpg-error,
   libX11,
   libxcb,
+  openssl,
   qt6,
   zlib,
 }:
@@ -41,6 +42,7 @@ stdenv.mkDerivation {
     libgpg-error
     libX11
     libxcb
+    openssl
     qt6.qtwayland
     stdenv.cc.cc.lib
     zlib
@@ -55,7 +57,10 @@ stdenv.mkDerivation {
     mkdir -p "$out/share" "$out/bin" "$out/share/applications"
     cp -R opt/happ "$out/share/happ"
 
-    makeWrapper "$out/share/happ/bin/Happ" "$out/bin/happ"
+    makeWrapper "$out/share/happ/bin/Happ" "$out/bin/happ" \
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ openssl ]}"
+    makeWrapper "$out/share/happ/bin/happd" "$out/bin/happd" \
+      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ openssl ]}"
 
     install -Dm644 usr/share/icons/hicolor/256x256/apps/happ.png \
       "$out/share/icons/hicolor/256x256/apps/happ.png"

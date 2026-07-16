@@ -16,7 +16,7 @@ in
       Type = "simple";
       User = "root";
       Group = "root";
-      ExecStart = "${happ}/share/happ/bin/happd";
+      ExecStart = "${happ}/bin/happd";
       Restart = "on-failure";
       RestartSec = "5s";
       NoNewPrivileges = false;

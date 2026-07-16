@@ -388,6 +388,12 @@ home/ilya/packages/manual.nix
 `Happ-proxy/happ-desktop` версии `3.1.0`. Пакет использует upstream asset
 `Happ.linux.x64.pkg.tar.zst` с pinned SHA-256, переносит bundled Qt desktop
 application в `/nix/store`, создает wrapper `happ` и desktop entry для launcher-а.
+OpenSSL добавлен в runtime dependencies намеренно: без него bundled Qt TLS
+plugin падает в `cert-only` backend, а `happd` пишет `Failed to load
+libssl/libcrypto` и не может выполнять HTTPS-запросы. Так как Qt OpenSSL
+backend грузит эти библиотеки через `dlopen`, wrapper-ы `happ` и `happd`
+добавляют OpenSSL в `LD_LIBRARY_PATH`; `happd.service` запускает именно wrapper,
+а не raw binary из `share/happ/bin`.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
