@@ -624,13 +624,18 @@ Touchpad:
 
 - natural scroll
 - tap-to-click
-- tap-and-drag
-- drag lock
+- tap-and-drag is off
+- drag lock is off
 - disable while typing is off, so the touchpad keeps working while keyboard
   keys are pressed
 - clickfinger behavior
 - middle button emulation
 - scroll factor `0.9`
+
+`tap-and-drag` and `drag_lock` are intentionally disabled. Keeping both enabled
+made tap gestures feel like a held mouse button that sometimes released late.
+Window moving/resizing should be done with `SUPER` + mouse/touchpad button
+binds, not sticky tap-drag.
 
 Gestures:
 

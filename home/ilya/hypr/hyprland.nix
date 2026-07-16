@@ -46,8 +46,8 @@ in
         touchpad = {
           natural_scroll = true;
           tap-to-click = true;
-          tap-and-drag = true;
-          drag_lock = 1;
+          tap-and-drag = false;
+          drag_lock = false;
           disable_while_typing = false;
           clickfinger_behavior = true;
           middle_button_emulation = true;
