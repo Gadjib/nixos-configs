@@ -76,6 +76,7 @@ nixosConfigurations.nixos
 ├── hosts/nixos/configuration.nix
 ├── modules/nixos/
 │   ├── desktop.nix
+│   ├── happ.nix
 │   ├── incy.nix
 │   ├── nix.nix
 │   ├── packages.nix
@@ -381,6 +382,17 @@ home/ilya/packages/manual.nix
 Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
 `vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
 `incy`, `qbittorrent`, `zip`.
+
+`happ` не приходит из nixpkgs и установлен локальным derivation
+`home/ilya/packages/happ.nix` из official GitHub release
+`Happ-proxy/happ-desktop` версии `3.1.0`. Пакет использует upstream asset
+`Happ.linux.x64.pkg.tar.zst` с pinned SHA-256, переносит bundled Qt desktop
+application в `/nix/store`, создает wrapper `happ` и desktop entry для launcher-а.
+`modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
+запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
+Это заменяет community installer-логику с `/opt/happ` и
+`/etc/systemd/system/happd.service`, но не запускает чужой install script и не
+пишет в `/opt` вручную.
 
 `incy` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/incy.nix` из official GitHub release
