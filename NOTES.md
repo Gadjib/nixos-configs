@@ -402,11 +402,12 @@ Home Manager activation удаляет stale
 и он может указывать на старый `/nix/store/...-incy-3.3.2`, перекрывая
 актуальный desktop entry из Nix profile в Rofi.
 
-Hyprland запускает KDE polkit agent
-`polkit-kde-authentication-agent-1` через `exec-once`. Это нужно INCY и другим
+Hyprland запускает `hyprpolkitagent` через `exec-once`. Это нужно INCY и другим
 программам, которые вызывают `pkexec`: вместо текстового prompt-а в терминале
 появляется графическое окно авторизации. Пароль в этом окне - пароль локального
-пользователя `ilya`, потому что `ilya` состоит в группе `wheel`.
+пользователя `ilya`, потому что `ilya` состоит в группе `wheel`. Не возвращать
+KDE polkit agent для Hyprland без причины: KDE Plasma остается fallback-сессией,
+но Hyprland не должен зависеть от KDE agent-а для повседневной авторизации.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен

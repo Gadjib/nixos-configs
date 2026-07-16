@@ -132,10 +132,10 @@ in
     catppuccinKde
     catppuccinKvantum
     kdePackages.plasma-integration
-    kdePackages.polkit-kde-agent-1
     kdePackages.qqc2-desktop-style
     kdePackages.qtstyleplugin-kvantum
     libsForQt5.qtstyleplugin-kvantum
+    hyprpolkitagent
 
     starship
     zoxide
