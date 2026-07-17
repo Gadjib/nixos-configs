@@ -40,11 +40,40 @@ let
         | ${pkgs.coreutils}/bin/sort -u
     }
 
+    existing_bypass_targets() {
+      ${pkgs.iproute2}/bin/ip -4 route show table 2022 2>/dev/null \
+        | ${pkgs.gawk}/bin/awk '
+          $1 ~ /^[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+(\/32)?$/ {
+            target = $1
+            sub(/\/32$/, "", target)
+            print target
+          }
+        '
+    }
+
+    all_bypass_targets() {
+      {
+        route_targets
+        existing_bypass_targets
+      } | ${pkgs.coreutils}/bin/sort -u
+    }
+
+    route_matches_uplink() {
+      target="$1"
+      current="$(${pkgs.iproute2}/bin/ip -4 route show table 2022 \
+        | ${pkgs.gawk}/bin/awk -v target="$target" '$1 == target || $1 == target "/32" { print; exit }')"
+
+      case "$current" in
+        *"via $gateway dev $device src $source"*) return 0 ;;
+        *) return 1 ;;
+      esac
+    }
+
     while true; do
       read -r gateway device source < <(default_route)
 
       if [ -n "''${gateway:-}" ] && [ -n "''${device:-}" ] && [ -n "''${source:-}" ]; then
-        route_targets | while read -r target; do
+        all_bypass_targets | while read -r target; do
           [ -n "$target" ] || continue
 
           case "$target" in
@@ -52,6 +81,10 @@ let
               continue
               ;;
           esac
+
+          if route_matches_uplink "$target"; then
+            continue
+          fi
 
           if ${pkgs.iproute2}/bin/ip route replace "$target/32" via "$gateway" dev "$device" src "$source" table 2022; then
             log "routed $target/32 via $gateway dev $device src $source in table 2022"
