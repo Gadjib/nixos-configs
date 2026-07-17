@@ -6,7 +6,7 @@ let
     set -uo pipefail
 
     log() {
-      ${pkgs.systemd}/bin/systemd-cat -t happ-xray-tun-bypass -- "$@"
+      printf '%s\n' "$*"
     }
 
     default_route() {
@@ -16,9 +16,10 @@ let
             for (i = 1; i <= NF; i++) {
               if ($i == "via") gateway = $(i + 1)
               if ($i == "dev") device = $(i + 1)
+              if ($i == "src") source = $(i + 1)
             }
-            if (gateway != "" && device != "") {
-              print gateway, device
+            if (gateway != "" && device != "" && source != "") {
+              print gateway, device, source
               exit
             }
           }
@@ -40,9 +41,9 @@ let
     }
 
     while true; do
-      read -r gateway device < <(default_route)
+      read -r gateway device source < <(default_route)
 
-      if [ -n "''${gateway:-}" ] && [ -n "''${device:-}" ]; then
+      if [ -n "''${gateway:-}" ] && [ -n "''${device:-}" ] && [ -n "''${source:-}" ]; then
         route_targets | while read -r target; do
           [ -n "$target" ] || continue
 
@@ -52,8 +53,8 @@ let
               ;;
           esac
 
-          if ${pkgs.iproute2}/bin/ip route replace "$target/32" via "$gateway" dev "$device" table 2022; then
-            log "routed $target/32 via $gateway dev $device in table 2022"
+          if ${pkgs.iproute2}/bin/ip route replace "$target/32" via "$gateway" dev "$device" src "$source" table 2022; then
+            log "routed $target/32 via $gateway dev $device src $source in table 2022"
           fi
         done
       fi

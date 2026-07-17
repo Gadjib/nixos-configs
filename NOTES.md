@@ -479,9 +479,12 @@ Home Manager дополнительно ставит user `PathChanged` unit д�
 соединение делает не sing-box direct outbound, а отдельный `xray`. Поэтому
 root-service следит за сокетами `xray`/`Happ`, которые уже оказались в TUN, и
 добавляет `/32` routes для удаленных публичных IP в routing table `2022` через
-текущий default gateway и физический interface. Это намеренно динамический
-workaround: endpoints приходят из подписки и могут меняться, а таблицу `2022`
-создает сам sing-box.
+текущий default gateway и физический interface. Эти routes обязательно пишутся
+с preferred `src` из обычного default route, например `src 192.168.12.74`;
+иначе `xray` может выйти через Wi-Fi с source `172.18.0.1`, и такие пакеты
+будут потеряны за пределами TUN. Это намеренно динамический workaround:
+endpoints приходят из подписки и могут меняться, а таблицу `2022` создает сам
+sing-box.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
