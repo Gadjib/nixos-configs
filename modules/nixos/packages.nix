@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable, ... }:
 
 {
   programs.firefox.enable = true;
@@ -53,6 +53,6 @@
     go
     rustup
 
-    codex
+    pkgsUnstable.codex
   ];
 }

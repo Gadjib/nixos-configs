@@ -26,9 +26,13 @@ let
     "application/vnd.oasis.opendocument.presentation" = [ "org.kde.okular.desktop" ];
     "application/vnd.oasis.opendocument.spreadsheet" = [ "org.kde.okular.desktop" ];
     "application/vnd.oasis.opendocument.text" = [ "org.kde.okular.desktop" ];
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation" = [ "org.kde.okular.desktop" ];
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation" = [
+      "org.kde.okular.desktop"
+    ];
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "org.kde.okular.desktop" ];
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = [ "org.kde.okular.desktop" ];
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = [
+      "org.kde.okular.desktop"
+    ];
     "application/x-7z-compressed" = [ "org.kde.ark.desktop" ];
     "application/x-bzip2" = [ "org.kde.ark.desktop" ];
     "application/x-compressed-tar" = [ "org.kde.ark.desktop" ];
@@ -97,7 +101,6 @@ in
     ./nvim/nvim.nix
     ./packages/manual.nix
     ./rofi/rofi.nix
-    ./scripts/happ.nix
     ./scripts/network-menus.nix
     ./scripts/package-installer.nix
     ./starship/starship.nix

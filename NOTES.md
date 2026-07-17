@@ -37,6 +37,7 @@ Push в remote не делать после каждого commit. Нормал�
 - NixOS state version: `26.05`
 - Home Manager state version: `26.05`
 - Flake input Nixpkgs: `github:NixOS/nixpkgs/nixos-26.05`
+- Flake input Nixpkgs unstable: `github:NixOS/nixpkgs/nixos-unstable`
 - Flake input Home Manager: `github:nix-community/home-manager/release-26.05`
 - Основной рабочий desktop: Hyprland
 - Fallback desktop: KDE Plasma через SDDM
@@ -298,7 +299,8 @@ broken IPv6 attempts.
 Системные пакеты: Firefox, Kitty, Dolphin, Kate, Thunar, `nwg-look`, `qt5ct`,
 `qt6ct`, Papirus, Bibata, pavucontrol, blueman, brightness/audio helpers,
 hardware/network diagnostics including `efibootmgr` and `os-prober`,
-compiler/dev tools, `codex`.
+compiler/dev tools. `codex` берется из отдельного `nixpkgs-unstable` input,
+чтобы обновлять CLI точечно и не переводить всю систему на unstable.
 
 Версионно важные имена:
 
@@ -459,37 +461,15 @@ GUI wrapper также изолирует Happ от глобальных Qt-пе
 `QT_IM_MODULE=compose`. Это нужно, потому что Happ поставляется с bundled Qt/QML
 и может падать при вводе текста или ломать QML-стили, если наследует KDE/Qt
 platform theme из пользовательской сессии.
-Wrapper `happ` перед запуском GUI также вызывает
-`happ-fix-singbox-config`. Этот скрипт берет текущий IPv4 default-route
-interface и прописывает его как `bind_interface` у `direct` outbound в
-`~/.config/Happ/config.json`. Это workaround для TUN-петли sing-box: на этой
-системе `route.auto_detect_interface` и правило `process_name = ["xray",
-"sing-box"]` не всегда удерживают собственный outbound Happ/Xray вне TUN, после
-чего `curl` и GUI-приложения просто висят. Явный `bind_interface` заставляет
-direct outbound идти через физический uplink. Скрипт не привязан к SSID: при
-смене Wi-Fi он заново читает интерфейс из default route.
-Home Manager дополнительно ставит user `PathChanged` unit для этого файла,
-потому что Happ может перегенерировать sing-box config после изменения настроек
-или подписки. В watcher-е намеренно нет `PathExists`: существующий файл мог бы
-запускать oneshot по кругу, пока systemd не упрется в start limit.
-Есть второй, более важный слой обхода TUN-петли:
-`happ-xray-tun-bypass.service`. Happ запускает отдельный процесс `xray`, и
-именно его outbound к VLESS-серверам может попадать в `tun0` с source
-`172.18.0.1`. `bind_interface` у sing-box это не исправляет, потому что
-соединение делает не sing-box direct outbound, а отдельный `xray`. Поэтому
-root-service следит за сокетами `xray`/`Happ`, которые уже оказались в TUN, и
-добавляет `/32` routes для удаленных публичных IP в routing table `2022` через
-текущий default gateway и физический interface. Эти routes обязательно пишутся
-с preferred `src` из обычного default route, например `src 192.168.12.74`;
-иначе `xray` может выйти через Wi-Fi с source `172.18.0.1`, и такие пакеты
-будут потеряны за пределами TUN. Это намеренно динамический workaround:
-endpoints приходят из подписки и могут меняться, а таблицу `2022` создает сам
-sing-box. Сервис также перечитывает уже существующие host routes в table `2022`
-и переписывает их через текущий uplink, если у них нет правильного `src` или они
-остались от прошлой попытки подключения. Это важно после итераций с ручной
-диагностикой: stale routes вроде `85.198.96.161 via ... dev wlp0s20f3` без
-`src` выглядят почти правильно, но все равно могут оставлять `xray` в
-полурабочем состоянии до переподключения Happ.
+Wrapper `happ` не читает и не меняет пользовательский config перед запуском GUI.
+Happ сам управляет своим TUN, DNS и routing state. Раньше в конфигурации были
+самодельные вмешательства:
+wrapper редактировал sing-box JSON, а отдельный root-сервис пытался чинить
+маршрутизацию для процессов Happ/Xray. Ручная проверка показала, что именно эти
+вмешательства ломали обычный интернет после подключения VPN, поэтому они
+удалены. Важное правило для следующих агентов: не возвращать автоматическое
+редактирование пользовательского Happ config и не добавлять собственный
+policy-routing слой, пока штатный Happ работает без него.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
