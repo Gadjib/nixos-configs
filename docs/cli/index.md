@@ -21,7 +21,10 @@
 | git gui | `lazygit` | интерактивный git |
 | curl api | `httpie` | удобные HTTP-запросы |
 
-Отдельно: в fish есть helper `install <pkgname>`, который добавляет пакет в `home/ilya/packages/manual.nix` и запускает `nh os switch`. Это не замена `nix shell` для временных экспериментов.
+Отдельно: в Fish есть helper `nix-install <pkgname>`, который на чистом Git
+worktree добавляет пакет в `home/ilya/packages/manual.nix`, проверяет dry-run,
+создает commit и запускает `nh os switch`. Это не замена `nix shell` для
+временных экспериментов.
 
 ## Топ-20 команд на каждый день
 

@@ -11,7 +11,7 @@ Home Manager декларативно управляет пользовател�
 ## Что держать в Home Manager
 
 - CLI-программы для пользователя: `bat`, `eza`, `fd`, `ripgrep`, `yazi`, `lazygit`.
-- Ручной список пользовательских пакетов в `home/ilya/packages/manual.nix`: сейчас `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`, `vlc`, `vscode`.
+- Ручной список пользовательских пакетов в `home/ilya/packages/manual.nix`; сам файл является источником актуального списка.
 - Настройки fish, kitty, rofi, mako, waybar.
 - Hyprland keybindings и user-level autostart.
 - Темы пользователя, XDG-файлы, dotfiles.
@@ -35,7 +35,7 @@ xdg.configFile."path".text = "...";
 В твоей системе есть:
 
 - `programs.fish` с starship, zoxide, direnv, fzf;
-- fish function `install`, которая вызывает `/home/ilya/.local/bin/nix-install-package` для добавления пакетов в `home/ilya/packages/manual.nix`;
+- Fish-функция `nix-install`, которая вызывает `/home/ilya/.local/bin/nix-install-package` для проверяемого добавления и commit пакетов из `home/ilya/packages/manual.nix`;
 - `programs.delta` и git integration;
 - `programs.direnv.nix-direnv`;
 - `xdg.configFile` для qt5ct/qt6ct/kdeglobals и hyprlock/hypridle.
@@ -49,6 +49,8 @@ xdg.configFile."path".text = "...";
 
 ```bash
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the Home Manager change"
 nh os switch /home/ilya/nixos-config
 ```
 
@@ -63,7 +65,7 @@ home-manager option programs.fish.enable
 
 ## Типичные ошибки
 
-- Конфликт существующего файла в `~/.config`; в flake задан `backupFileExtension = "hm-backup"`.
+- Конфликт существующего файла в `~/.config`; в flake задан timestamped `home-manager.backupCommand`, который переносит конфликтующий файл в уникальный `.hm-backup.<UTC timestamp>`.
 - Пакет добавлен в system packages, хотя нужен только пользователю.
 - Ручная правка generated `~/.config/hypr/hyprland.conf`, которая исчезнет после rebuild.
 

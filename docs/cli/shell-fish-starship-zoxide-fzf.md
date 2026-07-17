@@ -56,23 +56,27 @@ rebuild-test
 rebuild-switch
 ```
 
-## Функция install
+## Функция nix-install
 
-В `home/ilya/fish/fish.nix` определена функция `install`. Если первый аргумент не похож на option, команда:
+В `home/ilya/fish/fish.nix` определена отдельная package-функция:
 
 ```fish
-install glow
+nix-install glow
 ```
 
-вызывает `/home/ilya/.local/bin/nix-install-package glow`. Helper проверяет пакет в текущем flake, добавляет его в `home/ilya/packages/manual.nix`, делает dry-run build и затем запускает `nh os switch /home/ilya/nixos-config`.
+Она вызывает `/home/ilya/.local/bin/nix-install-package glow`. Helper требует
+чистый Git worktree, проверяет пакет в текущем flake, добавляет его в
+`home/ilya/packages/manual.nix`, делает dry-run build, создает commit и затем
+запускает `nh os switch /home/ilya/nixos-config`.
 
-Это не то же самое, что обычный `/run/current-system/sw/bin/install` из coreutils. Для option-like вызовов функция передает управление настоящей команде:
+Обычный `/run/current-system/sw/bin/install` из coreutils не переопределяется:
 
 ```fish
 install -m 755 source target
 ```
 
-Перед использованием package helper проверяйте рабочее дерево:
+Package helper сам проверяет рабочее дерево, но его состояние можно заранее
+посмотреть вручную:
 
 ```bash
 cd /home/ilya/nixos-config

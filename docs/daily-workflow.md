@@ -27,7 +27,10 @@ rebuild-test -> nh os test /home/ilya/nixos-config
 rebuild-switch -> nh os switch /home/ilya/nixos-config
 ```
 
-Также есть fish function `install`: `install <pkgname>` добавляет пакет в `home/ilya/packages/manual.nix`, проверяет его через текущий flake и запускает `nh os switch`. Это удобный helper, но он сразу меняет Nix config и применяет систему, поэтому перед использованием все равно полезно сделать `git status`.
+Также есть Fish-функция `nix-install`: `nix-install <pkgname>` требует чистый
+Git worktree, добавляет пакет в `home/ilya/packages/manual.nix`, выполняет
+dry-run, создает отдельный commit и только затем запускает `nh os switch`.
+Стандартная coreutils-команда `install` не переопределяется.
 
 ## Переход в проект
 
@@ -102,6 +105,8 @@ lazygit
 cd /home/ilya/nixos-config
 git diff
 rebuild-test
+git add -A
+git commit -m "Describe the configuration change"
 rebuild-switch
 ```
 

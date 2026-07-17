@@ -56,11 +56,11 @@ rg "journalctl|systemctl|nmcli" docs
 - Хост: `hosts/nixos/configuration.nix`.
 - Системные модули: `modules/nixos/`.
 - Home Manager: `home/ilya/home.nix`.
-- Ручные пользовательские пакеты через helper `install`: `home/ilya/packages/manual.nix`.
+- Ручные пользовательские пакеты через helper `nix-install`: `home/ilya/packages/manual.nix`.
 - Hyprland: `home/ilya/hypr/hyprland.nix`.
 - Kitty/Rofi/Mako/Waybar/fish: `home/ilya/*/*.nix`.
 
-Системная конфигурация отвечает за boot loader, SDDM, KDE, Hyprland как системную программу, PipeWire, Bluetooth, NetworkManager, шрифты, системные пакеты. Home Manager отвечает за пользовательские программы, shell, Hyprland-настройки, waybar, rofi, mako, kitty, темы и пользовательские XDG-файлы. Отдельный файл `home/ilya/packages/manual.nix` содержит пакеты, добавленные интерактивным helper `install`; сейчас там есть `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`, `vlc`, `vscode`.
+Системная конфигурация отвечает за boot loader, SDDM, KDE, Hyprland как системную программу, PipeWire, Bluetooth, NetworkManager, шрифты и системные пакеты. Home Manager отвечает за пользовательские программы, shell, Hyprland-настройки, waybar, rofi, mako, kitty, темы и пользовательские XDG-файлы. Актуальный список пакетов, добавленных через `nix-install`, находится непосредственно в `home/ilya/packages/manual.nix`.
 
 ## После изменения конфига
 
@@ -75,6 +75,8 @@ git diff
 
 ```bash
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
 ```
 
@@ -142,5 +144,7 @@ bat docs/index.md
 less docs/emergency.md
 nvim docs/nixos/rebuild.md
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
 ```

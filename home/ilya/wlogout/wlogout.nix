@@ -19,12 +19,6 @@
       "keybind" : "s"
     }
     {
-      "label" : "hibernate",
-      "action" : "systemctl hibernate",
-      "text" : "Hibernate",
-      "keybind" : "h"
-    }
-    {
       "label" : "reboot",
       "action" : "systemctl reboot",
       "text" : "Reboot",
@@ -84,10 +78,6 @@
 
     #suspend {
       background-image: image(url("/etc/profiles/per-user/ilya/share/wlogout/icons/suspend.png"));
-    }
-
-    #hibernate {
-      background-image: image(url("/etc/profiles/per-user/ilya/share/wlogout/icons/hibernate.png"));
     }
 
     #reboot {

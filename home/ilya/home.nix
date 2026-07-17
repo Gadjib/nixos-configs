@@ -223,10 +223,6 @@ in
       "$HOME/.cache/rofi3.druncache"
   '';
 
-  home.activation.removeStaleIncyDesktopEntry = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f "$HOME/.local/share/applications/incy.desktop"
-  '';
-
   xdg.configFile = {
     "gtk-4.0/gtk.css".source =
       "${catppuccinGtk}/share/themes/catppuccin-macchiato-blue-standard/gtk-4.0/gtk.css";

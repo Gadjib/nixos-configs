@@ -12,7 +12,9 @@ git status
 git diff
 ```
 
-`git diff` нужен, чтобы понимать, какие изменения попадут в generation. Если сборка упадет, по diff проще найти причину.
+`git diff` нужен, чтобы понимать, какие изменения попадут в generation. Перед
+`switch` актуальное состояние нужно закоммитить, чтобы у каждой примененной
+generation была понятная Git-точка отката.
 
 ## nixos-rebuild
 
@@ -71,6 +73,8 @@ sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos --show-trace
 nvim home/ilya/home.nix
 git diff
 rebuild-test
+git add home/ilya/home.nix NOTES.md
+git commit -m "Add package"
 rebuild-switch
 ```
 
@@ -94,6 +98,7 @@ nh os test /home/ilya/nixos-config
 
 - Запустить rebuild не из того flake.
 - Применить `switch` без проверки `test`.
+- Применить `switch` до commit проверенного состояния.
 - Не заметить, что Home Manager встроен в NixOS rebuild, и запускать отдельный `home-manager switch` без необходимости.
 - Оставить незакоммиченный рабочий config без документации.
 
@@ -112,6 +117,8 @@ nh os test /home/ilya/nixos-config -v
 ```bash
 git diff
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
 sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos
 sudo nixos-rebuild switch --rollback

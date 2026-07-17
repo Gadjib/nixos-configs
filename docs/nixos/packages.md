@@ -18,25 +18,21 @@
 
 Там находятся пользовательские программы: Hyprland-окружение, `starship`, `zoxide`, `fzf`, `bat`, `eza`, `fd`, `ripgrep`, `btop`, `dust`, `duf`, `procs`, `yazi`, `trash-cli`, `jq`, `yq`, `httpie`, `lazygit`, `delta`, `gh`, `direnv`.
 
-Дополнительно `home/ilya/home.nix` импортирует `home/ilya/packages/manual.nix`. Этот файл предназначен для пакетов, добавленных интерактивным helper `install`; сейчас там есть:
-
-```nix
-bitwarden-cli
-discord
-fastfetch
-ffmpeg
-glow
-vlc
-vscode
-```
+Дополнительно `home/ilya/home.nix` импортирует `home/ilya/packages/manual.nix`.
+Этот файл является источником актуального списка пакетов, добавленных
+интерактивным helper-ом `nix-install`.
 
 В fish настроена функция:
 
 ```fish
-install <pkgname>
+nix-install <pkgname> [pkgname...]
 ```
 
-Она не ставит пакет imperatively. Она проверяет пакет в текущем flake, добавляет имя в `home/ilya/packages/manual.nix`, делает dry-run build и запускает `nh os switch /home/ilya/nixos-config`. Если вызвать `install` с option-like аргументами, функция передает выполнение обычному coreutils `install`.
+Она не ставит пакет imperatively. Helper требует чистый Git worktree, проверяет
+все пакеты в текущем flake, добавляет их в `home/ilya/packages/manual.nix`,
+делает dry-run build, создает отдельный commit и только потом запускает
+`nh os switch /home/ilya/nixos-config`. Стандартная coreutils-команда `install`
+остается доступна без Fish-переопределения.
 
 Используйте helper осознанно: он меняет Nix-файл и применяет систему. Перед этим полезно выполнить:
 
@@ -77,6 +73,8 @@ Offline поиск может быть ограничен тем, что уже 
 
 ```bash
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Remove package"
 nh os switch /home/ilya/nixos-config
 ```
 
@@ -101,7 +99,7 @@ rg "package" home modules
 nix shell nixpkgs#pkg
 nix run nixpkgs#pkg
 nix search nixpkgs pkg
-install pkg
+nix-install pkg
 nvim home/ilya/home.nix
 nvim home/ilya/packages/manual.nix
 nvim modules/nixos/packages.nix

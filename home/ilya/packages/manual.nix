@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    # Packages added by the interactive `install <pkgname>` helper.
+    # Packages added by the interactive `nix-install <pkgname>` helper.
     bitwarden-cli
     discord
     fastfetch
@@ -14,7 +14,6 @@
     texliveFull
     prismlauncher
     (callPackage ./tlauncher.nix { })
-    (callPackage ./incy.nix { })
     qbittorrent
     zip
     (callPackage ./spotify.nix { })

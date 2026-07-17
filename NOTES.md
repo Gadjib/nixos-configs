@@ -78,7 +78,6 @@ nixosConfigurations.nixos
 ├── modules/nixos/
 │   ├── desktop.nix
 │   ├── happ.nix
-│   ├── incy.nix
 │   ├── nix.nix
 │   ├── packages.nix
 │   ├── compat.nix
@@ -107,7 +106,7 @@ nixosConfigurations.nixos
 `NOTES.md` остается главным файлом для агентского контекста.
 
 `home/ilya/packages/manual.nix.backup.*` - backup-файлы, созданные helper-ом
-`install`. Они не являются активным конфигом.
+`nix-install`. Они не являются активным конфигом.
 
 ## Entrypoints
 
@@ -424,15 +423,15 @@ image viewer.
 `networkmanagerapplet`, Catppuccin GTK/KDE themes, `direnv`, `nix-direnv`,
 `lazygit`, `delta`, `gh` и прочее.
 
-Ручные пакеты, добавленные командой `install`, лежат отдельно:
+Ручные пакеты, добавленные командой `nix-install`, лежат отдельно:
 
 ```text
 home/ilya/packages/manual.nix
 ```
 
-Текущий список: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`,
-`vlc`, `vscode`, `stress-ng`, `texliveFull`, `prismlauncher`, `tlauncher`,
-`incy`, `qbittorrent`, `zip`, `spotify`.
+Актуальный список намеренно не дублируется в документации: источником истины
+служит сам `home/ilya/packages/manual.nix`. Это позволяет helper-у добавлять
+пакеты без превращения `NOTES.md` в рассинхронизированный второй package list.
 
 `spotify` в этом списке - не прямой `pkgs.spotify`, а локальный wrapper
 `home/ilya/packages/spotify.nix`. Он оставляет upstream пакет из nixpkgs, но
@@ -486,38 +485,11 @@ Happ получает machine id через Qt `machineUniqueId()`, а на NixO
 этого сервер подписки может видеть пустой HWID и возвращать заглушки вроде
 `App not supported or HWID disabled in settings` вместо реальных узлов.
 
-`incy` не приходит из nixpkgs и установлен локальным derivation
-`home/ilya/packages/incy.nix` из official GitHub release
-`desktop-v3.3.2`. Пакет скачивает `incy-linux-x64-portable.zip`, проверяет
-pinned SHA-256, распаковывает bundled Java desktop application, патчит ELF через
-`autoPatchelfHook`, добавляет wrapper `incy` и `incy.desktop` для launcher-а.
-Для Hyprland scale `1.25` в bundled `incy.cfg` дописывается
-`-Dsun.java2d.uiScale=1.25`, иначе Compose Desktop/Skiko может выглядеть как
-нормального размера окно с низким внутренним разрешением под XWayland.
-`modules/nixos/incy.nix` также добавляет тот же package в system profile, чтобы
-polkit видел `share/polkit-1/actions/cc.incy.vpn.policy`. Этот модуль содержит
-узкое polkit-правило для `cc.incy.vpn.run-helper`: активная локальная сессия
-пользователя `ilya` может запускать INCY helper без повторного ввода пароля.
-Правило ограничено одним action id и не является общим passwordless sudo.
-В package policy патчится с upstream `/usr/lib/incy/incy-helper-linux.sh` на
-фактический store path helper-а, а `incy-helper-linux.sh`, `xray` и
-`jspawnhelper` получают execute bit, потому что portable zip хранит их как
-обычные `0644` файлы.
-В bundled `incy.cfg` также добавлен
-`-Djdk.lang.Process.launchMechanism=VFORK`, потому что helper spawn через
-`pkexec` может падать с `posix_spawn failed, error: 13` в bundled JDK.
-Home Manager activation удаляет stale
-`~/.local/share/applications/incy.desktop`: приложение создает этот файл само,
-и он может указывать на старый `/nix/store/...-incy-3.3.2`, перекрывая
-актуальный desktop entry из Nix profile в Rofi.
-
 Hyprland запускает `hyprpolkitagent` через `exec-once`. Это нужно программам,
 которые вызывают `pkexec`: вместо текстового prompt-а в терминале появляется
-графическое окно авторизации. INCY при этом отдельно разрешен через
-`modules/nixos/incy.nix`, потому что его helper часто вызывается при включении
-туннеля и не должен зависеть от KDE agent-а. Не возвращать KDE polkit agent для
-Hyprland без причины: KDE Plasma остается fallback-сессией, но Hyprland не
-должен зависеть от KDE agent-а для повседневной авторизации.
+графическое окно авторизации. Не возвращать KDE polkit agent для Hyprland без
+причины: KDE Plasma остается fallback-сессией, но Hyprland не должен зависеть
+от KDE agent-а для повседневной авторизации.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен
@@ -567,12 +539,12 @@ Bitwarden SSH Agent ожидается по native desktop socket:
 через `programs.neovim`. Дублирование `neovim` уже вызывало buildEnv conflict
 по `bin/nvim`.
 
-## Команда `install`
+## Команда `nix-install`
 
 В Fish есть функция:
 
 ```fish
-install <pkgname> [pkgname...]
+nix-install <pkgname> [pkgname...]
 ```
 
 Она вызывает:
@@ -586,6 +558,7 @@ install <pkgname> [pkgname...]
 Что делает helper:
 
 - принимает один или несколько пакетов;
+- требует полностью чистый Git worktree до начала изменений;
 - отказывается от option-like аргументов и подозрительных символов;
 - проверяет каждый пакет против текущего flake:
   `.#nixosConfigurations.nixos.pkgs.<pkg>.name`;
@@ -595,11 +568,12 @@ install <pkgname> [pkgname...]
 - добавляет все пакеты в `home/ilya/packages/manual.nix`;
 - делает dry-run system build;
 - при падении dry-run откатывает `manual.nix`;
-- после успешного dry-run запускает `nh os switch /home/ilya/nixos-config`.
+- проверяет, что в worktree изменился только `manual.nix`;
+- создает отдельный Git commit с новым package list;
+- только после успешного commit запускает `nh os switch`.
 
-Обычный `install` из coreutils остается доступен для форм с опциями или
-нетипичным количеством аргументов, потому что fish-функция отправляет такие
-вызовы в `command install`.
+Обычный `install` из coreutils больше не переопределяется Fish-функцией и всегда
+остается доступен под своим стандартным именем.
 
 ## Hyprland
 
@@ -952,7 +926,6 @@ Manager и является полной Catppuccin Macchiato Blue схемой 
 - Lock
 - Logout
 - Suspend
-- Hibernate
 - Reboot
 - Shutdown
 
@@ -1042,11 +1015,10 @@ rebuild-switch -> nh os switch /home/ilya/nixos-config
 Function:
 
 ```fish
-install <pkgname> [pkgname...]
+nix-install <pkgname> [pkgname...]
 ```
 
-Для нетипичных вызовов с option-like первым аргументом делает fallback в
-`command install`.
+Стандартная команда coreutils `install` не переопределяется.
 
 ## Starship
 
@@ -1200,8 +1172,8 @@ git diff
 8. Brightness keys работают.
 9. `Print` запускает screenshot через grim/slurp/swappy.
 10. `SUPER+V` открывает clipboard history.
-11. Клик по Wi-Fi в Waybar открывает `wifi-menu`.
-12. Клик по Bluetooth в Waybar открывает `bluetooth-menu`.
+11. Индикатор NetworkManager присутствует в tray.
+12. Индикатор Bluetooth присутствует в tray.
 13. Крайняя правая power button открывает wlogout.
 14. Закрытие крышки после rebuild должно отправлять ноут в suspend.
 15. При sleep сессия должна блокироваться.

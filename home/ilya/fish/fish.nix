@@ -22,12 +22,8 @@
       rebuild-test = "nh os test /home/ilya/nixos-config";
       rebuild-switch = "nh os switch /home/ilya/nixos-config";
     };
-    functions.install = ''
-      if test (count $argv) -ge 1; and not string match -q -- "-*" $argv[1]
-        /home/ilya/.local/bin/nix-install-package $argv
-      else
-        command install $argv
-      end
+    functions.nix-install = ''
+      /home/ilya/.local/bin/nix-install-package $argv
     '';
   };
 }

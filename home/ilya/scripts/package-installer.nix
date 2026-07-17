@@ -6,18 +6,21 @@
       set -euo pipefail
 
       repo="/home/ilya/nixos-config"
-      packages_file="$repo/home/ilya/packages/manual.nix"
+      packages_rel="home/ilya/packages/manual.nix"
+      packages_file="$repo/$packages_rel"
       system_attr="$repo#nixosConfigurations.nixos.config.system.build.toplevel"
 
       usage() {
         cat <<'USAGE'
       Usage:
-        install <pkgname> [pkgname...]
+        nix-install <pkgname> [pkgname...]
 
-      Adds package names to home/ilya/packages/manual.nix and runs nh os switch once.
+      Adds package names to home/ilya/packages/manual.nix, commits the change,
+      and runs nh os switch once.
 
       Safety rules:
         - accepts one or more package names
+        - requires a clean Git worktree before editing
         - refuses options and suspicious characters
         - validates each package against the current flake pkgs set
         - validates all packages before editing the config
@@ -25,11 +28,12 @@
         - creates a timestamped backup before editing
         - runs a dry-run system build before switching
         - rolls the config file back if dry-run fails
+        - commits the package list before switching
       USAGE
       }
 
       die() {
-        printf 'install: %s\n' "$*" >&2
+        printf 'nix-install: %s\n' "$*" >&2
         exit 1
       }
 
@@ -42,6 +46,11 @@
       [[ -f "$packages_file" ]] || die "manual packages file not found: $packages_file"
 
       cd "$repo"
+
+      if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+        git status --short >&2
+        die "repository must be clean before nix-install can modify and switch the system"
+      fi
 
       packages=("$@")
       validated=()
@@ -123,7 +132,28 @@
         die "dry-run failed; restored $packages_file from $backup"
       fi
 
-      printf 'Dry-run passed. Running nh os switch...\n'
+      expected_status=" M $packages_rel"
+      actual_status="$(git status --porcelain --untracked-files=normal)"
+      if [[ "$actual_status" != "$expected_status" ]]; then
+        git status --short >&2
+        die "repository changed unexpectedly; refusing to commit or switch"
+      fi
+
+      package_summary="''${validated[0]}"
+      for pkg in "''${validated[@]:1}"; do
+        package_summary+=", $pkg"
+      done
+      git add -- "$packages_rel"
+      if ! git commit -m "Install packages: $package_summary" -- "$packages_rel"; then
+        die "Git commit failed; refusing to switch"
+      fi
+
+      if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+        git status --short >&2
+        die "repository is no longer clean after commit; refusing to switch"
+      fi
+
+      printf 'Dry-run passed and package change committed. Running nh os switch...\n'
       if ! nh os switch "$repo"; then
         die "nh os switch failed; package remains in config, backup is $backup"
       fi

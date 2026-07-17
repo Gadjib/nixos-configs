@@ -47,6 +47,8 @@ home-manager generations
 cd /home/ilya/nixos-config
 git diff
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
 ```
 

@@ -62,7 +62,7 @@ Hyprland - основная сессия. Системно он включен �
 Home Manager управляет пользовательским окружением:
 
 - `home.packages` содержит CLI и Hyprland tools;
-- `home/ilya/packages/manual.nix` содержит пакеты, добавленные helper `install`: `bitwarden-cli`, `discord`, `fastfetch`, `ffmpeg`, `glow`, `vlc`, `vscode`;
+- `home/ilya/packages/manual.nix` содержит актуальный список пакетов, добавленных helper-ом `nix-install`;
 - `programs.fish` включает fish, starship, zoxide, direnv, fzf и алиасы;
 - `programs.kitty`, `programs.rofi`, `services.mako`, `programs.waybar`;
 - `wayland.windowManager.hyprland`;
@@ -98,7 +98,11 @@ Home Manager управляет пользовательским окружен�
 
 Yazi-конфиг в репозитории не найден, `~/.config/yazi` отсутствует. Значит Yazi сейчас, вероятно, работает на дефолтах. Если добавите `~/.config/yazi/*.toml`, лучше перенести это в Home Manager через `xdg.configFile`.
 
-Fish function `install` в `home/ilya/fish/fish.nix` перехватывает команды вида `install <pkgname>` и вызывает `/home/ilya/.local/bin/nix-install-package`. Это helper для добавления пакетов в `home/ilya/packages/manual.nix`; для обычного coreutils `install` с flags функция передает выполнение настоящей команде `install`.
+Fish-функция `nix-install` в `home/ilya/fish/fish.nix` вызывает
+`/home/ilya/.local/bin/nix-install-package`. Helper работает только на чистом
+Git worktree, добавляет пакеты в `home/ilya/packages/manual.nix`, проверяет
+dry-run, коммитит изменение и лишь затем делает switch. Обычная coreutils-команда
+`install` не переопределяется.
 
 Некоторые программы могут хранить runtime state в `~/.local/share`, `~/.cache`, `~/.config`. Не все такие файлы должны попадать в Nix.
 
@@ -106,7 +110,7 @@ Fish function `install` в `home/ilya/fish/fish.nix` перехватывает 
 
 - Перед изменениями: `git status && git diff`.
 - Менять сначала маленькими шагами.
-- Для NixOS сначала `nh os test /home/ilya/nixos-config`, потом `nh os switch /home/ilya/nixos-config`.
+- Для NixOS сначала `nh os test /home/ilya/nixos-config`, затем commit проверенного состояния и только потом `nh os switch /home/ilya/nixos-config`.
 - Не удалять boot generations, пока новая система не проверена.
 - Не делать агрессивный garbage collection сразу после крупного изменения.
 - Не ставить системные программы через `curl | sh`, если они могут быть в Nix.
@@ -130,5 +134,7 @@ bat hosts/nixos/configuration.nix
 bat home/ilya/home.nix
 bat home/ilya/hypr/hyprland.nix
 nh os test /home/ilya/nixos-config
+git add -A
+git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
 ```
