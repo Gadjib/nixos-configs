@@ -26,6 +26,7 @@
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+  services.resolved.enable = true;
 
   time.timeZone = "Europe/Moscow";
 

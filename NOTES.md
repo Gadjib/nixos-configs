@@ -249,6 +249,29 @@ Bootloader:
 - Do not modify disk partitions for this. The intended fix is only bootloader
   config plus a rebuild/switch.
 
+Networking and DNS:
+
+- `networking.networkmanager.enable = true`
+- `services.resolved.enable = true`
+
+`systemd-resolved` is enabled intentionally. On NixOS, enabling
+`services.resolved` makes `/etc/resolv.conf` point at
+`/run/systemd/resolve/stub-resolv.conf`, disables legacy `resolvconf`, and asks
+NetworkManager to use `systemd-resolved`. This matters for VPN/TUN clients such
+as Happ/sing-box: IP routing through TUN can work while domain resolution fails
+if per-link DNS is not delivered to a resolver that understands systemd link
+DNS settings.
+
+Expected post-switch checks:
+
+```text
+readlink -f /etc/resolv.conf
+resolvectl query google.com
+resolvectl status
+```
+
+`readlink` should resolve to `/run/systemd/resolve/stub-resolv.conf`.
+
 ### `modules/nixos/packages.nix`
 
 Системные пакеты: Firefox, Kitty, Dolphin, Kate, Thunar, `nwg-look`, `qt5ct`,
