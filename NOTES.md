@@ -643,6 +643,10 @@ is lifted. `clickfinger_behavior` gives predictable physical clicks by finger
 count, and `middle_button_emulation` is off because three-finger click/tap
 already provides middle click without accidental LMB+RMB emulation.
 
+Do not normalize all touchpad option names to underscores. In the current
+Hyprland version, `tap-to-click` and `tap-and-drag` must stay hyphenated in the
+generated config; `tap_to_click` and `tap_and_drag` are rejected at runtime.
+
 Gestures:
 
 - 3 fingers horizontal: workspace switching

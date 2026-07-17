@@ -45,9 +45,9 @@ in
         follow_mouse = 1;
         touchpad = {
           natural_scroll = true;
-          tap_to_click = true;
+          "tap-to-click" = true;
           tap_button_map = "lrm";
-          tap_and_drag = true;
+          "tap-and-drag" = true;
           drag_lock = 0;
           drag_3fg = 0;
           disable_while_typing = false;
