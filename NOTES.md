@@ -472,6 +472,16 @@ Home Manager дополнительно ставит user `PathChanged` unit д�
 потому что Happ может перегенерировать sing-box config после изменения настроек
 или подписки. В watcher-е намеренно нет `PathExists`: существующий файл мог бы
 запускать oneshot по кругу, пока systemd не упрется в start limit.
+Есть второй, более важный слой обхода TUN-петли:
+`happ-xray-tun-bypass.service`. Happ запускает отдельный процесс `xray`, и
+именно его outbound к VLESS-серверам может попадать в `tun0` с source
+`172.18.0.1`. `bind_interface` у sing-box это не исправляет, потому что
+соединение делает не sing-box direct outbound, а отдельный `xray`. Поэтому
+root-service следит за сокетами `xray`/`Happ`, которые уже оказались в TUN, и
+добавляет `/32` routes для удаленных публичных IP в routing table `2022` через
+текущий default gateway и физический interface. Это намеренно динамический
+workaround: endpoints приходят из подписки и могут меняться, а таблицу `2022`
+создает сам sing-box.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
