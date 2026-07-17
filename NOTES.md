@@ -252,6 +252,7 @@ Bootloader:
 Networking and DNS:
 
 - `networking.networkmanager.enable = true`
+- `networking.enableIPv6 = false`
 - `services.resolved.enable = true`
 
 `systemd-resolved` is enabled intentionally. On NixOS, enabling
@@ -262,15 +263,27 @@ as Happ/sing-box: IP routing through TUN can work while domain resolution fails
 if per-link DNS is not delivered to a resolver that understands systemd link
 DNS settings.
 
+IPv6 is disabled intentionally for now. The Wi-Fi network advertises IPv6 routes
+and DNS returns AAAA records, but real IPv6 TCP connections stay in `SYN-SENT`
+and time out. GUI applications such as Firefox, Telegram, Discord, and Happ can
+then appear broken even while IPv4 `curl` and `ping` work. Keep IPv6 disabled
+until the upstream network or VPN path has working IPv6; then this can be
+revisited.
+
 Expected post-switch checks:
 
 ```text
 readlink -f /etc/resolv.conf
+curl -4 -I https://google.com
+curl -6 -I --max-time 8 https://google.com
 resolvectl query google.com
 resolvectl status
 ```
 
 `readlink` should resolve to `/run/systemd/resolve/stub-resolv.conf`.
+The IPv6 curl check is expected to fail or return no route while IPv6 is
+disabled; applications should then use IPv4 immediately instead of hanging on
+broken IPv6 attempts.
 
 ### `modules/nixos/packages.nix`
 

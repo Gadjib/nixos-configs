@@ -25,6 +25,7 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos";
+  networking.enableIPv6 = false;
   networking.networkmanager.enable = true;
   services.resolved.enable = true;
 
