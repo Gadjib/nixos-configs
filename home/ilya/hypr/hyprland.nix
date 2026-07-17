@@ -45,25 +45,27 @@ in
         follow_mouse = 1;
         touchpad = {
           natural_scroll = true;
-          tap-to-click = true;
-          tap-and-drag = false;
-          drag_lock = false;
+          tap_to_click = true;
+          tap_button_map = "lrm";
+          tap_and_drag = true;
+          drag_lock = 0;
+          drag_3fg = 0;
           disable_while_typing = false;
           clickfinger_behavior = true;
-          middle_button_emulation = true;
-          scroll_factor = 0.9;
+          middle_button_emulation = false;
+          scroll_factor = 0.85;
         };
         sensitivity = 0;
       };
 
       gestures = {
-        workspace_swipe_distance = 260;
+        workspace_swipe_distance = 300;
         workspace_swipe_invert = true;
-        workspace_swipe_min_speed_to_force = 20;
-        workspace_swipe_cancel_ratio = 0.35;
+        workspace_swipe_min_speed_to_force = 25;
+        workspace_swipe_cancel_ratio = 0.4;
         workspace_swipe_create_new = true;
         workspace_swipe_direction_lock = true;
-        workspace_swipe_direction_lock_threshold = 8;
+        workspace_swipe_direction_lock_threshold = 10;
         workspace_swipe_forever = true;
       };
 

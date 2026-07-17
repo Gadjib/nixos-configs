@@ -624,18 +624,24 @@ Touchpad:
 
 - natural scroll
 - tap-to-click
-- tap-and-drag is off
+- tap button map `lrm`: one-finger tap/click is left, two-finger is right,
+  three-finger is middle
+- tap-and-drag is on
 - drag lock is off
 - disable while typing is off, so the touchpad keeps working while keyboard
   keys are pressed
 - clickfinger behavior
-- middle button emulation
-- scroll factor `0.9`
+- middle button emulation is off
+- scroll factor `0.85`
+- three/four-finger drag mode is off, so it does not conflict with workspace
+  swipe gestures
 
-`tap-and-drag` and `drag_lock` are intentionally disabled. Keeping both enabled
-made tap gestures feel like a held mouse button that sometimes released late.
-Window moving/resizing should be done with `SUPER` + mouse/touchpad button
-binds, not sticky tap-drag.
+The touchpad profile is tuned for everyday laptop use rather than minimalism.
+`tap_and_drag` stays enabled because dragging by tap is useful, but
+`drag_lock = 0` disables sticky drag-lock so the drag ends as soon as the finger
+is lifted. `clickfinger_behavior` gives predictable physical clicks by finger
+count, and `middle_button_emulation` is off because three-finger click/tap
+already provides middle click without accidental LMB+RMB emulation.
 
 Gestures:
 
@@ -647,6 +653,11 @@ Gestures:
 - 3 fingers pinch in: float
 - 4 fingers pinch out: cursor zoom x2
 - 4 fingers pinch in: cursor zoom reset
+
+Workspace swipe gestures are intentionally a little conservative:
+`workspace_swipe_distance = 300`, `workspace_swipe_cancel_ratio = 0.4`, and
+`workspace_swipe_min_speed_to_force = 25`. This keeps the gesture responsive
+while reducing accidental workspace changes from short diagonal movements.
 
 Осторожно: Hyprland gesture syntax быстро меняется. Текущий конфиг ориентирован
 на Hyprland `0.55.4` из lock-файла.
