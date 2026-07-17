@@ -27,6 +27,25 @@
   networking.hostName = "nixos";
   networking.enableIPv6 = false;
   networking.networkmanager.enable = true;
+  networking.networkmanager.dispatcherScripts = [
+    {
+      type = "basic";
+      source = pkgs.writeShellScript "networkmanager-disable-ipv6" ''
+        interface="$1"
+        action="$2"
+
+        case "$action" in
+          up|pre-up|dhcp6-change|connectivity-change)
+            if [ -n "$interface" ] && [ "$interface" != "lo" ]; then
+              ${pkgs.procps}/bin/sysctl -q -w "net.ipv6.conf.$interface.disable_ipv6=1" || true
+              ${pkgs.iproute2}/bin/ip -6 addr flush dev "$interface" scope global || true
+              ${pkgs.iproute2}/bin/ip -6 route flush dev "$interface" || true
+            fi
+            ;;
+        esac
+      '';
+    }
+  ];
   services.resolved.enable = true;
 
   time.timeZone = "Europe/Moscow";

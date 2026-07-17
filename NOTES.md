@@ -269,6 +269,14 @@ and time out. GUI applications such as Firefox, Telegram, Discord, and Happ can
 then appear broken even while IPv4 `curl` and `ping` work. Keep IPv6 disabled
 until the upstream network or VPN path has working IPv6; then this can be
 revisited.
+`networking.enableIPv6 = false` sets global/default sysctls, but NetworkManager
+can still leave IPv6 enabled on an already active interface. A small
+NetworkManager dispatcher script therefore also sets
+`net.ipv6.conf.<interface>.disable_ipv6=1` and flushes IPv6 addresses/routes for
+non-loopback interfaces when they come up. This avoids declaring Wi-Fi
+connection secrets in Nix just to change `ipv6.method`. The dispatcher is not
+tied to a particular SSID or NetworkManager profile; it receives the interface
+name from NetworkManager and works for any Wi-Fi network using that interface.
 
 Expected post-switch checks:
 
