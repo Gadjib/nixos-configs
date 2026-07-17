@@ -8,6 +8,11 @@ in
     happ
   ];
 
+  systemd.tmpfiles.rules = [
+    "d /var/lib/dbus 0755 root root - -"
+    "L+ /var/lib/dbus/machine-id - - - - /etc/machine-id"
+  ];
+
   systemd.services.happd = {
     description = "Happ Process Control Daemon";
     after = [ "network.target" ];

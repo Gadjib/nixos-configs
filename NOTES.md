@@ -420,6 +420,12 @@ platform theme из пользовательской сессии.
 Это заменяет community installer-логику с `/opt/happ` и
 `/etc/systemd/system/happd.service`, но не запускает чужой install script и не
 пишет в `/opt` вручную.
+Этот же модуль создает compatibility symlink для HWID:
+`/var/lib/dbus/machine-id -> /etc/machine-id` через `systemd.tmpfiles.rules`.
+Happ получает machine id через Qt `machineUniqueId()`, а на NixOS с
+`dbus-broker` legacy path `/var/lib/dbus/machine-id` может отсутствовать. Без
+этого сервер подписки может видеть пустой HWID и возвращать заглушки вроде
+`App not supported or HWID disabled in settings` вместо реальных узлов.
 
 `incy` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/incy.nix` из official GitHub release
