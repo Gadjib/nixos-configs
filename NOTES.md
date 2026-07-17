@@ -470,7 +470,8 @@ direct outbound идти через физический uplink. Скрипт н
 смене Wi-Fi он заново читает интерфейс из default route.
 Home Manager дополнительно ставит user `PathChanged` unit для этого файла,
 потому что Happ может перегенерировать sing-box config после изменения настроек
-или подписки.
+или подписки. В watcher-е намеренно нет `PathExists`: существующий файл мог бы
+запускать oneshot по кругу, пока systemd не упрется в start limit.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и

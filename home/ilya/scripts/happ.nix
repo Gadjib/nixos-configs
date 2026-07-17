@@ -15,7 +15,6 @@ in
   systemd.user.paths.happ-fix-singbox-config = {
     Unit.Description = "Watch Happ sing-box config for routing-loop fixes";
     Path = {
-      PathExists = "%h/.config/Happ/config.json";
       PathChanged = "%h/.config/Happ/config.json";
       Unit = "happ-fix-singbox-config.service";
     };

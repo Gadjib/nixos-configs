@@ -4,6 +4,7 @@
   fetchurl,
   autoPatchelfHook,
   coreutils,
+  diffutils,
   makeWrapper,
   zstd,
   alsa-lib,
@@ -52,7 +53,7 @@ let
       exit 0
     fi
 
-    if ! ${coreutils}/bin/cmp -s "$tmp" "$config"; then
+    if ! ${diffutils}/bin/cmp -s "$tmp" "$config"; then
       if [[ ! -e "''${config}.backup-before-nixos-bind-interface" ]]; then
         ${coreutils}/bin/cp "$config" "''${config}.backup-before-nixos-bind-interface"
       fi
