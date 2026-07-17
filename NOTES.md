@@ -443,6 +443,10 @@ platform theme из пользовательской сессии.
 Это заменяет community installer-логику с `/opt/happ` и
 `/etc/systemd/system/happd.service`, но не запускает чужой install script и не
 пишет в `/opt` вручную.
+`happd.service` intentionally starts after `network-online.target` and
+`systemd-resolved.service`. Happ can recover from early DNS failures, but
+starting the daemon after the resolver is ready avoids boot-time
+`HostNotFound` noise and makes TUN/DNS setup less timing-sensitive.
 Этот же модуль создает compatibility symlink для HWID:
 `/var/lib/dbus/machine-id -> /etc/machine-id` через `systemd.tmpfiles.rules`.
 Happ получает machine id через Qt `machineUniqueId()`, а на NixOS с

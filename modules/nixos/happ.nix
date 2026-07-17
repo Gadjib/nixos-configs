@@ -15,7 +15,14 @@ in
 
   systemd.services.happd = {
     description = "Happ Process Control Daemon";
-    after = [ "network.target" ];
+    wants = [
+      "network-online.target"
+      "systemd-resolved.service"
+    ];
+    after = [
+      "network-online.target"
+      "systemd-resolved.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
