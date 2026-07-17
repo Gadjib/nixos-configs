@@ -97,6 +97,7 @@ in
     ./nvim/nvim.nix
     ./packages/manual.nix
     ./rofi/rofi.nix
+    ./scripts/happ.nix
     ./scripts/network-menus.nix
     ./scripts/package-installer.nix
     ./starship/starship.nix

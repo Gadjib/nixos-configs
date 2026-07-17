@@ -459,6 +459,18 @@ GUI wrapper также изолирует Happ от глобальных Qt-пе
 `QT_IM_MODULE=compose`. Это нужно, потому что Happ поставляется с bundled Qt/QML
 и может падать при вводе текста или ломать QML-стили, если наследует KDE/Qt
 platform theme из пользовательской сессии.
+Wrapper `happ` перед запуском GUI также вызывает
+`happ-fix-singbox-config`. Этот скрипт берет текущий IPv4 default-route
+interface и прописывает его как `bind_interface` у `direct` outbound в
+`~/.config/Happ/config.json`. Это workaround для TUN-петли sing-box: на этой
+системе `route.auto_detect_interface` и правило `process_name = ["xray",
+"sing-box"]` не всегда удерживают собственный outbound Happ/Xray вне TUN, после
+чего `curl` и GUI-приложения просто висят. Явный `bind_interface` заставляет
+direct outbound идти через физический uplink. Скрипт не привязан к SSID: при
+смене Wi-Fi он заново читает интерфейс из default route.
+Home Manager дополнительно ставит user `PathChanged` unit для этого файла,
+потому что Happ может перегенерировать sing-box config после изменения настроек
+или подписки.
 `modules/nixos/happ.nix` добавляет пакет в system profile и декларативно
 запускает root-сервис `happd`, который upstream использует для TUN/VPN режима.
 Это заменяет community installer-логику с `/opt/happ` и
