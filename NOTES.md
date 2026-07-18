@@ -24,6 +24,15 @@ Waybar, правится раздел Waybar; если добавлен скри
 коммитить или если commit технически невозможен; в таком случае нужно сказать об
 этом прямо до команды switch.
 
+Агент не запускает `rebuild-test`, `rebuild-switch`, `nh os test`,
+`nh os switch`, `nixos-rebuild` и другие команды, которые реально собирают или
+активируют конфигурацию, если пользователь отдельно и явно не попросил об этом в
+текущей задаче. Обычный workflow агента: изменить конфиг и документацию,
+выполнить проверки синтаксиса, evaluation, warnings и `nix build --dry-run`,
+закоммитить изменения, затем подробно сообщить пользователю, что изменено и
+какой объем сборки ожидается. Пользователь читает изменения и сам запускает
+пересборку системы.
+
 Push в remote не делать после каждого commit. Нормальный режим: пушить пачкой
 примерно каждые 5 локальных commit или если с предыдущего push прошло больше
 суток. Если пользователь явно просит push, push делать сразу.
@@ -1084,7 +1093,9 @@ sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild t
 sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
 ```
 
-Dry-run для агента перед рекомендацией switch:
+Агент ограничивается evaluation и dry-run; фактические `test` и `switch`
+выполняет пользователь, кроме случаев, когда он отдельно и явно попросил агента
+запустить их в текущей задаче. Dry-run перед рекомендацией switch:
 
 ```bash
 nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations.nixos.config.system.build.toplevel --dry-run
