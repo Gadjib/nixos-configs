@@ -8,7 +8,10 @@
 
 Файл: `modules/nixos/packages.nix`.
 
-Там находятся базовые системные инструменты: `vim`, `curl`, `wget`, `git`, `kitty`, `dolphin`, `kate`, hardware/network/dev tools (`lshw`, `smartmontools`, `dnsutils`, `tcpdump`, `gcc`, `go`, `rustup`, `uv`).
+Firefox и Steam включены через собственные NixOS-модули. В
+`environment.systemPackages` находятся базовые системные инструменты: `vim`,
+`curl`, `wget`, `git`, `kitty`, `dolphin`, `kate`, hardware/network/dev tools
+(`lshw`, `smartmontools`, `dnsutils`, `tcpdump`, `gcc`, `go`, `rustup`, `uv`).
 
 Используйте system package, если программа нужна всем пользователям, system services или emergency/TTY.
 

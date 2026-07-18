@@ -295,11 +295,13 @@ broken IPv6 attempts.
 
 ### `modules/nixos/packages.nix`
 
-Системные пакеты: Firefox, Kitty, Dolphin, Kate, Thunar, `nwg-look`, `qt5ct`,
-`qt6ct`, Papirus, Bibata, pavucontrol, blueman, brightness/audio helpers,
-hardware/network diagnostics including `efibootmgr` and `os-prober`,
-compiler/dev tools. `codex` берется из отдельного `nixpkgs-unstable` input,
-чтобы обновлять CLI точечно и не переводить всю систему на unstable.
+Системные программы: Firefox и Steam включены через собственные NixOS-модули.
+В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
+`nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
+brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
+и `os-prober`, compiler/dev tools. `codex` берется из отдельного
+`nixpkgs-unstable` input, чтобы обновлять CLI точечно и не переводить всю
+систему на unstable.
 
 Версионно важные имена:
 
