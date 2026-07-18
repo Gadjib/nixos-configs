@@ -1,18 +1,19 @@
 { pkgs, lib, ... }:
 
 let
+  appearance = import ./appearance.nix { inherit pkgs; };
   catppuccinGtk = pkgs.catppuccin-gtk.override {
-    variant = "macchiato";
-    accents = [ "blue" ];
-    size = "standard";
+    variant = appearance.gtk.variant;
+    accents = [ appearance.gtk.accent ];
+    size = appearance.gtk.size;
   };
   catppuccinKde = pkgs.catppuccin-kde.override {
-    flavour = [ "macchiato" ];
-    accents = [ "blue" ];
+    flavour = [ appearance.gtk.variant ];
+    accents = [ appearance.gtk.accent ];
   };
   catppuccinKvantum = pkgs.catppuccin-kvantum.override {
-    variant = "macchiato";
-    accent = "blue";
+    variant = appearance.gtk.variant;
+    accent = appearance.gtk.accent;
   };
   defaultApplications = {
     "application/epub+zip" = [ "okularApplication_epub.desktop" ];
@@ -173,9 +174,7 @@ in
     TERMINAL = "kitty";
     BROWSER = "firefox";
     KDE_SESSION_VERSION = "6";
-    XCURSOR_THEME = "Bibata-Modern-Ice";
-    XCURSOR_SIZE = "30";
-    GTK_THEME = "catppuccin-macchiato-blue-standard";
+    GTK_THEME = appearance.gtk.name;
     ADW_DEBUG_COLOR_SCHEME = "prefer-dark";
     QT_QPA_PLATFORMTHEME = "kde";
     QT_QUICK_CONTROLS_STYLE = "org.kde.desktop";
@@ -184,23 +183,23 @@ in
     SSH_AUTH_SOCK = "/home/ilya/.bitwarden-ssh-agent.sock";
   };
 
+  home.pointerCursor = {
+    inherit (appearance.cursor) name package size;
+    gtk.enable = true;
+    hyprcursor.enable = true;
+    x11.enable = true;
+  };
+
   gtk = {
     enable = true;
     iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.papirus-icon-theme;
-    };
-    cursorTheme = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-      size = 30;
+      inherit (appearance.icons) name package;
     };
     font = {
-      name = "Inter";
-      size = 10;
+      inherit (appearance.fonts.general) name size;
     };
     theme = {
-      name = "catppuccin-macchiato-blue-standard";
+      name = appearance.gtk.name;
       package = catppuccinGtk;
     };
     gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
@@ -208,8 +207,8 @@ in
   };
 
   xdg.enable = true;
-  xdg.dataFile."color-schemes/CatppuccinMacchiatoBlue.colors".source =
-    "${catppuccinKde}/share/color-schemes/CatppuccinMacchiatoBlue.colors";
+  xdg.dataFile."color-schemes/${appearance.kde.colorScheme}.colors".source =
+    "${catppuccinKde}/share/color-schemes/${appearance.kde.colorScheme}.colors";
 
   xdg.mimeApps = {
     enable = true;
@@ -225,23 +224,23 @@ in
 
   xdg.configFile = {
     "gtk-4.0/gtk.css".source =
-      "${catppuccinGtk}/share/themes/catppuccin-macchiato-blue-standard/gtk-4.0/gtk.css";
+      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/gtk.css";
     "gtk-4.0/gtk-dark.css".source =
-      "${catppuccinGtk}/share/themes/catppuccin-macchiato-blue-standard/gtk-4.0/gtk-dark.css";
+      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/gtk-dark.css";
     "gtk-4.0/assets".source =
-      "${catppuccinGtk}/share/themes/catppuccin-macchiato-blue-standard/gtk-4.0/assets";
+      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/assets";
 
     "qt5ct/qt5ct.conf".text = ''
       [Appearance]
       color_scheme_path=/home/ilya/.config/qt5ct/colors/catppuccin-macchiato.conf
       custom_palette=true
-      icon_theme=Papirus-Dark
+      icon_theme=${appearance.icons.name}
       standard_dialogs=default
       style=kvantum
 
       [Fonts]
-      fixed="JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0"
-      general="Inter,10,-1,5,50,0,0,0,0,0"
+      fixed="${appearance.fonts.monospace.name},${toString appearance.fonts.monospace.size},-1,5,50,0,0,0,0,0"
+      general="${appearance.fonts.general.name},${toString appearance.fonts.general.size},-1,5,50,0,0,0,0,0"
 
       [Interface]
       activate_item_on_single_click=1
@@ -268,13 +267,13 @@ in
       [Appearance]
       color_scheme_path=/home/ilya/.config/qt6ct/colors/catppuccin-macchiato.conf
       custom_palette=true
-      icon_theme=Papirus-Dark
+      icon_theme=${appearance.icons.name}
       standard_dialogs=default
       style=kvantum
 
       [Fonts]
-      fixed="JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0"
-      general="Inter,10,-1,5,50,0,0,0,0,0"
+      fixed="${appearance.fonts.monospace.name},${toString appearance.fonts.monospace.size},-1,5,50,0,0,0,0,0"
+      general="${appearance.fonts.general.name},${toString appearance.fonts.general.size},-1,5,50,0,0,0,0,0"
 
       [Interface]
       activate_item_on_single_click=1
@@ -299,10 +298,10 @@ in
 
     "Kvantum/kvantum.kvconfig".text = ''
       [General]
-      theme=catppuccin-macchiato-blue
+      theme=${appearance.kde.kvantumTheme}
     '';
-    "Kvantum/catppuccin-macchiato-blue".source =
-      "${catppuccinKvantum}/share/Kvantum/catppuccin-macchiato-blue";
+    "Kvantum/${appearance.kde.kvantumTheme}".source =
+      "${catppuccinKvantum}/share/Kvantum/${appearance.kde.kvantumTheme}";
 
     "kdeglobals".text = ''
       [ColorEffects:Disabled]
@@ -424,15 +423,15 @@ in
       ForegroundVisited=198,160,246
 
       [General]
-      ColorScheme=CatppuccinMacchiatoBlue
-      Name=Catppuccin Macchiato Blue
+      ColorScheme=${appearance.kde.colorScheme}
+      Name=${appearance.kde.displayName}
       accentActiveTitlebar=false
-      fixed=JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0
-      font=Inter,10,-1,5,50,0,0,0,0,0
+      fixed=${appearance.fonts.monospace.name},${toString appearance.fonts.monospace.size},-1,5,50,0,0,0,0,0
+      font=${appearance.fonts.general.name},${toString appearance.fonts.general.size},-1,5,50,0,0,0,0,0
       shadeSortColumn=true
 
       [Icons]
-      Theme=Papirus-Dark
+      Theme=${appearance.icons.name}
 
       [KDE]
       contrast=4
@@ -451,11 +450,11 @@ in
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
-      cursor-theme = "Bibata-Modern-Ice";
-      font-name = "Inter 10";
-      gtk-theme = "catppuccin-macchiato-blue-standard";
-      icon-theme = "Papirus-Dark";
-      monospace-font-name = "JetBrainsMono Nerd Font 11";
+      font-name = "${appearance.fonts.general.name} ${toString appearance.fonts.general.size}";
+      gtk-theme = appearance.gtk.name;
+      icon-theme = appearance.icons.name;
+      monospace-font-name =
+        "${appearance.fonts.monospace.name} ${toString appearance.fonts.monospace.size}";
     };
   };
 

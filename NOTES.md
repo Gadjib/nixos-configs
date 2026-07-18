@@ -93,6 +93,7 @@ nixosConfigurations.nixos
 │   ├── smb.nix
 │   └── users.nix
 └── home/ilya/
+    ├── appearance.nix
     ├── home.nix
     ├── firefox/firefox.nix
     ├── fish/fish.nix
@@ -360,14 +361,21 @@ Home Manager также задает session variables:
 - `EDITOR = "nvim"`
 - `TERMINAL = "kitty"`
 - `BROWSER = "firefox"`
-- cursor theme/size
+- cursor theme/size из единого `home/ilya/appearance.nix`
 - GTK dark preference
 - Qt platform theme `kde`
 - Qt Quick Controls style `org.kde.desktop`
 - `XDG_CURRENT_DESKTOP = "Hyprland"`
 - `XDG_SESSION_DESKTOP = "Hyprland"`
 
-Cursor size is `30`, matching the enlarged Hyprland scale.
+Глобальные параметры оформления собраны в `home/ilya/appearance.nix`: scale,
+cursor theme/package/size, icon theme/package, UI и monospace fonts, GTK theme
+и Qt/KDE theme names. Остальные модули импортируют этот файл, поэтому смена
+курсора в нем автоматически обновляет Home Manager session variables,
+Hyprland/Hyprcursor, XWayland/Xresources, GTK, dconf и compatibility links
+`~/.icons`/`~/.local/share/icons`. Cursor size is `30`, matching the enlarged
+Hyprland scale. Rofi, Mako, qt5ct/qt6ct и `kdeglobals` также получают общие
+имена и шрифты из `appearance.nix`.
 
 Глобальная тема задана без Stylix и без тяжелого theming framework.
 Базовая палитра: Catppuccin Macchiato Blue. Это нежно-темно-синяя схема:
@@ -653,17 +661,22 @@ scale, prefer a per-application wrapper over global scale environment variables.
 Current example: `home/ilya/packages/spotify.nix` forces Spotify to use native
 Wayland/Ozone while keeping Spotify's own device scale factor at `1.10`.
 
-XWayland bitmap scaling is disabled globally:
+XWayland follows the same compositor scale as native Wayland applications:
 
 ```nix
-xwayland.force_zero_scaling = true;
+xwayland = {
+  force_zero_scaling = false;
+  use_nearest_neighbor = false;
+};
 ```
 
-This is intentional for the current `1.25` monitor scale. Without it, legacy
-XWayland apps can be rendered at a lower internal resolution and then enlarged
-by Hyprland, which makes text and UI look pixelated. With zero scaling, Hyprland
-does not blur XWayland windows; individual legacy apps may look smaller if they
-do not have their own HiDPI support.
+This is intentional for the current `1.25` monitor scale: legacy X11 windows are
+enlarged to the same logical size as Wayland windows instead of being forced to
+scale `1`. Linear filtering avoids the harsher nearest-neighbor look. Because
+X11 has no universal fractional HiDPI mechanism, old applications can be a bit
+softer than native Wayland applications, but their window and UI size stays
+consistent. Cursor theme and size come from `appearance.nix` through both
+XCursor and Hyprcursor settings.
 
 Keyboard:
 

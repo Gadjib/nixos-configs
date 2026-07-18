@@ -1,8 +1,14 @@
+{ pkgs, ... }:
+
+let
+  appearance = import ../appearance.nix { inherit pkgs; };
+in
+
 {
   services.mako = {
     enable = true;
     settings = {
-      font = "Inter 10";
+      font = "${appearance.fonts.general.name} ${toString appearance.fonts.general.size}";
       background-color = "#24273acc";
       text-color = "#cad3f5ff";
       border-color = "#8aadf4ff";

@@ -1,6 +1,7 @@
 { pkgs, ... }:
 
 let
+  appearance = import ../appearance.nix { inherit pkgs; };
   wallpaper = ../../../assets/wallpapers/wallhaven-2eqpzm.png;
 in
 
@@ -17,14 +18,14 @@ in
       "$browser" = "/home/ilya/.local/bin/firefox-hyprland";
 
       monitor = [
-        ",preferred,auto,1.25"
+        ",preferred,auto,${toString appearance.scale}"
       ];
 
       env = [
-        "XCURSOR_THEME,Bibata-Modern-Ice"
-        "XCURSOR_SIZE,30"
-        "HYPRCURSOR_THEME,Bibata-Modern-Ice"
-        "HYPRCURSOR_SIZE,30"
+        "XCURSOR_THEME,${appearance.cursor.name}"
+        "XCURSOR_SIZE,${toString appearance.cursor.size}"
+        "HYPRCURSOR_THEME,${appearance.cursor.name}"
+        "HYPRCURSOR_SIZE,${toString appearance.cursor.size}"
       ];
 
       exec-once = [
@@ -121,7 +122,8 @@ in
       };
 
       xwayland = {
-        force_zero_scaling = true;
+        force_zero_scaling = false;
+        use_nearest_neighbor = false;
       };
 
       bind = [

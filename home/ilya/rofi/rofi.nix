@@ -1,5 +1,9 @@
 { pkgs, ... }:
 
+let
+  appearance = import ../appearance.nix { inherit pkgs; };
+in
+
 {
   programs.rofi = {
     enable = true;
@@ -8,7 +12,7 @@
     extraConfig = {
       modi = "drun,run,window";
       show-icons = true;
-      icon-theme = "Papirus-Dark";
+      icon-theme = appearance.icons.name;
       disable-history = false;
       max-history-size = 100;
       sort = true;

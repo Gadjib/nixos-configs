@@ -62,6 +62,8 @@ Hyprland - основная сессия. Системно он включен �
 Home Manager управляет пользовательским окружением:
 
 - `home.packages` содержит CLI и Hyprland tools;
+- `home/ilya/appearance.nix` является единым источником масштаба, курсора,
+  иконок, шрифтов и имен GTK/Qt/KDE themes;
 - `home/ilya/packages/manual.nix` содержит актуальный список пакетов, добавленных helper-ом `nix-install`;
 - `programs.fish` включает fish, starship, zoxide, direnv, fzf и алиасы;
 - `programs.kitty`, `programs.rofi`, `services.mako`, `programs.waybar`;
@@ -74,6 +76,10 @@ Home Manager управляет пользовательским окружен�
   `~/.local/share/color-schemes/CatppuccinMacchiatoBlue.colors`, qt5ct/qt6ct
   configs, Kvantum Catppuccin Macchiato Blue for Qt widgets/toolbars, and
   explicit GTK4 Catppuccin css/assets links.
+- Home Manager синхронизирует курсор из `appearance.nix` с Hyprcursor,
+  XCursor/Xresources, GTK, dconf и compatibility links. XWayland использует
+  compositor scale, поэтому X11-окна имеют тот же логический размер, что и
+  Wayland-приложения при scale `1.25`.
 
 ## CLI stack
 
