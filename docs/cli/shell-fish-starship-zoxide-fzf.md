@@ -1,8 +1,9 @@
-# Fish, Starship, Zoxide, FZF
+# Fish, Oh My Fish, Agnoster, Zoxide, FZF
 
 ## Назначение
 
-Fish - интерактивный shell; Starship - prompt; Zoxide - умный `cd`; FZF - интерактивный выбор.
+Fish - интерактивный shell; Oh My Fish с темой Agnoster управляет prompt;
+Zoxide - умный `cd`; FZF - интерактивный выбор.
 
 ## Fish
 
@@ -11,11 +12,16 @@ Fish - интерактивный shell; Starship - prompt; Zoxide - умный 
 Включено:
 
 ```fish
-starship init fish | source
+source $OMF_PATH/init.fish
 zoxide init fish | source
 direnv hook fish | source
 fzf --fish | source
 ```
+
+Oh My Fish и Agnoster подключены декларативно. Home Manager управляет файлами
+`~/.config/omf/theme` и `~/.config/omf/themes/agnoster`, поэтому менять тему
+командой `omf theme` не нужно: изменение следует делать в
+`home/ilya/fish/fish.nix`.
 
 Базовые команды:
 
@@ -85,7 +91,9 @@ git status
 
 ## Starship
 
-Starship показывает статус prompt: директория, git, языки, exit code. Конфиг управляется `home/ilya/starship/starship.nix` и runtime `~/.config/starship.toml`.
+Starship установлен и его конфиг по-прежнему управляется
+`home/ilya/starship/starship.nix`, но Fish-интеграция отключена. Активный prompt
+формирует Agnoster; Starship не переопределяет `fish_prompt`.
 
 Troubleshooting fonts:
 
@@ -118,7 +126,7 @@ Fish integration обычно дает keybindings вроде history/file searc
 ## Troubleshooting
 
 ```bash
-command -v fish starship zoxide fzf direnv
+command -v fish omf starship zoxide fzf direnv
 fish --no-config
 fish -n ~/.config/fish/config.fish
 bind | rg fzf

@@ -65,7 +65,8 @@ Home Manager управляет пользовательским окружен�
 - `home/ilya/appearance.nix` является единым источником масштаба, курсора,
   иконок, шрифтов и имен GTK/Qt/KDE themes;
 - `home/ilya/packages/manual.nix` содержит актуальный список пакетов, добавленных helper-ом `nix-install`;
-- `programs.fish` включает fish, starship, zoxide, direnv, fzf и алиасы;
+- `programs.fish` включает Fish, Oh My Fish с Agnoster, zoxide, direnv, fzf и
+  алиасы; Starship остается установленным, но не интегрируется в Fish;
 - `programs.kitty`, `programs.rofi`, `services.mako`, `programs.waybar`;
 - `wayland.windowManager.hyprland`;
 - `xdg.configFile` для Qt/KDE/Hyprland config files.

@@ -6,7 +6,8 @@
 
 ## Старт
 
-В Hyprland терминал открывается `SUPER+Enter` и запускает `kitty`. Shell - `fish`, prompt - `starship`.
+В Hyprland терминал открывается `SUPER+Enter` и запускает `kitty`. Shell -
+`fish`, prompt - Oh My Fish с темой Agnoster.
 
 ```fish
 pwd

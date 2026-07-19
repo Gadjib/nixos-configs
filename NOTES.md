@@ -1018,10 +1018,18 @@ Rofi theme is opaque: `bg = #24273a`, `surface = #363a4f`.
 
 Interactive init:
 
-- Starship
+- Oh My Fish from `pkgs.oh-my-fish`
+- Agnoster theme pinned from the official `oh-my-fish/theme-agnoster` repository
 - Zoxide
 - Direnv
 - fzf integration if available
+
+Oh My Fish is loaded declaratively from the Nix store through `OMF_PATH`.
+Home Manager writes `~/.config/omf/theme` with `agnoster` and links the pinned
+theme source at `~/.config/omf/themes/agnoster`. Do not run `omf install` or
+`omf theme` for declaratively managed packages/themes; change
+`home/ilya/fish/fish.nix` instead. The `omf` command remains available for
+inspection and diagnostics.
 
 Aliases:
 
@@ -1058,6 +1066,10 @@ nix-install <pkgname> [pkgname...]
 - prompt character
 
 Palette: Catppuccin Macchiato.
+
+Starship остается установленным и его config продолжает генерироваться, но
+`enableFishIntegration = false`: активный Fish prompt принадлежит теме Agnoster,
+поэтому Starship не переопределяет `fish_prompt`.
 
 ## Neovim
 

@@ -34,7 +34,8 @@ xdg.configFile."path".text = "...";
 
 В твоей системе есть:
 
-- `programs.fish` с starship, zoxide, direnv, fzf;
+- `programs.fish` с Oh My Fish/Agnoster, zoxide, direnv и fzf; Starship
+  установлен, но его Fish-интеграция отключена;
 - Fish-функция `nix-install`, которая вызывает `/home/ilya/.local/bin/nix-install-package` для проверяемого добавления и commit пакетов из `home/ilya/packages/manual.nix`;
 - `programs.delta` и git integration;
 - `programs.direnv.nix-direnv`;

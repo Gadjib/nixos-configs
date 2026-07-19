@@ -1,8 +1,29 @@
+{ pkgs, ... }:
+
+let
+  agnosterTheme = pkgs.fetchFromGitHub {
+    owner = "oh-my-fish";
+    repo = "theme-agnoster";
+    rev = "4c5518c89ebcef393ef154c9f576a52651400d27";
+    hash = "sha256-OFESuesnfqhXM0aij+79kdxjp4xgCt28YwTrcwQhFMU=";
+  };
+in
+
 {
+  home.packages = [ pkgs.oh-my-fish ];
+
+  xdg.configFile = {
+    "omf/theme".text = "agnoster\n";
+    "omf/themes/agnoster".source = agnosterTheme;
+  };
+
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-      starship init fish | source
+      set -gx OMF_PATH ${pkgs.oh-my-fish}/share/oh-my-fish
+      set -gx OMF_CONFIG /home/ilya/.config/omf
+      source $OMF_PATH/init.fish
+
       zoxide init fish | source
       direnv hook fish | source
 
