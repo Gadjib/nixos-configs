@@ -1036,7 +1036,9 @@ Upstream Agnoster scans every `/nix/store/...` entry in `$PATH` to detect
 a huge `nix[binutils-wrapper ...]` segment. `fish.nix` overrides only
 `prompt_virtual_env`: the standard Agnoster directory segment stays visible,
 Conda/Python environments still work, and a Nix segment is shown only when
-`IN_NIX_SHELL` is actually set.
+`IN_NIX_SHELL` is actually set. `fish_prompt.fish` is sourced explicitly before
+the override; without this ordering, Fish autoloads the upstream theme on the
+first prompt render and silently replaces the override.
 
 Aliases:
 

@@ -25,7 +25,9 @@ in
       source $OMF_PATH/init.fish
 
       # Agnoster mistakes the regular NixOS PATH for an ephemeral `nix shell`.
-      # Keep its standard directory segment and show environments only when active.
+      # Load the theme before overriding it so Fish autoload cannot restore the
+      # upstream implementation on the first prompt render.
+      source $OMF_CONFIG/themes/agnoster/functions/fish_prompt.fish
       functions --erase prompt_virtual_env
       function prompt_virtual_env
         set -l envs
