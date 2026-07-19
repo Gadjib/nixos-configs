@@ -452,6 +452,9 @@ home/ilya/packages/manual.nix
 служит сам `home/ilya/packages/manual.nix`. Это позволяет helper-у добавлять
 пакеты без превращения `NOTES.md` в рассинхронизированный второй package list.
 
+Obsidian установлен обычным пакетом `pkgs.obsidian` из закрепленного nixpkgs;
+отдельный wrapper или системный модуль для него не используется.
+
 `spotify` в этом списке - не прямой `pkgs.spotify`, а локальный wrapper
 `home/ilya/packages/spotify.nix`. Он оставляет upstream пакет из nixpkgs, но
 подменяет `bin/spotify` и desktop entry так, чтобы Spotify запускался с

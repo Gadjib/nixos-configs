@@ -17,5 +17,6 @@
     qbittorrent
     zip
     (callPackage ./spotify.nix { })
+    obsidian
   ];
 }
