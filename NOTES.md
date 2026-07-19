@@ -1031,6 +1031,13 @@ theme source at `~/.config/omf/themes/agnoster`. Do not run `omf install` or
 `home/ilya/fish/fish.nix` instead. The `omf` command remains available for
 inspection and diagnostics.
 
+Upstream Agnoster scans every `/nix/store/...` entry in `$PATH` to detect
+`nix shell`. On NixOS that misdetects the normal system environment and creates
+a huge `nix[binutils-wrapper ...]` segment. `fish.nix` overrides only
+`prompt_virtual_env`: the standard Agnoster directory segment stays visible,
+Conda/Python environments still work, and a Nix segment is shown only when
+`IN_NIX_SHELL` is actually set.
+
 Aliases:
 
 ```fish

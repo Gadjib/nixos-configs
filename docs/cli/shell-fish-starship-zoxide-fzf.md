@@ -23,6 +23,11 @@ Oh My Fish и Agnoster подключены декларативно. Home Manag
 командой `omf theme` не нужно: изменение следует делать в
 `home/ilya/fish/fish.nix`.
 
+Для NixOS добавлен локальный compatibility override: Agnoster не сканирует
+обычный системный `$PATH` как список пакетов `nix shell`. Поэтому prompt
+показывает стандартный сегмент текущего пути, а `nix[...]` появляется только
+в реальном окружении с `IN_NIX_SHELL`.
+
 Базовые команды:
 
 ```fish

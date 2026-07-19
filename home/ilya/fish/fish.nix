@@ -24,6 +24,29 @@ in
       set -gx OMF_CONFIG /home/ilya/.config/omf
       source $OMF_PATH/init.fish
 
+      # Agnoster mistakes the regular NixOS PATH for an ephemeral `nix shell`.
+      # Keep its standard directory segment and show environments only when active.
+      functions --erase prompt_virtual_env
+      function prompt_virtual_env
+        set -l envs
+
+        if test -n "$CONDA_DEFAULT_ENV"
+          set -a envs "conda[$CONDA_DEFAULT_ENV]"
+        end
+
+        if test -n "$VIRTUAL_ENV"
+          set -a envs "py["(basename "$VIRTUAL_ENV")"]"
+        end
+
+        if test -n "$IN_NIX_SHELL"
+          set -a envs "nix[$IN_NIX_SHELL]"
+        end
+
+        if test (count $envs) -gt 0
+          prompt_segment $color_virtual_env_bg $color_virtual_env_str (string join " " $envs)
+        end
+      end
+
       zoxide init fish | source
       direnv hook fish | source
 
