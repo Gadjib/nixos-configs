@@ -489,10 +489,14 @@ backend грузит эти библиотеки через `dlopen`, wrapper-ы
 а не raw binary из `share/happ/bin`.
 GUI wrapper также изолирует Happ от глобальных Qt-переменных Hyprland-сессии:
 сбрасывает `QT_QPA_PLATFORMTHEME`, `QT_STYLE_OVERRIDE`, `QT_PLUGIN_PATH`,
-`QML2_IMPORT_PATH`, ставит `QT_QUICK_CONTROLS_STYLE=Basic` и
-`QT_IM_MODULE=compose`. Это нужно, потому что Happ поставляется с bundled Qt/QML
-и может падать при вводе текста или ломать QML-стили, если наследует KDE/Qt
-platform theme из пользовательской сессии.
+`QML2_IMPORT_PATH`, ставит `QT_QPA_PLATFORM=wayland;xcb`,
+`QT_QUICK_CONTROLS_STYLE=Basic` и `QT_IM_MODULE=compose`. Wayland выбирается
+первым, чтобы touchpad scrolling и input semantics совпадали с остальными
+нативными приложениями Hyprland; `xcb` остается fallback для X11-сессий.
+Bundled Happ содержит рабочий `libqwayland.so` со всеми runtime dependencies.
+Изоляция остальных Qt variables нужна, потому что Happ поставляется с bundled
+Qt/QML и может падать при вводе текста или ломать QML-стили, если наследует
+KDE/Qt platform theme из пользовательской сессии.
 Wrapper `happ` не читает и не меняет пользовательский config перед запуском GUI.
 Happ сам управляет своим TUN, DNS и routing state. Раньше в конфигурации были
 самодельные вмешательства:

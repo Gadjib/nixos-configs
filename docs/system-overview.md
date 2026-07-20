@@ -81,6 +81,8 @@ Home Manager управляет пользовательским окружен�
   XCursor/Xresources, GTK, dconf и compatibility links. XWayland использует
   compositor scale, поэтому X11-окна имеют тот же логический размер, что и
   Wayland-приложения при scale `1.25`.
+- Bundled Qt GUI Happ запускается через Wayland QPA с fallback на `xcb`, чтобы
+  touchpad scrolling в Hyprland не проходил через XWayland wheel emulation.
 
 ## CLI stack
 

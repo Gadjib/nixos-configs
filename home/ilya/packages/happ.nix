@@ -63,6 +63,7 @@ stdenv.mkDerivation {
       --unset QT_STYLE_OVERRIDE \
       --unset QT_PLUGIN_PATH \
       --unset QML2_IMPORT_PATH \
+      --set QT_QPA_PLATFORM "wayland;xcb" \
       --set QT_QUICK_CONTROLS_STYLE Basic \
       --set QT_IM_MODULE compose
     makeWrapper "$out/share/happ/bin/happd" "$out/bin/happd" \
