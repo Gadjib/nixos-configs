@@ -108,6 +108,7 @@ nixosConfigurations.nixos
     ├── scripts/package-installer.nix
     ├── starship/starship.nix
     ├── telegram/telegram.nix
+    ├── vscode/vscode.nix
     ├── waybar/waybar.nix
     └── wlogout/wlogout.nix
 ```
@@ -353,6 +354,7 @@ Fish включен системно через `programs.fish.enable = true`.
 - package installer
 - Starship
 - Telegram Hyprland wrapper
+- VS Code и декларативных extensions/settings
 - Waybar
 - Wlogout
 
@@ -454,6 +456,15 @@ home/ilya/packages/manual.nix
 
 Obsidian установлен обычным пакетом `pkgs.obsidian` из закрепленного nixpkgs;
 отдельный wrapper или системный модуль для него не используется.
+
+VS Code больше не является строкой в `packages/manual.nix`: им владеет
+`home/ilya/vscode/vscode.nix` через `programs.vscode`. Модуль устанавливает
+`shd101wyy.markdown-preview-enhanced`, задает
+`markdown-preview-enhanced.previewMode = "Previews Only"` и ассоциацию
+`"*.md" = "markdown-preview-enhanced"` в `workbench.editorAssociations`.
+Это открывает каждый Markdown-файл сразу в отдельном MPE custom-editor preview,
+поэтому preview разных файлов могут оставаться в нескольких вкладках. Built-in
+view type `vscode.markdown.preview.editor` намеренно не используется.
 
 `spotify` в этом списке - не прямой `pkgs.spotify`, а локальный wrapper
 `home/ilya/packages/spotify.nix`. Он оставляет upstream пакет из nixpkgs, но

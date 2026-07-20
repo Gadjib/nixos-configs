@@ -106,6 +106,7 @@ in
     ./scripts/package-installer.nix
     ./starship/starship.nix
     ./telegram/telegram.nix
+    ./vscode/vscode.nix
     ./waybar/waybar.nix
     ./wlogout/wlogout.nix
   ];

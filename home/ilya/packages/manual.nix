@@ -9,7 +9,6 @@
     ffmpeg
     glow
     vlc
-    vscode
     stress-ng
     texliveFull
     prismlauncher

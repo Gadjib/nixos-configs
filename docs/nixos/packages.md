@@ -27,6 +27,9 @@ Firefox и Steam включены через собственные NixOS-мод
 Obsidian установлен в этом списке как пользовательское desktop-приложение из
 nixpkgs.
 
+VS Code управляется отдельно через `home/ilya/vscode/vscode.nix`, включая его
+декларативные extensions и user settings, поэтому в `manual.nix` не дублируется.
+
 В fish настроена функция:
 
 ```fish
