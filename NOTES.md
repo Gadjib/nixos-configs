@@ -91,6 +91,7 @@ nixosConfigurations.nixos
 │   ├── packages.nix
 │   ├── compat.nix
 │   ├── smb.nix
+│   ├── swap.nix
 │   └── users.nix
 └── home/ilya/
     ├── appearance.nix
@@ -220,6 +221,15 @@ SMB mount:
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
 - `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
+
+Swap:
+
+- `modules/nixos/swap.nix` declares `/swapfile` through `swapDevices`.
+- Size is `16 * 1024` MiB, exactly 16 GiB.
+- The root filesystem is ext4, so no Btrfs-specific swapfile handling is
+  needed. NixOS creates and initializes a missing file through its generated
+  `mkswap-*.service`, then activates the corresponding systemd swap unit.
+- Hibernation/resume is not configured; this is regular memory-pressure swap.
 
 Закрытие крышки явно отправляет ноут в сон:
 

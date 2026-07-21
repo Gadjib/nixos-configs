@@ -33,6 +33,8 @@ NixOS управляет системой декларативно: boot loader,
 - SDDM включен как display manager;
 - Hyprland включен как Wayland compositor;
 - PipeWire, Bluetooth, power-profiles-daemon и upower включены.
+- `/swapfile` управляется NixOS декларативно и имеет размер 16 GiB;
+  hibernation отдельно не настроена.
 
 ## KDE fallback
 
