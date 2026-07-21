@@ -860,7 +860,7 @@ Telegram в Hyprland. KDE Plasma fallback они не затрагивают.
 Layout:
 
 - left: Hyprland workspaces, active window
-- center: clock
+- center: empty
 - right:
   - language
   - power profile
@@ -870,7 +870,8 @@ Layout:
   - tray
   - volume
   - battery
-- custom power button
+  - date in `dd.mm.yy` format
+  - custom power button
 - power profile indicator is custom: `custom/power-profile` uses
   `/home/ilya/.local/bin/waybar-power-profile`. Click/scroll cycling is ordered
   so the previous/left step from balanced is `power-saver` and balanced is the
@@ -879,16 +880,18 @@ Layout:
 
 Bar layout is tuned for current Hyprland scale `1.25`:
 
-- `fixed-center = true`, so the clock stays visually centered even when the
-  right side is wide.
+- `fixed-center = false`; the center is intentionally empty and the date sits
+  on the right between battery and power.
 - height `36`, spacing `7`, readable module padding.
 - Waybar background stays close to opaque for readability: main bar alpha
   `0.92`, module background alpha `0.86`.
 - Workspace buttons are explicitly reset from GTK defaults: no background
-  image, no shadow, no border, stable min-width and own hover/active styles.
+  image, no shadow, no border, compact `20px` min-width, reduced horizontal
+  padding/margins and own hover/active styles.
 - active window title is capped at 42 chars.
-- empty window module is visually hidden via `#window.empty`, so an empty
-  title does not leave a blank pill next to workspaces.
+- empty window module is visually hidden via the Waybar-supported selector
+  `window#waybar.empty #window`, so an empty title does not leave a blank pill
+  next to workspaces.
 - separate Wi-Fi and Bluetooth modules are intentionally disabled. Network and
   Bluetooth management live in tray via `nm-applet` and `blueman-applet`,
   because tray icons are enough and avoid duplicating device state in the bar.

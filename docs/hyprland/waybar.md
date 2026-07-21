@@ -18,8 +18,12 @@ Runtime:
 ## Текущие модули
 
 - Left: `hyprland/workspaces`, `hyprland/window`.
-- Center: `clock`.
-- Right: language, power profile, cpu, memory, temperature, tray, pulseaudio, battery, custom power.
+- Center: empty.
+- Right: language, power profile, cpu, memory, temperature, tray, pulseaudio,
+  battery, date (`dd.mm.yy`), custom power.
+
+Workspace indicators use compact width and padding. The active-window pill is
+hidden completely when the current workspace has no active window.
 
 Отдельных network/bluetooth modules в Waybar нет. Сеть управляется через
 `nm-applet` в tray; Bluetooth управляется через `blueman-applet` в tray. Оба

@@ -6,9 +6,9 @@
       position = "top";
       height = 36;
       spacing = 7;
-      fixed-center = true;
+      fixed-center = false;
       modules-left = [ "hyprland/workspaces" "hyprland/window" ];
-      modules-center = [ "clock" ];
+      modules-center = [ ];
       modules-right = [
         "hyprland/language"
         "custom/power-profile"
@@ -18,6 +18,7 @@
         "tray"
         "pulseaudio"
         "battery"
+        "clock"
         "custom/power"
       ];
 
@@ -60,7 +61,7 @@
         interval = 3;
       };
       clock = {
-        format = "{:%a %d %b  %H:%M}";
+        format = "{:%d.%m.%y}";
         tooltip-format = "{:%Y-%m-%d}";
       };
       pulseaudio = {
@@ -129,10 +130,14 @@
         color: #ed8796;
       }
 
+      #workspaces {
+        padding: 0 4px;
+      }
+
       #workspaces button {
-        padding: 0 8px;
-        margin: 0 2px;
-        min-width: 24px;
+        padding: 0 5px;
+        margin: 0 1px;
+        min-width: 20px;
         border: 0;
         border-radius: 6px;
         box-shadow: none;
@@ -142,9 +147,10 @@
         text-shadow: none;
       }
 
-      #window.empty {
+      window#waybar.empty #window {
         padding: 0;
         margin: 0;
+        min-width: 0;
         background: transparent;
       }
 
