@@ -39,8 +39,8 @@ runtime_jar="\$runtime_dir/TLauncher.jar"
 store_jar="$out/share/tlauncher/TLauncher.jar"
 
 mkdir -p "\$runtime_dir"
-if [[ ! -f "\$runtime_jar" ]] || ! cmp -s "\$store_jar" "\$runtime_jar"; then
-  cp -f "\$store_jar" "\$runtime_jar"
+if [[ ! -f "\$runtime_jar" ]]; then
+  cp "\$store_jar" "\$runtime_jar"
   chmod u+w "\$runtime_jar"
 fi
 

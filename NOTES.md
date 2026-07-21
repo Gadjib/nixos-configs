@@ -544,9 +544,14 @@ Hyprland запускает `hyprpolkitagent` через `exec-once`. Это н�
 официальный `https://tlauncher.org/jar`, проверяет pinned SHA-256, достает
 `TLauncher.jar`, делает wrapper `tlauncher` через Java и кладет валидированный
 `tlauncher.desktop`, чтобы приложение появлялось в launcher-е. Wrapper перед
-запуском копирует jar в writable
-`$XDG_DATA_HOME/tlauncher/TLauncher.jar`, потому что стартер пытается обновлять
-свой jar и не может писать в `/nix/store`.
+первым запуском копирует jar в writable
+`$XDG_DATA_HOME/tlauncher/TLauncher.jar`, потому что стартер обновляет свой jar
+и не может писать в `/nix/store`. Копирование выполняется только если runtime
+jar отсутствует: сравнивать его со store jar и восстанавливать при отличии
+нельзя. Иначе wrapper откатывает штатное self-update, TLauncher при каждом
+старте снова показывает dialog о замене launcher-а и запускает второй process.
+Если runtime jar поврежден и нужен чистый seed, его можно удалить вручную при
+полностью закрытом TLauncher; следующий запуск восстановит файл из Nix store.
 
 TLauncher отдельно скачивает generic Linux JRE в
 `~/.tlauncher/starter/jre_default/...`. На чистой NixOS такие бинарники падают
