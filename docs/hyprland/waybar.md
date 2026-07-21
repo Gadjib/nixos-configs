@@ -20,7 +20,7 @@ Runtime:
 - Left: `hyprland/workspaces`, `hyprland/window`.
 - Center: empty.
 - Right: language, power profile, cpu, memory, temperature, tray, pulseaudio,
-  battery, date (`dd.mm.yy`), custom power.
+  battery, date and time (`dd.mm.yy HH:MM`), custom power.
 
 Workspace indicators use compact width and padding. The active-window pill is
 hidden completely when the current workspace has no active window.

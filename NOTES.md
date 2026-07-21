@@ -870,7 +870,7 @@ Layout:
   - tray
   - volume
   - battery
-  - date in `dd.mm.yy` format
+  - date and time in `dd.mm.yy HH:MM` format
   - custom power button
 - power profile indicator is custom: `custom/power-profile` uses
   `/home/ilya/.local/bin/waybar-power-profile`. Click/scroll cycling is ordered
@@ -880,13 +880,13 @@ Layout:
 
 Bar layout is tuned for current Hyprland scale `1.25`:
 
-- `fixed-center = false`; the center is intentionally empty and the date sits
-  on the right between battery and power.
+- `fixed-center = false`; the center is intentionally empty and date/time sits
+  on the right between battery and power in `dd.mm.yy HH:MM` format.
 - height `36`, spacing `7`, readable module padding.
 - Waybar background stays close to opaque for readability: main bar alpha
   `0.92`, module background alpha `0.86`.
 - Workspace buttons are explicitly reset from GTK defaults: no background
-  image, no shadow, no border, compact `20px` min-width, reduced horizontal
+  image, no shadow, no border, compact `22px` min-width, reduced horizontal
   padding/margins and own hover/active styles.
 - active window title is capped at 42 chars.
 - empty window module is visually hidden via the Waybar-supported selector

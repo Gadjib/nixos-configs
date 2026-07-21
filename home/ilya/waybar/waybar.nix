@@ -61,7 +61,7 @@
         interval = 3;
       };
       clock = {
-        format = "{:%d.%m.%y}";
+        format = "{:%d.%m.%y %H:%M}";
         tooltip-format = "{:%Y-%m-%d}";
       };
       pulseaudio = {
@@ -135,9 +135,9 @@
       }
 
       #workspaces button {
-        padding: 0 5px;
+        padding: 0 6px;
         margin: 0 1px;
-        min-width: 20px;
+        min-width: 22px;
         border: 0;
         border-radius: 6px;
         box-shadow: none;
