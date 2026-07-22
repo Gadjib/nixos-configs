@@ -216,6 +216,7 @@ in
       windowrule = [
         "match:class ^(pavucontrol)$, float on"
         "match:class ^(blueman-manager)$, float on"
+        "match:class ^(firefox)$, workspace 2"
         "match:class ^(TelegramDesktop)$, decorate off"
         "match:class ^(org.telegram.desktop)$, decorate off"
         "match:title ^(Picture-in-Picture)$, float on"

@@ -29,7 +29,7 @@
       }
       EOF
 
-      exec firefox --no-remote --profile "$profile_root" "$@"
+      exec firefox --profile "$profile_root" "$@"
     '';
   };
 

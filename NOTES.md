@@ -372,7 +372,7 @@ Home Manager также задает session variables:
 
 - `EDITOR = "nvim"`
 - `TERMINAL = "kitty"`
-- `BROWSER = "firefox"`
+- `BROWSER = "/home/ilya/.local/bin/firefox-hyprland"`
 - cursor theme/size из единого `home/ilya/appearance.nix`
 - GTK dark preference
 - Qt platform theme `kde`
@@ -432,7 +432,7 @@ previously made images open in Firefox from Yazi.
 
 Current default app policy:
 
-- web links and HTML: `firefox.desktop`.
+- web links and HTML: `firefox-hyprland.desktop`.
 - Telegram links: `org.telegram.desktop.desktop`.
 - images: `org.kde.gwenview.desktop`.
 - video/audio: `vlc.desktop`.
@@ -443,8 +443,8 @@ Current default app policy:
 - code/config formats: `code.desktop`.
 
 `firefox-hyprland.desktop` intentionally does not advertise image MIME types.
-It exists for Hyprland browser keybindings/window buttons, not as a general
-image viewer.
+It is the common entry point for Hyprland browser keybindings and web links,
+not a general image viewer.
 
 ## Пользовательские Пакеты
 
@@ -647,6 +647,9 @@ configType = "hyprlang";
 - file manager: `dolphin`
 - browser: `/home/ilya/.local/bin/firefox-hyprland`
 
+Firefox windows are assigned to workspace 2 by a Hyprland window rule matching
+class `firefox`.
+
 Autostart:
 
 - `waybar`
@@ -826,7 +829,11 @@ Hyprland does not launch plain `firefox` from `SUPER+B`; it launches:
 - включает tabs-in-titlebar;
 - пишет `chrome/userChrome.css`;
 - скрывает Firefox titlebar window buttons through CSS;
-- запускает `firefox --no-remote --profile ~/.mozilla/firefox/hyprland`.
+- запускает `firefox --profile ~/.mozilla/firefox/hyprland`.
+
+HTTP/HTTPS links, HTML files, `BROWSER` and `SUPER+B` all use the same wrapper.
+Firefox remoting is left enabled, so a new URL is handed to an already running
+Hyprland-profile instance instead of starting another browser instance.
 
 Это сделано специально, чтобы в Hyprland убрать кнопки окна Firefox, но в KDE
 оставить обычный Firefox с обычным profile и обычными кнопками.

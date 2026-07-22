@@ -40,7 +40,7 @@ let
     "application/x-gzip" = [ "org.kde.ark.desktop" ];
     "application/x-shellscript" = [ "code.desktop" ];
     "application/x-tar" = [ "org.kde.ark.desktop" ];
-    "application/xhtml+xml" = [ "firefox.desktop" ];
+    "application/xhtml+xml" = [ "firefox-hyprland.desktop" ];
     "application/xml" = [ "code.desktop" ];
     "application/zip" = [ "org.kde.ark.desktop" ];
     "audio/aac" = [ "vlc.desktop" ];
@@ -64,7 +64,7 @@ let
     "inode/directory" = [ "org.kde.dolphin.desktop" ];
     "text/css" = [ "code.desktop" ];
     "text/csv" = [ "code.desktop" ];
-    "text/html" = [ "firefox.desktop" ];
+    "text/html" = [ "firefox-hyprland.desktop" ];
     "text/markdown" = [ "code.desktop" ];
     "text/plain" = [ "org.kde.kate.desktop" ];
     "text/x-c" = [ "code.desktop" ];
@@ -84,9 +84,9 @@ let
     "video/x-flv" = [ "vlc.desktop" ];
     "video/x-matroska" = [ "vlc.desktop" ];
     "video/x-msvideo" = [ "vlc.desktop" ];
-    "x-scheme-handler/chrome" = [ "firefox.desktop" ];
-    "x-scheme-handler/http" = [ "firefox.desktop" ];
-    "x-scheme-handler/https" = [ "firefox.desktop" ];
+    "x-scheme-handler/chrome" = [ "firefox-hyprland.desktop" ];
+    "x-scheme-handler/http" = [ "firefox-hyprland.desktop" ];
+    "x-scheme-handler/https" = [ "firefox-hyprland.desktop" ];
     "x-scheme-handler/tg" = [ "org.telegram.desktop.desktop" ];
     "x-scheme-handler/tonsite" = [ "org.telegram.desktop.desktop" ];
   };
@@ -173,7 +173,7 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
     TERMINAL = "kitty";
-    BROWSER = "firefox";
+    BROWSER = "/home/ilya/.local/bin/firefox-hyprland";
     KDE_SESSION_VERSION = "6";
     GTK_THEME = appearance.gtk.name;
     ADW_DEBUG_COLOR_SCHEME = "prefer-dark";
