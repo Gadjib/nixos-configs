@@ -17,6 +17,17 @@ Waybar, правится раздел Waybar; если добавлен скри
 С пользователем нужно общаться на русском. Команды, пути, имена опций, имена
 пакетов и идентификаторы оставлять в оригинальном написании.
 
+При установке каждой новой графической программы в том же изменении нужно
+добавить для нее отдельную иконку в `hyprland/workspaces.window-rewrite` в
+`home/ilya/waybar/waybar.nix`. Нужно учитывать реальный Wayland `app_id` и/или
+XWayland `WM_CLASS`; если возможны несколько вариантов класса, они объединяются
+одним regex. Иконка должна существовать в используемом Nerd Font. Установка GUI
+программы не считается завершенной, пока mapping не добавлен. Если точный класс
+невозможно узнать до первого запуска, добавляется mapping для ожидаемого класса,
+а после применения конфигурации класс проверяется через `hyprctl clients` и при
+необходимости исправляется. Правило не относится к CLI-программам, библиотекам,
+драйверам и фоновым сервисам, которые не создают окна.
+
 Перед тем как предлагать пользователю выполнить `rebuild-switch` или
 эквивалентный `nh os switch /home/ilya/nixos-config`, нужно сначала закоммитить
 актуальное состояние репозитория. Идея: любой switch должен иметь понятную
@@ -919,6 +930,9 @@ Bar layout is tuned for current Hyprland scale `1.25`:
   window. This uses the native `hyprland/workspaces` module without polling,
   helper processes or workspace renaming. Known application classes have
   dedicated icons and unmatched classes use a generic window icon.
+- Every newly installed GUI application must add its class and dedicated icon
+  to this `window-rewrite` table in the same change, as required by the
+  repository workflow above.
 - active window title is capped at 42 chars.
 - empty window module is visually hidden via the Waybar-supported selector
   `window#waybar.empty #window`, so an empty title does not leave a blank pill
