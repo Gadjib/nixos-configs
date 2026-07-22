@@ -23,14 +23,11 @@ Runtime:
   battery, date and time (`dd.mm.yy HH:MM`), custom power.
 
 Workspace indicators use compact width and padding. Each indicator keeps its
-workspace number and dynamically appends one icon: the application owning the
-largest visible window on that workspace. The continuous
-`~/.local/bin/waybar-workspace-icons` helper calculates window area from one
-batched `hyprctl` query per second and updates numeric workspace names only when
-their labels change; unknown application classes use a generic window icon. A
-hidden `custom/workspace-icons` module keeps the helper running with Waybar.
-The active-window pill is hidden completely when the current workspace has no
-active window.
+workspace number and appends the icon of the first opened window. The native
+`{windows}` value is truncated through `{windows:.2}` to its leading space and
+first Nerd Font icon, so no helper, polling or workspace renaming is involved.
+Unknown application classes use a generic window icon. The active-window pill
+is hidden completely when the current workspace has no active window.
 
 Отдельных network/bluetooth modules в Waybar нет. Сеть управляется через
 `nm-applet` в tray; Bluetooth управляется через `blueman-applet` в tray. Оба
