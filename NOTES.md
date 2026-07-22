@@ -913,6 +913,12 @@ Bar layout is tuned for current Hyprland scale `1.25`:
 - Workspace buttons are explicitly reset from GTK defaults: no background
   image, no shadow, no border, compact `22px` min-width, reduced horizontal
   padding/margins and own hover/active styles.
+- Workspace labels use `{name}{windows}`. The numeric workspace name remains
+  stable, while `window-rewrite` appends compact Nerd Font icons for every open
+  window. Known classes include Firefox, Kitty, Telegram, Spotify, Happ,
+  VS Code, Dolphin, Obsidian, Steam, TLauncher and common KDE utilities;
+  unmatched classes use a generic window icon. Each icon value carries its own
+  leading space, so empty workspaces have no trailing gap.
 - active window title is capped at 42 chars.
 - empty window module is visually hidden via the Waybar-supported selector
   `window#waybar.empty #window`, so an empty title does not leave a blank pill

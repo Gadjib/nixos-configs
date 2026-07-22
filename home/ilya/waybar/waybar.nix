@@ -31,7 +31,26 @@
       "hyprland/workspaces" = {
         disable-scroll = true;
         all-outputs = true;
-        format = "{name}";
+        format = "{name}{windows}";
+        format-window-separator = "";
+        window-rewrite-default = " ";
+        window-rewrite = {
+          "class<kitty>" = " ";
+          "class<firefox>" = " ";
+          "class<(TelegramDesktop|org\\.telegram\\.desktop)>" = " ";
+          "class<spotify>" = " ";
+          "class<Happ>" = " 󰒍";
+          "class<([Cc]ode|code-url-handler)>" = " 󰨞";
+          "class<org\\.kde\\.dolphin>" = " ";
+          "class<[Oo]bsidian>" = " 󰠮";
+          "class<([Ss]team|steam_app_.*)>" = " ";
+          "class<([Tt][Ll]auncher|Minecraft.*)>" = " ";
+          "class<org\\.kde\\.gwenview>" = " ";
+          "class<org\\.kde\\.okular>" = " ";
+          "class<org\\.kde\\.kate>" = " 󰷈";
+          "class<pavucontrol>" = " ";
+          "class<org\\.kde\\.plasma-systemmonitor>" = " ";
+        };
       };
       "hyprland/window" = {
         max-length = 42;

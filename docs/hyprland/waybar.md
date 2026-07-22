@@ -22,8 +22,11 @@ Runtime:
 - Right: language, power profile, cpu, memory, temperature, tray, pulseaudio,
   battery, date and time (`dd.mm.yy HH:MM`), custom power.
 
-Workspace indicators use compact width and padding. The active-window pill is
-hidden completely when the current workspace has no active window.
+Workspace indicators use compact width and padding. Each indicator keeps its
+workspace number and dynamically appends icons for the windows open there via
+`{windows}` and `window-rewrite`; unknown application classes use a generic
+window icon. The active-window pill is hidden completely when the current
+workspace has no active window.
 
 Отдельных network/bluetooth modules в Waybar нет. Сеть управляется через
 `nm-applet` в tray; Bluetooth управляется через `blueman-applet` в tray. Оба
