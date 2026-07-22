@@ -7,7 +7,7 @@
       height = 36;
       spacing = 7;
       fixed-center = false;
-      modules-left = [ "hyprland/workspaces" "hyprland/window" ];
+      modules-left = [ "custom/workspace-icons" "hyprland/workspaces" "hyprland/window" ];
       modules-center = [ ];
       modules-right = [
         "hyprland/language"
@@ -28,29 +28,16 @@
         tooltip-format = "Power menu";
         on-click = "wlogout --protocol layer-shell";
       };
+      "custom/workspace-icons" = {
+        exec = "/home/ilya/.local/bin/waybar-workspace-icons";
+        restart-interval = 1;
+        hide-empty-text = true;
+        tooltip = false;
+      };
       "hyprland/workspaces" = {
         disable-scroll = true;
         all-outputs = true;
-        format = "{name}{windows}";
-        format-window-separator = "";
-        window-rewrite-default = " ";
-        window-rewrite = {
-          "class<kitty>" = " ";
-          "class<firefox>" = " ";
-          "class<(TelegramDesktop|org\\.telegram\\.desktop)>" = " ";
-          "class<spotify>" = " ";
-          "class<Happ>" = " 󰒍";
-          "class<([Cc]ode|code-url-handler)>" = " 󰨞";
-          "class<org\\.kde\\.dolphin>" = " ";
-          "class<[Oo]bsidian>" = " 󰠮";
-          "class<([Ss]team|steam_app_.*)>" = " ";
-          "class<([Tt][Ll]auncher|Minecraft.*)>" = " ";
-          "class<org\\.kde\\.gwenview>" = " ";
-          "class<org\\.kde\\.okular>" = " ";
-          "class<org\\.kde\\.kate>" = " 󰷈";
-          "class<pavucontrol>" = " ";
-          "class<org\\.kde\\.plasma-systemmonitor>" = " ";
-        };
+        format = "{name}";
       };
       "hyprland/window" = {
         max-length = 42;
@@ -226,6 +213,11 @@
         color: #eed49f;
       }
     '';
+  };
+
+  home.file.".local/bin/waybar-workspace-icons" = {
+    executable = true;
+    source = ./workspace-icons.sh;
   };
 
   home.file.".local/bin/waybar-cpu-temp" = {
