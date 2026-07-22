@@ -833,7 +833,10 @@ Hyprland does not launch plain `firefox` from `SUPER+B`; it launches:
 
 HTTP/HTTPS links, HTML files, `BROWSER` and `SUPER+B` all use the same wrapper.
 Firefox remoting is left enabled, so a new URL is handed to an already running
-Hyprland-profile instance instead of starting another browser instance.
+Hyprland-profile instance instead of starting another browser instance. When
+the wrapper receives a URL and finds an existing Firefox window through
+`hyprctl -j clients`, it then runs `focuswindow class:^(firefox)$`; Hyprland
+therefore switches to workspace 2 and focuses Firefox after opening the link.
 
 Это сделано специально, чтобы в Hyprland убрать кнопки окна Firefox, но в KDE
 оставить обычный Firefox с обычным profile и обычными кнопками.

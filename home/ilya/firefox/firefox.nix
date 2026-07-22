@@ -29,6 +29,13 @@
       }
       EOF
 
+      if (( $# > 0 )) && hyprctl -j clients \
+        | jq -e 'any(.[]; .class == "firefox")' >/dev/null; then
+        firefox --profile "$profile_root" "$@"
+        hyprctl dispatch focuswindow 'class:^(firefox)$' >/dev/null
+        exit 0
+      fi
+
       exec firefox --profile "$profile_root" "$@"
     '';
   };
