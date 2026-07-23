@@ -87,8 +87,6 @@ let
     "x-scheme-handler/chrome" = [ "firefox-hyprland.desktop" ];
     "x-scheme-handler/http" = [ "firefox-hyprland.desktop" ];
     "x-scheme-handler/https" = [ "firefox-hyprland.desktop" ];
-    "x-scheme-handler/tg" = [ "org.telegram.desktop.desktop" ];
-    "x-scheme-handler/tonsite" = [ "org.telegram.desktop.desktop" ];
   };
 in
 
@@ -105,7 +103,6 @@ in
     ./scripts/network-menus.nix
     ./scripts/package-installer.nix
     ./starship/starship.nix
-    ./telegram/telegram.nix
     ./vscode/vscode.nix
     ./waybar/waybar.nix
     ./wlogout/wlogout.nix
