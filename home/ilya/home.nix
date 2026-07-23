@@ -302,7 +302,7 @@ in
     "Kvantum/${appearance.kde.kvantumTheme}".source =
       "${catppuccinKvantum}/share/Kvantum/${appearance.kde.kvantumTheme}";
 
-    "kdeglobals".text = ''
+    ".home-manager-kdeglobals".text = ''
       [ColorEffects:Disabled]
       Color=36, 39, 58
       ColorAmount=0.30000000000000004
@@ -445,6 +445,12 @@ in
       inactiveForeground=165,173,203
     '';
   };
+
+  home.activation.installWritableKdeglobals = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm600 \
+      "$HOME/.config/.home-manager-kdeglobals" \
+      "$HOME/.config/kdeglobals"
+  '';
 
   dconf.settings = {
     "org/gnome/desktop/interface" = {

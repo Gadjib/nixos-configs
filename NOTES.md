@@ -429,7 +429,13 @@ Hyprland scale. Rofi, Mako, qt5ct/qt6ct и `kdeglobals` также получа�
   for KDE apps such as Gwenview launched from Hyprland.
 - `~/.config/kdeglobals` embeds the full Catppuccin `[Colors:*]` sections, not
   only `ColorScheme=CatppuccinMacchiatoBlue`. KDE apps outside Plasma do not
-  reliably expand the scheme name by themselves.
+  reliably expand the scheme name by themselves. Home Manager generates the
+  declarative source as `~/.config/.home-manager-kdeglobals`, then
+  `installWritableKdeglobals` copies it after `linkGeneration` to a regular
+  writable `~/.config/kdeglobals` with mode `0600`. Do not manage
+  `kdeglobals` as a direct `xdg.configFile` symlink: KDE's `KConfig` resolves
+  that symlink into `/nix/store`, fails to create `hm_kdeglobals.lock`, and Qt
+  applications such as Telegram can abort when opening a file chooser.
 - GTK4 theme files are explicitly linked from Catppuccin into
   `~/.config/gtk-4.0/gtk.css`, `gtk-dark.css`, and `assets`.
 - Kitty, Rofi, Mako, Waybar, Wlogout, Starship, Hyprland borders and
@@ -861,6 +867,11 @@ Telegram установлен напрямую как `pkgs.telegram-desktop`. �
 environment variables, Hyprland window rules или принудительных XDG MIME
 defaults. Запуск, обработчики `tg`/`tonsite` и window decorations оставлены
 upstream-пакету и стандартному desktop environment behavior.
+
+Кнопка вложения использует системную Qt/KDE file chooser integration.
+`kdeglobals` намеренно является обычным writable-файлом, а не ссылкой в
+`/nix/store`: иначе `KConfig` не может создать lock-файл, и Telegram аварийно
+завершается внутри Qt message handler.
 
 ## Waybar
 
