@@ -162,6 +162,7 @@ in
     jq
     yq
     httpie
+    nettools
     tealdeer
     lazygit
     delta

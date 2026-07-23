@@ -463,7 +463,7 @@ not a general image viewer.
 
 Туда входят Hyprland stack, CLI tools, Bitwarden Desktop, Telegram,
 `networkmanagerapplet`, Catppuccin GTK/KDE themes, `direnv`, `nix-direnv`,
-`lazygit`, `delta`, `gh` и прочее.
+`lazygit`, `delta`, `gh`, `net-tools` (включая `ifconfig`) и прочее.
 
 Ручные пакеты, добавленные командой `nix-install`, лежат отдельно:
 
