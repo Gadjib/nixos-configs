@@ -799,6 +799,7 @@ Workspaces:
 
 - `SUPER+1..9,0` -> workspace 1..10
 - `SUPER+CTRL+1..9,0` -> workspace 11..20
+- `SUPER+CTRL+SHIFT+1..9,0` -> move window to workspace 11..20
 - `SUPER+Shift+1..9,0` -> move window to workspace 1..10
 
 Mouse:

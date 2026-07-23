@@ -18,6 +18,7 @@
 | `SUPER+Shift+H/J/K/L` | move window |
 | `SUPER+1..0` | workspace 1..10 |
 | `SUPER+CTRL+1..0` | workspace 11..20 |
+| `SUPER+CTRL+Shift+1..0` | move to workspace 11..20 |
 | `SUPER+Shift+1..0` | move to workspace |
 
 ## Waybar/Mako

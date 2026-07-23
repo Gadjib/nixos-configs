@@ -40,6 +40,8 @@
 | `SUPER+0` | workspace 10 |
 | `SUPER+CTRL+1..9` | workspace 11..19 |
 | `SUPER+CTRL+0` | workspace 20 |
+| `SUPER+CTRL+Shift+1..9` | move active window to workspace 11..19 |
+| `SUPER+CTRL+Shift+0` | move active window to workspace 20 |
 | `SUPER+Shift+1..9` | move active window to workspace 1..9 |
 | `SUPER+Shift+0` | move active window to workspace 10 |
 
@@ -92,5 +94,6 @@ SUPER+V clipboard
 Print screenshot area
 SUPER+1..0 workspaces
 SUPER+CTRL+1..0 workspaces 11..20
+SUPER+CTRL+Shift+1..0 move to workspace 11..20
 SUPER+Shift+1..0 move to workspace
 ```
