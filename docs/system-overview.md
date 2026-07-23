@@ -12,7 +12,7 @@ Flake `flake.nix` использует:
 
 - `nixpkgs.url = github:NixOS/nixpkgs/nixos-26.05`;
 - `home-manager.url = github:nix-community/home-manager/release-26.05`;
-- `nixosConfigurations.nixos` для хоста `nixos`;
+- `nixosConfigurations.nixos` для хоста `thinkpad-nix`;
 - встроенный Home Manager module для пользователя `ilya`.
 
 Хостовая конфигурация: `hosts/nixos/configuration.nix`. Она подключает hardware config и модули из `modules/nixos/`.
@@ -26,7 +26,7 @@ NixOS управляет системой декларативно: boot loader,
   на соседних разделах dual boot;
 - `configurationLimit = 10`, то есть boot menu хранит ограничение поколений;
 - kernel - `linuxPackages_latest`;
-- hostname - `nixos`;
+- hostname - `thinkpad-nix`;
 - timezone - `Europe/Moscow`;
 - NetworkManager включен;
 - KDE Plasma 6 включен как fallback;

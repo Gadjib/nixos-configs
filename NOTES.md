@@ -50,7 +50,7 @@ Push в remote не делать после каждого commit. Нормал�
 
 ## Машина
 
-- Hostname: `nixos`
+- Hostname: `thinkpad-nix`
 - User: `ilya`
 - Архитектура: `x86_64-linux`
 - Time zone: `Europe/Moscow`

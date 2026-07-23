@@ -31,7 +31,8 @@ home-manager.inputs.nixpkgs.follows = "nixpkgs";
 nixosConfigurations.nixos = nixpkgs.lib.nixosSystem { ... };
 ```
 
-Hostname в конфиге тоже `nixos`, поэтому команды используют `#nixos`.
+Hostname в конфиге - `thinkpad-nix`, но имя flake-output остается `nixos`,
+поэтому команды по-прежнему используют `#nixos`.
 
 ## Обновление inputs
 

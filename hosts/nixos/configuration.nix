@@ -24,7 +24,7 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "nixos";
+  networking.hostName = "thinkpad-nix";
   networking.enableIPv6 = false;
   networking.networkmanager.enable = true;
   networking.networkmanager.dispatcherScripts = [
