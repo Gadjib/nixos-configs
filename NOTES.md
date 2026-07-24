@@ -114,6 +114,7 @@ nixosConfigurations.nixos
     ├── mako/mako.nix
     ├── nvim/nvim.nix
     ├── packages/manual.nix
+    ├── packages/telegram.nix
     ├── rofi/rofi.nix
     ├── rofi/theme.rasi
     ├── scripts/network-menus.nix
@@ -203,6 +204,8 @@ config и системные модули.
 
 - `xdg-desktop-portal-hyprland`
 - `xdg-desktop-portal-gtk`
+- Hyprland portal preference: `default=hyprland;gtk`
+- `org.freedesktop.impl.portal.FileChooser` explicitly uses `gtk`
 
 Audio:
 
@@ -490,15 +493,10 @@ VS Code больше не является строкой в `packages/manual.ni
 поэтому preview разных файлов могут оставаться в нескольких вкладках. Built-in
 view type `vscode.markdown.preview.editor` намеренно не используется.
 
-`spotify` в этом списке - не прямой `pkgs.spotify`, а локальный wrapper
-`home/ilya/packages/spotify.nix`. Он оставляет upstream пакет из nixpkgs, но
-подменяет `bin/spotify` и desktop entry так, чтобы Spotify запускался с
-`NIXOS_OZONE_WL=1`, `--ozone-platform=wayland` и
-`--force-device-scale-factor=1.10`. Это нужно под текущий Hyprland scale `1.25`:
-иначе Spotify может стартовать через XWayland и выглядеть как окно нормального
-размера, отрисованное в низком внутреннем разрешении. Scale factor у wrapper-а
-держится ниже compositor scale, чтобы Spotify был чуть крупнее базового `1`, но
-не раздувался до полного `1.25` поверх масштабирования compositor-а.
+Spotify установлен напрямую как `pkgs.spotify`. Не возвращать локальный wrapper
+с `--ozone-platform=wayland`: Spotify 1.2.90 падал внутри `libcef` с `SIGSEGV`
+при таком принудительном native Wayland запуске. Upstream launcher сам выбирает
+поддерживаемый backend; стабильный запуск важнее принудительного Ozone backend.
 
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
@@ -707,9 +705,9 @@ still have its own scaling behavior because it is preserved as a separate
 fallback session.
 
 For specific applications that are blurry or pixelated under this compositor
-scale, prefer a per-application wrapper over global scale environment variables.
-Current example: `home/ilya/packages/spotify.nix` forces Spotify to use native
-Wayland/Ozone while keeping Spotify's own device scale factor at `1.10`.
+scale, prefer a narrowly scoped per-application wrapper over global scale
+environment variables, but only after checking that the application's native
+Wayland backend is stable.
 
 XWayland follows the same compositor scale as native Wayland applications:
 
@@ -862,16 +860,18 @@ state не общие с обычным KDE Firefox profile.
 
 ## Telegram
 
-Telegram установлен напрямую как `pkgs.telegram-desktop`. Для него нет
-пользовательского wrapper, переопределенного desktop entry, дополнительных
-environment variables, Hyprland window rules или принудительных XDG MIME
-defaults. Запуск, обработчики `tg`/`tonsite` и window decorations оставлены
-upstream-пакету и стандартному desktop environment behavior.
+Telegram использует локальный package wrapper
+`home/ilya/packages/telegram.nix` поверх `pkgs.telegram-desktop`. Wrapper меняет
+только `QT_QPA_PLATFORMTHEME=xdgdesktopportal`, чтобы attachment/file chooser
+всегда обслуживался XDG portal, и перенаправляет upstream DBus service на тот же
+wrapped binary. Upstream desktop entry, обработчики `tg`/`tonsite`, Hyprland
+window behavior и остальные environment variables не переопределяются.
 
-Кнопка вложения использует системную Qt/KDE file chooser integration.
-`kdeglobals` намеренно является обычным writable-файлом, а не ссылкой в
-`/nix/store`: иначе `KConfig` не может создать lock-файл, и Telegram аварийно
-завершается внутри Qt message handler.
+`kdeglobals` остаётся обычным writable-файлом, а не ссылкой в `/nix/store`,
+поскольку KDE-приложения должны иметь возможность создавать `KConfig`
+lock-файлы. Для кнопки вложения Telegram нативная KDE file chooser integration
+намеренно обходится через `xdgdesktopportal`: выбранный для Hyprland GTK portal
+показывает диалог и возвращает выбранные файлы по стандартному XDG API.
 
 ## Waybar
 

@@ -129,7 +129,7 @@ in
     cliphist
     xdg-utils
     bitwarden-desktop
-    telegram-desktop
+    (callPackage ./packages/telegram.nix { })
     networkmanagerapplet
     catppuccinGtk
     catppuccinKde
