@@ -8,7 +8,7 @@
       repo="/home/ilya/nixos-config"
       packages_rel="home/ilya/packages/manual.nix"
       packages_file="$repo/$packages_rel"
-      system_attr="$repo#nixosConfigurations.nixos.config.system.build.toplevel"
+      system_attr="$repo#nixosConfigurations.thinkpad-nix.config.system.build.toplevel"
 
       usage() {
         cat <<'USAGE'
@@ -78,7 +78,7 @@
         if ! resolved_name="$(
           nix --extra-experimental-features nix-command \
             --extra-experimental-features flakes \
-            eval --raw ".#nixosConfigurations.nixos.pkgs.$pkg.name" 2>/tmp/install-package-nix-eval.$$
+            eval --raw ".#nixosConfigurations.thinkpad-nix.pkgs.$pkg.name" 2>/tmp/install-package-nix-eval.$$
         )"; then
           cat /tmp/install-package-nix-eval.$$ >&2
           rm -f /tmp/install-package-nix-eval.$$

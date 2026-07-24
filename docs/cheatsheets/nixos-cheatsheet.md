@@ -9,8 +9,8 @@ nh os test /home/ilya/nixos-config
 git add -A
 git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
-sudo nixos-rebuild test --flake .#nixos
-sudo nixos-rebuild switch --flake .#nixos
+sudo nixos-rebuild test --flake .#thinkpad-nix
+sudo nixos-rebuild switch --flake .#thinkpad-nix
 ```
 
 ## Rollback

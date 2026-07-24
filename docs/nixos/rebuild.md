@@ -19,9 +19,9 @@ generation была понятная Git-точка отката.
 ## nixos-rebuild
 
 ```bash
-sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos
-sudo nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
-sudo nixos-rebuild boot --flake /home/ilya/nixos-config#nixos
+sudo nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix
+sudo nixos-rebuild switch --flake /home/ilya/nixos-config#thinkpad-nix
+sudo nixos-rebuild boot --flake /home/ilya/nixos-config#thinkpad-nix
 ```
 
 - `test`: собрать и активировать до reboot, не делать boot default.
@@ -60,7 +60,7 @@ rebuild-switch
 
 ```bash
 nh os test /home/ilya/nixos-config
-sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos --show-trace
+sudo nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix --show-trace
 ```
 
 Копировать ошибку удобно через mouse selection в kitty: выделение копируется в clipboard из-за `copy_on_select = clipboard`.
@@ -120,6 +120,6 @@ nh os test /home/ilya/nixos-config
 git add -A
 git commit -m "Describe the configuration change"
 nh os switch /home/ilya/nixos-config
-sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos
+sudo nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix
 sudo nixos-rebuild switch --rollback
 ```

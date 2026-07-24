@@ -28,11 +28,11 @@ home-manager.inputs.nixpkgs.follows = "nixpkgs";
 Главный output:
 
 ```nix
-nixosConfigurations.nixos = nixpkgs.lib.nixosSystem { ... };
+nixosConfigurations.thinkpad-nix = nixpkgs.lib.nixosSystem { ... };
 ```
 
-Hostname в конфиге - `thinkpad-nix`, но имя flake-output остается `nixos`,
-поэтому команды по-прежнему используют `#nixos`.
+Hostname и имя flake-output совпадают: `thinkpad-nix`. Благодаря этому `nh`
+может автоматически выбрать конфигурацию по текущему hostname.
 
 ## Обновление inputs
 
@@ -52,8 +52,8 @@ git restore flake.lock
 ## Rebuild через flake
 
 ```bash
-sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos
-sudo nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
+sudo nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix
+sudo nixos-rebuild switch --flake /home/ilya/nixos-config#thinkpad-nix
 ```
 
 `nh os test /home/ilya/nixos-config` сам понимает flake.
@@ -62,7 +62,8 @@ sudo nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
 
 - `flake.lock` изменился после `nix flake update`, но не проверен rebuild.
 - `nixpkgs` и Home Manager на разных релизах.
-- Переименовали `nixosConfigurations.nixos`, но команды все еще используют `#nixos`.
+- Переименовали output в `nixosConfigurations.thinkpad-nix`, но команды всё ещё
+  используют старый `#nixos`.
 - Работаете в dirty tree и не понимаете, какие файлы влияют на сборку.
 
 ## Troubleshooting
@@ -80,6 +81,6 @@ git diff flake.nix flake.lock
 nix flake show
 nix flake update
 git diff flake.lock
-sudo nixos-rebuild test --flake .#nixos
+sudo nixos-rebuild test --flake .#thinkpad-nix
 nh os test /home/ilya/nixos-config
 ```

@@ -12,7 +12,7 @@ Flake `flake.nix` использует:
 
 - `nixpkgs.url = github:NixOS/nixpkgs/nixos-26.05`;
 - `home-manager.url = github:nix-community/home-manager/release-26.05`;
-- `nixosConfigurations.nixos` для хоста `thinkpad-nix`;
+- `nixosConfigurations.thinkpad-nix` для хоста `thinkpad-nix`;
 - встроенный Home Manager module для пользователя `ilya`.
 
 Хостовая конфигурация: `hosts/nixos/configuration.nix`. Она подключает hardware config и модули из `modules/nixos/`.

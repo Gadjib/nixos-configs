@@ -26,7 +26,7 @@
       };
     in
     {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.thinkpad-nix = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
           inherit self pkgsUnstable;

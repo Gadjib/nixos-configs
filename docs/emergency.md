@@ -50,7 +50,7 @@ home-manager switch --rollback
 Если flake-команда нужна вручную:
 
 ```bash
-sudo nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
+sudo nixos-rebuild switch --flake /home/ilya/nixos-config#thinkpad-nix
 ```
 
 ## Проверить место на диске

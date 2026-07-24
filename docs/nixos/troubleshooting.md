@@ -6,7 +6,7 @@
 cd /home/ilya/nixos-config
 git diff
 nh os test /home/ilya/nixos-config
-sudo nixos-rebuild test --flake .#nixos --show-trace
+sudo nixos-rebuild test --flake .#thinkpad-nix --show-trace
 ```
 
 Читайте первое содержательное `error:` и ближайший путь `*.nix:line:column`.
@@ -32,10 +32,10 @@ rg "option.name|programs.hyprland|services.xserver" .
 
 ## Flake не видит hostname
 
-В этом repo output называется `nixosConfigurations.nixos`. Команда:
+В этом repo output называется `nixosConfigurations.thinkpad-nix`. Команда:
 
 ```bash
-sudo nixos-rebuild test --flake /home/ilya/nixos-config#nixos
+sudo nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix
 ```
 
 Если переименовали output, обновите команды и docs.
@@ -107,7 +107,7 @@ systemctl restart display-manager
 ```bash
 git diff
 nh os test /home/ilya/nixos-config
-sudo nixos-rebuild test --flake .#nixos --show-trace
+sudo nixos-rebuild test --flake .#thinkpad-nix --show-trace
 systemctl --failed
 journalctl -b -p err
 df -h /boot

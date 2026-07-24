@@ -81,7 +81,7 @@ impermanence, Stylix или чужие dotfiles без отдельного яв
 Репозиторий flake-based. Главная система называется:
 
 ```text
-nixosConfigurations.nixos
+nixosConfigurations.thinkpad-nix
 ```
 
 Актуальная структура важных файлов:
@@ -625,7 +625,7 @@ nix-install <pkgname> [pkgname...]
 - требует полностью чистый Git worktree до начала изменений;
 - отказывается от option-like аргументов и подозрительных символов;
 - проверяет каждый пакет против текущего flake:
-  `.#nixosConfigurations.nixos.pkgs.<pkg>.name`;
+  `.#nixosConfigurations.thinkpad-nix.pkgs.<pkg>.name`;
 - проверяет дубли внутри команды;
 - проверяет очевидные дубли отдельной строкой в `.nix`;
 - делает backup `home/ilya/packages/manual.nix.backup.<timestamp>`;
@@ -1173,8 +1173,8 @@ nh os switch /home/ilya/nixos-config
 Если shell еще не подхватил aliases или flakes не активны в окружении:
 
 ```bash
-sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild test --flake /home/ilya/nixos-config#nixos
-sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild switch --flake /home/ilya/nixos-config#nixos
+sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild test --flake /home/ilya/nixos-config#thinkpad-nix
+sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild switch --flake /home/ilya/nixos-config#thinkpad-nix
 ```
 
 Агент ограничивается evaluation и dry-run; фактические `test` и `switch`
@@ -1182,7 +1182,7 @@ sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild s
 запустить их в текущей задаче. Dry-run перед рекомендацией switch:
 
 ```bash
-nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations.nixos.config.system.build.toplevel --dry-run
+nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#nixosConfigurations.thinkpad-nix.config.system.build.toplevel --dry-run
 ```
 
 После изменения Hyprland config:
