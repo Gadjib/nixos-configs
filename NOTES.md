@@ -207,6 +207,15 @@ config и системные модули.
 - Hyprland portal preference: `default=hyprland;gtk`
 - `org.freedesktop.impl.portal.FileChooser` explicitly uses `gtk`
 
+Portal backend list and the Hyprland preference are declared in both the NixOS
+module and Home Manager. This duplication is required by the current Home
+Manager Hyprland module: it enables `xdg.portal` for the user and exports
+`NIX_XDG_DESKTOP_PORTAL_DIR` pointing at the per-user profile. Therefore the
+Home Manager profile must contain both `hyprland.portal` and `gtk.portal`;
+otherwise the broker sees only Hyprland's ScreenCast/Screenshot interfaces and
+does not export `FileChooser` or `Settings`, even though the GTK backend is
+installed system-wide.
+
 Audio:
 
 - PipeWire
@@ -497,6 +506,11 @@ Spotify установлен напрямую как `pkgs.spotify`. Не воз
 с `--ozone-platform=wayland`: Spotify 1.2.90 падал внутри `libcef` с `SIGSEGV`
 при таком принудительном native Wayland запуске. Upstream launcher сам выбирает
 поддерживаемый backend; стабильный запуск важнее принудительного Ozone backend.
+После смены hostname с `nixos` на `thinkpad-nix` пришлось один раз удалить
+`~/.cache/spotify/SingletonCookie`, `SingletonLock` и `SingletonSocket`: они
+остались после crash с lock target `nixos-51010`, из-за чего новые запуски из
+Rofi молча завершались с кодом 1. Это runtime cleanup, а не постоянная часть
+конфигурации.
 
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
