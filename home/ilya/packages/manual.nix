@@ -15,7 +15,7 @@
     (callPackage ./tlauncher.nix { })
     qbittorrent
     zip
-    spotify
+    (callPackage ./spotify.nix { })
     obsidian
   ];
 }

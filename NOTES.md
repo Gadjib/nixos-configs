@@ -114,7 +114,7 @@ nixosConfigurations.thinkpad-nix
     ├── mako/mako.nix
     ├── nvim/nvim.nix
     ├── packages/manual.nix
-    ├── packages/telegram.nix
+    ├── packages/spotify.nix
     ├── rofi/rofi.nix
     ├── rofi/theme.rasi
     ├── scripts/network-menus.nix
@@ -502,13 +502,15 @@ VS Code больше не является строкой в `packages/manual.ni
 поэтому preview разных файлов могут оставаться в нескольких вкладках. Built-in
 view type `vscode.markdown.preview.editor` намеренно не используется.
 
-Spotify установлен напрямую как `pkgs.spotify`. Не возвращать локальный wrapper
-с `--ozone-platform=wayland`: Spotify 1.2.90 падал внутри `libcef` с `SIGSEGV`
-при таком принудительном native Wayland запуске. Upstream launcher сам выбирает
-поддерживаемый backend; стабильный запуск важнее принудительного Ozone backend.
+Spotify установлен через локальный wrapper `home/ilya/packages/spotify.nix`.
+Он запускает Chromium frontend через native Wayland/Ozone и задаёт
+`--force-device-scale-factor=1.10`, чтобы интерфейс оставался чётким при
+Hyprland scale `1.25`, а не размывался при масштабировании XWayland. Desktop
+entry также направлен на wrapped binary, поэтому тот же режим используется при
+запуске из Rofi.
 После смены hostname с `nixos` на `thinkpad-nix` пришлось один раз удалить
 `~/.cache/spotify/SingletonCookie`, `SingletonLock` и `SingletonSocket`: они
-остались после crash с lock target `nixos-51010`, из-за чего новые запуски из
+остались с lock target `nixos-51010`, из-за чего новые запуски из
 Rofi молча завершались с кодом 1. Это runtime cleanup, а не постоянная часть
 конфигурации.
 
@@ -874,18 +876,13 @@ state не общие с обычным KDE Firefox profile.
 
 ## Telegram
 
-Telegram использует локальный package wrapper
-`home/ilya/packages/telegram.nix` поверх `pkgs.telegram-desktop`. Wrapper меняет
-только `QT_QPA_PLATFORMTHEME=xdgdesktopportal`, чтобы attachment/file chooser
-всегда обслуживался XDG portal, и перенаправляет upstream DBus service на тот же
-wrapped binary. Upstream desktop entry, обработчики `tg`/`tonsite`, Hyprland
-window behavior и остальные environment variables не переопределяются.
+Telegram установлен напрямую как `pkgs.telegram-desktop`. Для него нет
+локального wrapper-а, дополнительных environment variables, подмены desktop
+entry или DBus service, MIME association и Hyprland window rules. Приложение
+запускается с полностью upstream-конфигурацией пакета.
 
-`kdeglobals` остаётся обычным writable-файлом, а не ссылкой в `/nix/store`,
-поскольку KDE-приложения должны иметь возможность создавать `KConfig`
-lock-файлы. Для кнопки вложения Telegram нативная KDE file chooser integration
-намеренно обходится через `xdgdesktopportal`: выбранный для Hyprland GTK portal
-показывает диалог и возвращает выбранные файлы по стандартному XDG API.
+Пользовательские данные Telegram в `~/.local/share/TelegramDesktop`, кэш и
+прочие runtime-файлы декларативной конфигурацией не управляются и не удаляются.
 
 ## Waybar
 
