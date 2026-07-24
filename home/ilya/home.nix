@@ -207,13 +207,17 @@ in
 
   xdg.enable = true;
   xdg.portal = {
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [
+      pkgs.kdePackages.xdg-desktop-portal-kde
+      pkgs.xdg-desktop-portal-gtk
+    ];
     config.hyprland = {
       default = [
         "hyprland"
+        "kde"
         "gtk"
       ];
-      "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "kde" ];
     };
   };
   xdg.dataFile."color-schemes/${appearance.kde.colorScheme}.colors".source =

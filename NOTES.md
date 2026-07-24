@@ -203,18 +203,19 @@ config и системные модули.
 Порталы:
 
 - `xdg-desktop-portal-hyprland`
+- `xdg-desktop-portal-kde`
 - `xdg-desktop-portal-gtk`
-- Hyprland portal preference: `default=hyprland;gtk`
-- `org.freedesktop.impl.portal.FileChooser` explicitly uses `gtk`
+- Hyprland portal preference: `default=hyprland;kde;gtk`
+- `org.freedesktop.impl.portal.FileChooser` explicitly uses `kde`
 
 Portal backend list and the Hyprland preference are declared in both the NixOS
 module and Home Manager. This duplication is required by the current Home
 Manager Hyprland module: it enables `xdg.portal` for the user and exports
 `NIX_XDG_DESKTOP_PORTAL_DIR` pointing at the per-user profile. Therefore the
-Home Manager profile must contain both `hyprland.portal` and `gtk.portal`;
-otherwise the broker sees only Hyprland's ScreenCast/Screenshot interfaces and
-does not export `FileChooser` or `Settings`, even though the GTK backend is
-installed system-wide.
+Home Manager profile must contain the KDE and GTK fallback descriptors in
+addition to Hyprland's portal. KDE provides the native themed `FileChooser`;
+Hyprland remains first for compositor-specific ScreenCast/Screenshot
+interfaces, and GTK remains the final fallback.
 
 Audio:
 
