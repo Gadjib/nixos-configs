@@ -8,6 +8,7 @@
     ../../modules/nixos/desktop.nix
     ../../modules/nixos/happ.nix
     ../../modules/nixos/packages.nix
+    ../../modules/nixos/removable-media.nix
     ../../modules/nixos/smb.nix
     ../../modules/nixos/swap.nix
     ../../modules/nixos/users.nix

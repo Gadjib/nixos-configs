@@ -250,8 +250,13 @@ fd -t f . | xargs -r du -h | sort -h | tail
 ```bash
 lsblk
 duf
-yazi /run/media/$USER
+yazi /mnt
 ```
+
+USB block devices with a recognized filesystem are mounted automatically by
+`usb-automount@.service` below `/mnt/<label>` (or `/mnt/<device>` without a
+label). Mako reports both successful mounts and mount errors. Yazi itself does
+not mount devices; it only opens the resulting directory.
 
 ## Troubleshooting
 

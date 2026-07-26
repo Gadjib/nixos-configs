@@ -100,6 +100,7 @@ nixosConfigurations.thinkpad-nix
 │   ├── happ.nix
 │   ├── nix.nix
 │   ├── packages.nix
+│   ├── removable-media.nix
 │   ├── compat.nix
 │   ├── smb.nix
 │   ├── swap.nix
@@ -233,6 +234,22 @@ Audio:
 - UPower
 - Polkit
 - dconf
+
+USB removable media:
+
+- `modules/nixos/removable-media.nix` enables `udisks2` explicitly.
+- A udev rule starts `usb-automount@<device>.service` for each USB block device
+  with a recognized filesystem.
+- Filesystems mount immediately below `/mnt/<label>`; unlabeled filesystems use
+  `/mnt/<device>`. If that directory already exists, the device name is added
+  to avoid hiding an existing mount such as `/mnt/home`.
+- FAT, exFAT, and NTFS mounts use `ilya` ownership. All automatic mounts use
+  `nosuid,nodev,noexec`.
+- The service stays bound to the kernel device and unmounts/removes its
+  mountpoint when the device disappears.
+- Success and failure are sent to the active user D-Bus notification service,
+  so Mako shows the mount path or the mount error. Errors are also retained in
+  `journalctl -u 'usb-automount@*.service'`.
 
 SMB mount:
 
