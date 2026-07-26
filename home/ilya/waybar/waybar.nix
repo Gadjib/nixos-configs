@@ -48,6 +48,7 @@
           "class<org\\.kde\\.gwenview>" = " ";
           "class<org\\.kde\\.okular>" = " ";
           "class<org\\.kde\\.kate>" = " 󰷈";
+          "class<([Ll]ibre[Oo]ffice.*|soffice)>" = " 󰈙";
           "class<pavucontrol>" = " ";
           "class<org\\.kde\\.plasma-systemmonitor>" = " ";
         };

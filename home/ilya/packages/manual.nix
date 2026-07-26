@@ -17,5 +17,6 @@
     zip
     (callPackage ./spotify.nix { })
     obsidian
+    libreoffice-qt6
   ];
 }

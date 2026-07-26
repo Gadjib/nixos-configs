@@ -494,6 +494,10 @@ home/ilya/packages/manual.nix
 Obsidian установлен обычным пакетом `pkgs.obsidian` из закрепленного nixpkgs;
 отдельный wrapper или системный модуль для него не используется.
 
+LibreOffice установлен как `pkgs.libreoffice-qt6`, чтобы использовать уже
+настроенную KDE/Qt6 integration в Hyprland. MIME associations для офисных
+документов при установке намеренно не меняются.
+
 VS Code больше не является строкой в `packages/manual.nix`: им владеет
 `home/ilya/vscode/vscode.nix` через `programs.vscode`. Модуль устанавливает
 `shd101wyy.markdown-preview-enhanced`, задает
