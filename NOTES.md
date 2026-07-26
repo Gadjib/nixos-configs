@@ -495,8 +495,9 @@ Obsidian установлен обычным пакетом `pkgs.obsidian` из
 отдельный wrapper или системный модуль для него не используется.
 
 LibreOffice установлен как `pkgs.libreoffice-qt6`, чтобы использовать уже
-настроенную KDE/Qt6 integration в Hyprland. MIME associations для офисных
-документов при установке намеренно не меняются.
+настроенную KDE/Qt6 integration в Hyprland. Declarative MIME associations
+направляют Word/RTF/ODT в Writer, Excel/ODS в Calc и PowerPoint/ODP в Impress.
+PDF и EPUB по-прежнему открываются в Okular.
 
 VS Code больше не является строкой в `packages/manual.nix`: им владеет
 `home/ilya/vscode/vscode.nix` через `programs.vscode`. Модуль устанавливает

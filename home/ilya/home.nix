@@ -18,21 +18,21 @@ let
   defaultApplications = {
     "application/epub+zip" = [ "okularApplication_epub.desktop" ];
     "application/json" = [ "code.desktop" ];
-    "application/msword" = [ "org.kde.okular.desktop" ];
+    "application/msword" = [ "writer.desktop" ];
     "application/ogg" = [ "vlc.desktop" ];
     "application/pdf" = [ "okularApplication_pdf.desktop" ];
-    "application/rtf" = [ "org.kde.okular.desktop" ];
-    "application/vnd.ms-excel" = [ "org.kde.okular.desktop" ];
-    "application/vnd.ms-powerpoint" = [ "org.kde.okular.desktop" ];
-    "application/vnd.oasis.opendocument.presentation" = [ "org.kde.okular.desktop" ];
-    "application/vnd.oasis.opendocument.spreadsheet" = [ "org.kde.okular.desktop" ];
-    "application/vnd.oasis.opendocument.text" = [ "org.kde.okular.desktop" ];
+    "application/rtf" = [ "writer.desktop" ];
+    "application/vnd.ms-excel" = [ "calc.desktop" ];
+    "application/vnd.ms-powerpoint" = [ "impress.desktop" ];
+    "application/vnd.oasis.opendocument.presentation" = [ "impress.desktop" ];
+    "application/vnd.oasis.opendocument.spreadsheet" = [ "calc.desktop" ];
+    "application/vnd.oasis.opendocument.text" = [ "writer.desktop" ];
     "application/vnd.openxmlformats-officedocument.presentationml.presentation" = [
-      "org.kde.okular.desktop"
+      "impress.desktop"
     ];
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "org.kde.okular.desktop" ];
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = [ "calc.desktop" ];
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = [
-      "org.kde.okular.desktop"
+      "writer.desktop"
     ];
     "application/x-7z-compressed" = [ "org.kde.ark.desktop" ];
     "application/x-bzip2" = [ "org.kde.ark.desktop" ];
