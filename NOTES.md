@@ -257,6 +257,11 @@ SMB mount:
   the standard SMB port.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
+- The mount requires `home-smb-available.service`. Its oneshot preflight first
+  requires the active SSID to be exactly `0xDEADBEEF48`; on every other Wi-Fi
+  it exits immediately without any network probe. On the home SSID it sends
+  exactly one ping with a one-second timeout to `192.168.0.10`, bound to the
+  active Wi-Fi interface. CIFS is attempted only when that first ping succeeds.
 - Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
