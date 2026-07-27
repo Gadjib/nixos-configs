@@ -367,6 +367,12 @@ broken IPv6 attempts.
 ### `modules/nixos/packages.nix`
 
 Системные программы: Firefox и Steam включены через собственные NixOS-модули.
+Steam package sets `GLOBIGNORE=/vault` in `extraPreBwrapCmds` so the generated
+FHS wrapper does not stat or bind the root-level SMB automount while enumerating
+host directories. This prevents an unavailable `/vault` from aborting Steam's
+`bubblewrap` startup; all other host directories retain the standard Nixpkgs
+Steam behavior. `dotglob` is disabled again after assigning `GLOBIGNORE` to
+avoid changing which hidden root entries the wrapper enumerates.
 В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`

@@ -2,7 +2,15 @@
 
 {
   programs.firefox.enable = true;
-  programs.steam.enable = true;
+  programs.steam = {
+    enable = true;
+    package = pkgs.steam.override {
+      extraPreBwrapCmds = ''
+        GLOBIGNORE=/vault
+        shopt -u dotglob
+      '';
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     vim
