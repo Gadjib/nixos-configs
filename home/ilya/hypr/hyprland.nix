@@ -208,7 +208,6 @@ in
         "4, horizontal, workspace"
         "4, down, special, magic"
         "4, up, fullscreen"
-        "3, pinchout, fullscreen"
         "3, pinchin, float"
         "4, pinchout, cursorZoom, 2"
         "4, pinchin, cursorZoom, 1"

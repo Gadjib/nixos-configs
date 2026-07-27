@@ -813,7 +813,6 @@ Gestures:
 - 4 fingers horizontal: workspace switching
 - 4 fingers down: special workspace `magic`
 - 4 fingers up: fullscreen
-- 3 fingers pinch out: fullscreen
 - 3 fingers pinch in: float
 - 4 fingers pinch out: cursor zoom x2
 - 4 fingers pinch in: cursor zoom reset
