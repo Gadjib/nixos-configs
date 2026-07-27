@@ -258,10 +258,11 @@ USB block devices with a recognized filesystem are mounted automatically by
 label). Mako reports both successful mounts and mount errors. Yazi itself does
 not mount devices; it only opens the resulting directory.
 
-`/mnt/home` is a separate SMB automount. It is attempted only on Wi-Fi SSID
-`0xDEADBEEF48` and only if `192.168.0.10` answers the first one-second ping.
-This prevents Yazi metadata scans of `/mnt` from waiting on CIFS in other
-networks.
+The SMB share is a separate automount at `/vault`, so scans of `/mnt` never
+touch it. On Wi-Fi SSID `0xDEADBEEF48`, accessing `/vault` directly permits the
+normal CIFS attempt. In any other network session, the first access sends one
+one-second ping to `192.168.0.10`; a failed result is cached until the network
+changes or reconnects, and later accesses do not retry the ping or CIFS.
 
 ## Troubleshooting
 

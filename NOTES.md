@@ -242,7 +242,7 @@ USB removable media:
   with a recognized filesystem.
 - Filesystems mount immediately below `/mnt/<label>`; unlabeled filesystems use
   `/mnt/<device>`. If that directory already exists, the device name is added
-  to avoid hiding an existing mount such as `/mnt/home`.
+  to avoid hiding an existing directory.
 - FAT, exFAT, and NTFS mounts use `ilya` ownership. All automatic mounts use
   `nosuid,nodev,noexec`.
 - The service stays bound to the kernel device and unmounts/removes its
@@ -253,15 +253,20 @@ USB removable media:
 
 SMB mount:
 
-- `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/mnt/home` using
+- `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/vault` using
   the standard SMB port.
 - It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
   not block if the NAS is offline.
-- The mount requires `home-smb-available.service`. Its oneshot preflight first
-  requires the active SSID to be exactly `0xDEADBEEF48`; on every other Wi-Fi
-  it exits immediately without any network probe. On the home SSID it sends
-  exactly one ping with a one-second timeout to `192.168.0.10`, bound to the
-  active Wi-Fi interface. CIFS is attempted only when that first ping succeeds.
+- The mount requires `home-smb-available.service`. On SSID `0xDEADBEEF48` the
+  preflight immediately permits the normal CIFS attempt without a ping. In
+  every other network session it sends exactly one one-second ping to
+  `192.168.0.10`, bound to the active Wi-Fi interface when present.
+- The non-home result is cached in `/run/home-smb-preflight/current`, keyed by
+  NetworkManager's `ActiveConnection` id. A failed probe blocks all further
+  probes and CIFS attempts for that connection session; reconnecting or
+  changing networks produces a new id and permits one new ping.
+- tmpfiles creates `/vault` and removes the obsolete `/mnt/home` directory only
+  when the old path is empty.
 - Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
   It should contain `username=...`, `password=...`, and optionally
   `domain=WORKGROUP`.
