@@ -966,6 +966,8 @@ Bar layout is tuned for current Hyprland scale `1.25`:
 - Every newly installed GUI application must add its class and dedicated icon
   to this `window-rewrite` table in the same change, as required by the
   repository workflow above.
+- OpenMW uses the controller icon for `openmw`, `openmw-launcher`, `openmw-cs`
+  and reverse-DNS `org.openmw.*` window identifiers.
 - active window title is capped at 42 chars.
 - empty window module is visually hidden via the Waybar-supported selector
   `window#waybar.empty #window`, so an empty title does not leave a blank pill

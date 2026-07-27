@@ -18,5 +18,6 @@
     (callPackage ./spotify.nix { })
     obsidian
     libreoffice-qt6
+    openmw
   ];
 }

@@ -45,6 +45,7 @@
           "class<[Oo]bsidian>" = " 󰠮";
           "class<([Ss]team|steam_app_.*)>" = " ";
           "class<([Tt][Ll]auncher|Minecraft.*)>" = " ";
+          "class<(openmw|openmw-launcher|openmw-cs|org\\.openmw\\..*)>" = " 󰍳";
           "class<org\\.kde\\.gwenview>" = " ";
           "class<org\\.kde\\.okular>" = " ";
           "class<org\\.kde\\.kate>" = " 󰷈";
