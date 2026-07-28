@@ -15,7 +15,8 @@ symlinkJoin {
     makeWrapper "${spotify}/bin/spotify" "$out/bin/spotify" \
       --set NIXOS_OZONE_WL 1 \
       --add-flags "--enable-features=UseOzonePlatform" \
-      --add-flags "--ozone-platform=wayland"
+      --add-flags "--ozone-platform=wayland" \
+      --add-flags "--force-device-scale-factor=1.10"
 
     if [ -f "$out/share/applications/spotify.desktop" ]; then
       rm -f "$out/share/applications/spotify.desktop"
@@ -28,7 +29,7 @@ symlinkJoin {
   '';
 
   meta = spotify.meta // {
-    description = "${spotify.meta.description or "Spotify"} wrapped for native Wayland rendering";
+    description = "${spotify.meta.description or "Spotify"} wrapped for crisp Hyprland HiDPI rendering";
     mainProgram = "spotify";
     platforms = [ "x86_64-linux" ];
     license = lib.licenses.unfree;

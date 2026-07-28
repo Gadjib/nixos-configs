@@ -80,9 +80,9 @@ Home Manager управляет пользовательским окружен�
   configs, Kvantum Catppuccin Macchiato Blue for Qt widgets/toolbars, and
   explicit GTK4 Catppuccin css/assets links.
 - Home Manager синхронизирует курсор из `appearance.nix` с Hyprcursor,
-  XCursor/Xresources, GTK, dconf и compatibility links. XWayland использует
-  физическое разрешение `1920x1200` без compositor scaling, как и
-  Wayland-приложения при scale `1`.
+  XCursor/Xresources, GTK, dconf и compatibility links. Wayland-приложения
+  используют scale `1.25`, а `xwayland.force_zero_scaling` оставляет X11
+  приложения и игры в масштабе `1` с физическим разрешением `1920x1200`.
 - Bundled Qt GUI Happ запускается через Wayland QPA с fallback на `xcb`, чтобы
   touchpad scrolling в Hyprland не проходил через XWayland wheel emulation.
 

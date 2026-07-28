@@ -10,11 +10,12 @@
 
 ```nix
 monitor = [
-  ",preferred,auto,1"
+  ",preferred,auto,1.25"
 ];
 ```
 
-Это означает: для любого монитора использовать preferred mode, auto position, scale 1.
+Это означает: для любого монитора использовать preferred mode, auto position,
+scale 1.25. XWayland отдельно принудительно использует scale 1.
 
 ## Посмотреть мониторы
 
@@ -43,7 +44,7 @@ hyprctl monitors all
 Scale:
 
 ```nix
-"eDP-1,preferred,auto,1"
+"eDP-1,preferred,auto,1.25"
 ```
 
 Mirror обычно делается одинаковой позицией, но в Hyprland это менее удобно, чем extend. Для презентаций проверьте текущую версию `hyprctl keyword monitor ...`.

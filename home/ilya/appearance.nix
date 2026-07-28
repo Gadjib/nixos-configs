@@ -1,7 +1,7 @@
 { pkgs }:
 
 {
-  scale = 1;
+  scale = 1.25;
 
   cursor = {
     name = "Bibata-Modern-Ice";

@@ -542,9 +542,11 @@ VS Code больше не является строкой в `packages/manual.ni
 view type `vscode.markdown.preview.editor` намеренно не используется.
 
 Spotify установлен через локальный wrapper `home/ilya/packages/spotify.nix`.
-Он запускает Chromium frontend через native Wayland/Ozone без собственного
-коэффициента масштаба. Desktop entry также направлен на wrapped binary, поэтому
-тот же режим используется при запуске из Rofi.
+Он запускает Chromium frontend через native Wayland/Ozone и задаёт
+`--force-device-scale-factor=1.10`, чтобы интерфейс оставался чётким при
+Hyprland scale `1.25`, а не размывался при масштабировании XWayland. Desktop
+entry также направлен на wrapped binary, поэтому тот же режим используется при
+запуске из Rofi.
 После смены hostname с `nixos` на `thinkpad-nix` пришлось один раз удалить
 `~/.cache/spotify/SingletonCookie`, `SingletonLock` и `SingletonSocket`: они
 остались с lock target `nixos-51010`, из-за чего новые запуски из
@@ -744,31 +746,32 @@ Monitor scaling is set in Hyprland, not by manually increasing every app font:
 
 ```nix
 monitor = [
-  ",preferred,auto,1"
+  ",preferred,auto,1.25"
 ];
 ```
 
-The current global UI scale is `1`: Wayland and XWayland both use the physical
-`1920x1200` panel resolution without compositor enlargement. Avoid also adding
-`QT_SCALE_FACTOR`, `GDK_SCALE`, or manual per-app font bumps unless there is a
-specific problem, because that would make applications diverge from the global
-scale. KDE may still have its own scaling behavior because it is preserved as a
-separate fallback session.
+The current Wayland UI scale is `1.25`, restoring the established size for
+native Wayland applications and desktop components. Avoid also adding global
+`QT_SCALE_FACTOR`, `GDK_SCALE`, or manual font bumps, because that can
+double-scale parts of the UI. KDE may still have its own scaling behavior
+because it is preserved as a separate fallback session.
 
-XWayland uses the same unscaled output geometry as native Wayland applications:
+XWayland is intentionally kept at scale `1` independently of the Wayland scale:
 
 ```nix
 xwayland = {
-  force_zero_scaling = false;
+  force_zero_scaling = true;
   use_nearest_neighbor = false;
 };
 ```
 
-At monitor scale `1`, XWayland publishes the physical `1920x1200` mode and no
-bitmap enlargement is required. X11 games such as native Linux Half-Life 2 can
-therefore select and render at the panel's physical resolution. Cursor theme and
-size still come from `appearance.nix` through both XCursor and Hyprcursor
-settings.
+`force_zero_scaling` makes XWayland publish the physical `1920x1200` mode
+instead of the Wayland logical `1536x960` geometry. X11 games such as native
+Linux Half-Life 2 can therefore select and render at the panel's physical
+resolution without compositor enlargement. Legacy X11 desktop applications
+that do not implement their own HiDPI scaling will appear smaller than Wayland
+applications. Cursor theme and size still come from `appearance.nix` through
+both XCursor and Hyprcursor settings.
 
 Keyboard:
 
@@ -936,7 +939,7 @@ Layout:
   top/center step. The bar shows icon-only labels: `power-saver` uses the
   10-o'clock gauge icon, `balanced` uses the 12-o'clock gauge icon.
 
-Bar layout uses the current Hyprland scale `1`:
+Bar layout is tuned for the current Hyprland scale `1.25`:
 
 - `fixed-center = false`; the center is intentionally empty and date/time sits
   on the right between battery and power in `dd.mm.yy HH:MM` format.
