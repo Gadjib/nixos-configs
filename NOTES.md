@@ -781,13 +781,6 @@ softer than native Wayland applications, but their window and UI size stays
 consistent. Cursor theme and size come from `appearance.nix` through both
 XCursor and Hyprcursor settings.
 
-Steam is a targeted exception to the global linear-filter choice. Its XWayland
-window class `steam` uses the `nearest_neighbor` window rule, keeping the same
-logical size at scale `1.25` while avoiding visibly blurred text. This is still
-scaled XWayland output rather than true native fractional HiDPI, so diagonal
-edges can look slightly pixelated. Other XWayland applications retain linear
-filtering.
-
 Keyboard:
 
 - layouts: `us,ru`

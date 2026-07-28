@@ -236,7 +236,6 @@ in
         "match:class ^(pavucontrol)$, float on"
         "match:class ^(blueman-manager)$, float on"
         "match:class ^(firefox)$, workspace 2"
-        "match:class ^(steam)$, nearest_neighbor on"
         "match:title ^(Picture-in-Picture)$, float on"
         "match:title ^(Picture-in-Picture)$, pin on"
       ];
