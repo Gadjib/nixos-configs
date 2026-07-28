@@ -98,6 +98,7 @@ in
     ./kitty/kitty.nix
     ./mako/mako.nix
     ./nvim/nvim.nix
+    ./packages/hl2.nix
     ./packages/manual.nix
     ./rofi/rofi.nix
     ./scripts/network-menus.nix

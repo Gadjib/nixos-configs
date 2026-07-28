@@ -547,6 +547,19 @@ Spotify установлен через локальный wrapper `home/ilya/pa
 Hyprland scale `1.25`, а не размывался при масштабировании XWayland. Desktop
 entry также направлен на wrapped binary, поэтому тот же режим используется при
 запуске из Rofi.
+
+Нативный Linux-клиент Half-Life 2 получает декларативный stability profile из
+`home/ilya/packages/hl2.nix`. Два coredump от 2026-07-28 упали с одинаковым
+стеком `materialsystem.so -> shaderapidx9.so -> engine.so`, а перед падением
+OpenGL backend создавал 4x MSAA shaders с несовпадающей centroid mask. Поэтому
+`hl2_complete/cfg/autoexec.cfg` принудительно включает синхронный
+`mat_queue_mode 0`, отключает вспомогательные render threads и MSAA, оставляет
+VSync и ограничивает частоту до 60 FPS. Управляемый
+`hl2/videoconfig_linux.cfg` также отключает 4x MSAA до инициализации OpenGL,
+сохраняя fullscreen `1920x1200` и остальные текущие параметры. Это профиль для
+нативного `hl2_linux`; Proton/Wine не используется, сохранения и Steam cache
+не изменяются.
+
 После смены hostname с `nixos` на `thinkpad-nix` пришлось один раз удалить
 `~/.cache/spotify/SingletonCookie`, `SingletonLock` и `SingletonSocket`: они
 остались с lock target `nixos-51010`, из-за чего новые запуски из
