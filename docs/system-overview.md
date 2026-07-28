@@ -81,8 +81,8 @@ Home Manager управляет пользовательским окружен�
   explicit GTK4 Catppuccin css/assets links.
 - Home Manager синхронизирует курсор из `appearance.nix` с Hyprcursor,
   XCursor/Xresources, GTK, dconf и compatibility links. XWayland использует
-  compositor scale, поэтому X11-окна имеют тот же логический размер, что и
-  Wayland-приложения при scale `1.25`.
+  физическое разрешение `1920x1200` без compositor scaling, как и
+  Wayland-приложения при scale `1`.
 - Bundled Qt GUI Happ запускается через Wayland QPA с fallback на `xcb`, чтобы
   touchpad scrolling в Hyprland не проходил через XWayland wheel emulation.
 

@@ -43,7 +43,7 @@ hyprctl monitors all
 Scale:
 
 ```nix
-"eDP-1,preferred,auto,1.25"
+"eDP-1,preferred,auto,1"
 ```
 
 Mirror обычно делается одинаковой позицией, но в Hyprland это менее удобно, чем extend. Для презентаций проверьте текущую версию `hyprctl keyword monitor ...`.
