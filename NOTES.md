@@ -859,7 +859,10 @@ SUPER+B           Firefox Hyprland wrapper
 SUPER+S           special workspace magic
 SUPER+Shift+S     move window to special workspace magic
 SUPER+V           cliphist + rofi
-Print             grim/slurp/swappy area screenshot
+Print             select an area and copy it directly to the clipboard
+Shift+Print       copy the entire output to the clipboard
+Ctrl+Print        select an area and open it in Swappy
+Ctrl+Shift+Print  capture the entire output and open it in Swappy
 SUPER+F           fullscreen
 SUPER+Space       floating toggle
 SUPER+P           pseudo
@@ -1339,7 +1342,9 @@ git diff
 6. Alt+Shift переключает `us`/`ru`, индикатор языка обновляется.
 7. Volume/mute keys работают без double-toggle.
 8. Brightness keys работают.
-9. `Print` запускает screenshot через grim/slurp/swappy.
+9. Screenshot bindings use `grim`, `slurp`, `wl-copy` and `swappy`: plain
+   `Print` and `Shift+Print` copy an area or the entire output directly to the
+   clipboard; adding `Ctrl` opens the captured image in Swappy instead.
 10. `SUPER+V` открывает clipboard history.
 11. Индикатор NetworkManager присутствует в tray.
 12. Индикатор Bluetooth присутствует в tray.

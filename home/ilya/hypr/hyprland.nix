@@ -136,7 +136,10 @@ in
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
         "$mod, V, exec, cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy"
-        ", Print, exec, grim -g \"$(slurp)\" - | swappy -f -"
+        ", Print, exec, grim -g \"$(slurp)\" - | wl-copy --type image/png"
+        "SHIFT, Print, exec, grim - | wl-copy --type image/png"
+        "CTRL, Print, exec, grim -g \"$(slurp)\" - | swappy -f -"
+        "CTRL SHIFT, Print, exec, grim - | swappy -f -"
 
         "$mod, F, fullscreen"
         "$mod, Space, togglefloating"
