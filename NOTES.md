@@ -982,6 +982,11 @@ Bar layout is tuned for the current Hyprland scale `1.25`:
 - Every newly installed GUI application must add its class and dedicated icon
   to this `window-rewrite` table in the same change, as required by the
   repository workflow above.
+- Existing mappings cover the installed desktop applications, including the
+  live-verified `Bitwarden` and `org.qbittorrent.qBittorrent` classes, plus
+  Discord, VLC, Prism Launcher, Ark, Thunar, Blueman, appearance tools and
+  Swappy. Regexes include expected Wayland app IDs and XWayland class variants
+  where an application can expose either.
 - OpenMW uses the controller icon for `openmw`, `openmw-launcher`, `openmw-cs`
   and reverse-DNS `org.openmw.*` window identifiers.
 - active window title is capped at 42 chars.
