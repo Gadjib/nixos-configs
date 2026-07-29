@@ -9,8 +9,11 @@
         GLOBIGNORE=/vault
         shopt -u dotglob
       '';
+      extraLibraries = pkgs': [ pkgs'.faudio ];
     };
   };
+
+  hardware.graphics.enable32Bit = true;
 
   environment.systemPackages = with pkgs; [
     vim
@@ -61,6 +64,11 @@
     uv
     go
     rustup
+
+    wineWow64Packages.stagingFull
+    winetricks
+    cabextract
+    vulkan-tools
 
     pkgsUnstable.codex
   ];

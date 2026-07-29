@@ -560,6 +560,17 @@ VSync и ограничивает частоту до 60 FPS. Управляем
 нативного `hl2_linux`; Proton/Wine не используется, сохранения и Steam cache
 не изменяются.
 
+Для 32-битных Windows-игр вроде Colin McRae: DiRT 2 установлены
+`wineWow64Packages.stagingFull`, `winetricks`, `cabextract` и `vulkan-tools`.
+32-битные Mesa/Vulkan drivers и PipeWire ALSA support включены системно.
+Steam package добавляет FAudio через `extraLibraries`; поскольку Steam FHS
+multiarch, библиотека попадает и в обычный Steam runtime, и в `steam-run` для
+`x86_64` и `i686`. Самораспаковывающиеся сборки с собственными Wine/DXVK нужно
+запускать как `steam-run ./имя-файла.run`: это даёт их нениксовым ELF-файлам
+FHS layout, 32-битный Vulkan loader, Intel Mesa driver, звук и FAudio.
+Системный Wine 11 staging остаётся запасным вариантом для замены старого
+bundled Wine; сама игра и её файлы конфигурацией не устанавливаются.
+
 После смены hostname с `nixos` на `thinkpad-nix` пришлось один раз удалить
 `~/.cache/spotify/SingletonCookie`, `SingletonLock` и `SingletonSocket`: они
 остались с lock target `nixos-51010`, из-за чего новые запуски из
