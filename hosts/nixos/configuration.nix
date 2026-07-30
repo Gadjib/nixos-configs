@@ -12,6 +12,7 @@
     ../../modules/nixos/smb.nix
     ../../modules/nixos/swap.nix
     ../../modules/nixos/users.nix
+    ../../modules/nixos/windows.nix
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;

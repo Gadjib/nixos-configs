@@ -251,6 +251,17 @@ USB removable media:
   so Mako shows the mount path or the mount error. Errors are also retained in
   `journalctl -u 'usb-automount@*.service'`.
 
+Windows partition:
+
+- The internal NTFS Windows data partition with UUID `32566001565FC3EF` mounts
+  at `/mnt/win_c` during boot through `modules/nixos/windows.nix`.
+- It uses the kernel `ntfs3` driver with read/write access owned by
+  `ilya:users`; `windows_names` rejects Linux filenames that Windows cannot
+  represent.
+- `nofail` and a five-second device timeout keep an unavailable, dirty or
+  hibernated Windows partition from blocking NixOS boot. Such a partition is
+  intentionally not force-mounted because that could damage it.
+
 SMB mount:
 
 - `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/vault` using
