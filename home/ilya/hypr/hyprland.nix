@@ -236,6 +236,7 @@ in
       ];
 
       windowrule = [
+        "match:class .*, idle_inhibit fullscreen"
         "match:class ^(pavucontrol)$, float on"
         "match:class ^(blueman-manager)$, float on"
         "match:class ^(firefox)$, workspace 2"

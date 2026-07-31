@@ -903,6 +903,9 @@ Sleep/lock:
 
 - `hypridle` locks after 300 seconds;
 - display off after 600 seconds;
+- every fullscreen Hyprland window gets `idle_inhibit fullscreen`, so games
+  controlled only by a gamepad do not trigger either timer; leaving fullscreen
+  restores normal idle handling without polling or a helper process;
 - before sleep: `loginctl lock-session`;
 - after sleep: `hyprctl dispatch dpms on`;
 - additional user systemd service `lock-before-sleep` locks before
