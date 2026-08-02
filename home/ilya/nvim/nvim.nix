@@ -333,6 +333,14 @@ in
             buffer = args.buf,
             desc = "Move up by display line",
           })
+          vim.keymap.set("i", "<Down>", "<C-o>gj", {
+            buffer = args.buf,
+            desc = "Move down by display line",
+          })
+          vim.keymap.set("i", "<Up>", "<C-o>gk", {
+            buffer = args.buf,
+            desc = "Move up by display line",
+          })
         end,
       })
 

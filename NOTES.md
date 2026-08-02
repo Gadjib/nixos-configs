@@ -1253,7 +1253,8 @@ LaTeX-окружение:
 - `neovim-remote` доступен для внешней интеграции;
 - `%! TEX root = ../main.tex` поддерживается VimTeX и LSP root detection;
 - TeX-файлы получают word-boundary wrap и conceal математических символов;
-  стрелки вверх/вниз двигаются по экранным, а не физическим строкам;
+  стрелки вверх/вниз в normal, visual и insert mode двигаются по экранным, а
+  не физическим строкам;
 - BibTeX использует Treesitter highlighting. LaTeX parser установлен, но
   VimTeX syntax оставлен активным, поскольку от него зависят conceal и text
   objects.
