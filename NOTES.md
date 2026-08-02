@@ -253,14 +253,18 @@ USB removable media:
 
 Windows partition:
 
-- The internal NTFS Windows data partition with UUID `32566001565FC3EF` mounts
-  at `/mnt/win_c` during boot through `modules/nixos/windows.nix`.
+- The internal NTFS Windows data partition with UUID `32566001565FC3EF` is
+  exposed at `/mnt/win_c` through `modules/nixos/windows.nix`. A systemd
+  automount starts during boot and mounts the partition transparently on first
+  access; after that it stays mounted.
 - It uses the kernel `ntfs3` driver with read/write access owned by
   `ilya:users`; `windows_names` rejects Linux filenames that Windows cannot
   represent.
-- `nofail` and a five-second device timeout keep an unavailable, dirty or
-  hibernated Windows partition from blocking NixOS boot. Such a partition is
-  intentionally not force-mounted because that could damage it.
+- `noauto`, `nofail`, `x-systemd.automount` and a five-second device timeout
+  keep an unavailable, dirty or hibernated Windows partition from blocking
+  NixOS boot or `nh test`. Access still fails until Windows repairs a dirty
+  volume. Such a partition is intentionally not force-mounted because that
+  could damage it.
 
 SMB mount:
 

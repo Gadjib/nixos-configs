@@ -8,7 +8,9 @@
       "gid=100"
       "umask=022"
       "windows_names"
+      "noauto"
       "nofail"
+      "x-systemd.automount"
       "x-systemd.device-timeout=5s"
     ];
   };
