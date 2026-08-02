@@ -54,6 +54,7 @@
           "class<(openmw|openmw-launcher|openmw-cs|org\\.openmw\\..*)>" = " 󰍳";
           "class<org\\.kde\\.gwenview>" = " ";
           "class<org\\.kde\\.okular>" = " ";
+          "class<(org\\.pwmt\\.zathura|[Zz]athura)>" = " ";
           "class<org\\.kde\\.kate>" = " 󰷈";
           "class<org\\.kde\\.ark>" = " ";
           "class<([Ll]ibre[Oo]ffice.*|soffice)>" = " 󰈙";

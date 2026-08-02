@@ -1227,7 +1227,7 @@ Starship остается установленным и его config продо
 
 Файл: `home/ilya/nvim/nvim.nix`.
 
-Минимальный LazyVim-ready слой:
+Базовый слой редактора:
 
 - line numbers
 - relative numbers
@@ -1237,8 +1237,31 @@ Starship остается установленным и его config продо
 - sign column
 - system clipboard
 - leader: space
+- `nvim-cmp` + LSP/path/buffer completion и LuaSnip
+- Treesitter parsers для LaTeX и BibTeX
 
-Не добавлять крупный Neovim framework в этот первый слой без отдельного решения.
+LaTeX-окружение:
+
+- `texliveFull` предоставляет TeX Live, `latexmk`, Biber, SyncTeX и обычные
+  учебные/математические пакеты;
+- VimTeX является единственным владельцем непрерывной сборки через `latexmk`;
+- TexLab отвечает за completion, diagnostics, definitions/references и не
+  запускает собственную сборку (`build.onSave = false`);
+- LTeX+ и встроенный spellcheck проверяют русский и английский текст;
+- Zathura используется для PDF, автоматически перечитывает PDF и поддерживает
+  forward/inverse SyncTeX через уже запущенный Neovim;
+- `neovim-remote` доступен для внешней интеграции;
+- `%! TEX root = ../main.tex` поддерживается VimTeX и LSP root detection;
+- TeX-файлы получают word-boundary wrap и conceal математических символов;
+- BibTeX использует Treesitter highlighting. LaTeX parser установлен, но
+  VimTeX syntax оставлен активным, поскольку от него зависят conceal и text
+  objects.
+
+Стандартные VimTeX mappings не дублируются: `\ll` compile, `\lk` stop,
+`\lv` view/forward search, `\le` errors, `\lo` output, `\li` project info,
+`\lc` clean и `\lC` full clean.
+
+Zathura как новое GUI-приложение имеет отдельное class-to-icon правило Waybar.
 
 ## Mako
 
