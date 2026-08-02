@@ -315,7 +315,7 @@ in
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "tex", "plaintex" },
-        callback = function()
+        callback = function(args)
           vim.opt_local.wrap = true
           vim.opt_local.linebreak = true
           vim.opt_local.breakindent = true
@@ -324,6 +324,15 @@ in
           vim.opt_local.concealcursor = "nc"
           vim.opt_local.spell = true
           vim.opt_local.spelllang = { "en_us", "ru" }
+
+          vim.keymap.set({ "n", "x" }, "<Down>", "gj", {
+            buffer = args.buf,
+            desc = "Move down by display line",
+          })
+          vim.keymap.set({ "n", "x" }, "<Up>", "gk", {
+            buffer = args.buf,
+            desc = "Move up by display line",
+          })
         end,
       })
 
