@@ -1,0 +1,2 @@
+-- Language-specific autocmds live in their plugin specs. This file is kept
+-- intentionally empty so LazyVim does not apply IDE behavior to TeX buffers.

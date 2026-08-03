@@ -1,6 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
+  appearance = import ../appearance.nix { inherit pkgs; };
   russianSpell = pkgs.fetchurl {
     url = "https://ftp.nluug.nl/pub/vim/runtime/spell/ru.utf-8.spl";
     hash = "sha256-6y0714ogILMLzAp8/r2s6/t6QnWBEU9muIpXeubaxU0=";
@@ -9,17 +10,154 @@ let
     url = "https://ftp.nluug.nl/pub/vim/runtime/spell/ru.utf-8.sug";
     hash = "sha256-6r2GForYXVv7gGiAjPeYK6sDdK/CmctJ7MidcWFvOTs=";
   };
+  treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (parsers: [
+    parsers.bash
+    parsers.bibtex
+    parsers.c
+    parsers.cmake
+    parsers.cpp
+    parsers.json
+    parsers.latex
+    parsers.lua
+    parsers.markdown
+    parsers.markdown_inline
+    parsers.ninja
+    parsers.python
+    parsers.query
+    parsers.regex
+    parsers.rst
+    parsers.toml
+    parsers.vim
+    parsers.vimdoc
+    parsers.yaml
+  ]);
+  treesitterPlugin = pkgs.symlinkJoin {
+    name = "nvim-treesitter";
+    paths = [ treesitter ] ++ treesitter.dependencies;
+  };
+  debugPython = pkgs.python3.withPackages (pythonPackages: [
+    pythonPackages.debugpy
+    pythonPackages.pytest
+  ]);
+  vscodeLldb = pkgs.vscode-extensions.vadimcn.vscode-lldb;
+  neotestPython = pkgs.symlinkJoin {
+    # neotest-python locates its helper by the literal path suffix
+    # "neotest-python/neotest.py".
+    name = "neotest-python";
+    paths = [ pkgs.vimPlugins.neotest-python ];
+  };
+  codelldb = pkgs.writeShellScriptBin "codelldb" ''
+    exec ${vscodeLldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb "$@"
+  '';
+  localPlugins = [
+    { repo = "MagicDuck/grug-far.nvim"; package = pkgs.vimPlugins.grug-far-nvim; }
+    { repo = "MunifTanjim/nui.nvim"; package = pkgs.vimPlugins.nui-nvim; }
+    { repo = "L3MON4D3/LuaSnip"; package = pkgs.vimPlugins.luasnip; }
+    { repo = "Civitasv/cmake-tools.nvim"; package = pkgs.vimPlugins.cmake-tools-nvim; }
+    { repo = "akinsho/bufferline.nvim"; package = pkgs.vimPlugins.bufferline-nvim; }
+    { repo = "folke/flash.nvim"; package = pkgs.vimPlugins.flash-nvim; }
+    { repo = "folke/lazydev.nvim"; package = pkgs.vimPlugins.lazydev-nvim; }
+    { repo = "folke/noice.nvim"; package = pkgs.vimPlugins.noice-nvim; }
+    { repo = "folke/persistence.nvim"; package = pkgs.vimPlugins.persistence-nvim; }
+    { repo = "folke/snacks.nvim"; package = pkgs.vimPlugins.snacks-nvim; }
+    { repo = "folke/todo-comments.nvim"; package = pkgs.vimPlugins.todo-comments-nvim; }
+    { repo = "folke/trouble.nvim"; package = pkgs.vimPlugins.trouble-nvim; }
+    { repo = "folke/ts-comments.nvim"; package = pkgs.vimPlugins.ts-comments-nvim; }
+    { repo = "folke/which-key.nvim"; package = pkgs.vimPlugins.which-key-nvim; }
+    { repo = "hrsh7th/cmp-buffer"; package = pkgs.vimPlugins.cmp-buffer; }
+    { repo = "hrsh7th/cmp-nvim-lsp"; package = pkgs.vimPlugins.cmp-nvim-lsp; }
+    { repo = "hrsh7th/cmp-nvim-lsp-signature-help"; package = pkgs.vimPlugins.cmp-nvim-lsp-signature-help; }
+    { repo = "hrsh7th/cmp-path"; package = pkgs.vimPlugins.cmp-path; }
+    { repo = "hrsh7th/cmp-vimtex"; package = pkgs.vimPlugins.cmp-vimtex; }
+    { repo = "hrsh7th/nvim-cmp"; package = pkgs.vimPlugins.nvim-cmp; }
+    { repo = "lervag/vimtex"; package = pkgs.vimPlugins.vimtex; }
+    { repo = "lewis6991/gitsigns.nvim"; package = pkgs.vimPlugins.gitsigns-nvim; }
+    { repo = "linux-cultist/venv-selector.nvim"; package = pkgs.vimPlugins.venv-selector-nvim; }
+    { repo = "mfussenegger/nvim-dap"; package = pkgs.vimPlugins.nvim-dap; }
+    { repo = "mfussenegger/nvim-dap-python"; package = pkgs.vimPlugins.nvim-dap-python; }
+    { repo = "mfussenegger/nvim-lint"; package = pkgs.vimPlugins.nvim-lint; }
+    { repo = "neovim/nvim-lspconfig"; package = pkgs.vimPlugins.nvim-lspconfig; }
+    { repo = "nvim-lua/plenary.nvim"; package = pkgs.vimPlugins.plenary-nvim; }
+    { repo = "nvim-lualine/lualine.nvim"; package = pkgs.vimPlugins.lualine-nvim; }
+    { repo = "nvim-mini/mini.ai"; package = pkgs.vimPlugins.mini-ai; }
+    { repo = "nvim-mini/mini.icons"; package = pkgs.vimPlugins.mini-icons; }
+    { repo = "nvim-mini/mini.pairs"; package = pkgs.vimPlugins.mini-pairs; }
+    { repo = "nvim-neotest/neotest"; package = pkgs.vimPlugins.neotest; }
+    { repo = "orjangj/neotest-ctest"; package = pkgs.vimPlugins.neotest-ctest; }
+    { repo = "alfaix/neotest-gtest"; package = pkgs.vimPlugins.neotest-gtest; }
+    { repo = "nvim-neotest/neotest-python"; package = neotestPython; }
+    { repo = "nvim-neotest/nvim-nio"; package = pkgs.vimPlugins.nvim-nio; }
+    { repo = "nvim-treesitter/nvim-treesitter"; package = treesitterPlugin; }
+    { repo = "nvim-treesitter/nvim-treesitter-textobjects"; package = pkgs.vimPlugins.nvim-treesitter-textobjects; }
+    { repo = "p00f/clangd_extensions.nvim"; package = pkgs.vimPlugins.clangd_extensions-nvim; }
+    { repo = "rafamadriz/friendly-snippets"; package = pkgs.vimPlugins.friendly-snippets; }
+    { repo = "rcarriga/nvim-dap-ui"; package = pkgs.vimPlugins.nvim-dap-ui; }
+    { repo = "saadparwaiz1/cmp_luasnip"; package = pkgs.vimPlugins.cmp_luasnip; }
+    { repo = "stevearc/conform.nvim"; package = pkgs.vimPlugins.conform-nvim; }
+    { repo = "theHamsta/nvim-dap-virtual-text"; package = pkgs.vimPlugins.nvim-dap-virtual-text; }
+    { repo = "windwp/nvim-ts-autotag"; package = pkgs.vimPlugins.nvim-ts-autotag; }
+  ];
+  localPluginSpecs = lib.concatMapStringsSep "\n" (plugin: ''
+    { ${builtins.toJSON plugin.repo}, dir = ${builtins.toJSON "${plugin.package}"} },
+  '') localPlugins;
 in
 {
   xdg.configFile = {
     "nvim/spell/ru.utf-8.spl".source = russianSpell;
     "nvim/spell/ru.utf-8.sug".source = russianSuggestions;
+    "nvim/lua/config/lazy.lua".source = ./lua/config/lazy.lua;
+    "nvim/lua/config/options.lua".source = ./lua/config/options.lua;
+    "nvim/lua/config/keymaps.lua".source = ./lua/config/keymaps.lua;
+    "nvim/lua/config/autocmds.lua".source = ./lua/config/autocmds.lua;
+    "nvim/lua/config/runner.lua".source = ./lua/config/runner.lua;
+    "nvim/lua/plugins/theme.lua".source = ./lua/plugins/theme.lua;
+    "nvim/lua/plugins/latex.lua".source = ./lua/plugins/latex.lua;
+    "nvim/lua/plugins/ide.lua".source = ./lua/plugins/ide.lua;
+    "nvim/lua/config/nix.lua".text = ''
+      return {
+        lazyvim = ${builtins.toJSON "${pkgs.vimPlugins.LazyVim}"},
+        lazy = ${builtins.toJSON "${pkgs.vimPlugins.lazy-nvim}"},
+        catppuccin = ${builtins.toJSON "${pkgs.vimPlugins.catppuccin-nvim}"},
+        theme = ${builtins.toJSON appearance.gtk.variant},
+        tools = {
+          basedpyright = ${builtins.toJSON "${pkgs.basedpyright}/bin/basedpyright-langserver"},
+          clang = ${builtins.toJSON "${pkgs.clang}/bin/clang"},
+          clangd = ${builtins.toJSON "${pkgs.clang-tools}/bin/clangd"},
+          clang_format = ${builtins.toJSON "${pkgs.clang-tools}/bin/clang-format"},
+          clangxx = ${builtins.toJSON "${pkgs.clang}/bin/clang++"},
+          codelldb = ${builtins.toJSON "${codelldb}/bin/codelldb"},
+          debugpy_adapter = ${builtins.toJSON "${debugPython}/bin/debugpy-adapter"},
+          python = ${builtins.toJSON "${debugPython}/bin/python"},
+          ruff = ${builtins.toJSON "${pkgs.ruff}/bin/ruff"},
+          texlab = ${builtins.toJSON "${pkgs.texlab}/bin/texlab"},
+          ltex = ${builtins.toJSON "${pkgs.ltex-ls-plus}/bin/ltex-ls-plus"},
+        },
+      }
+    '';
+    "nvim/lua/config/local_plugins.lua".text = ''
+      return {
+      ${localPluginSpecs}
+      }
+    '';
   };
 
   home.packages = with pkgs; [
-    texlab
+    basedpyright
+    bear
+    clang
+    clang-tools
+    cmake
+    codelldb
+    debugPython
     ltex-ls-plus
+    neocmakelsp
     neovim-remote
+    ninja
+    poetry
+    ruff
+    texlab
+    uv
+    vscodeLldb
   ];
 
   programs.zathura = {
@@ -41,317 +179,9 @@ in
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
-
-    plugins = with pkgs.vimPlugins; [
-      vimtex
-      nvim-lspconfig
-      nvim-cmp
-      cmp-nvim-lsp
-      cmp-buffer
-      cmp-path
-      cmp-vimtex
-      cmp_luasnip
-      luasnip
-      (nvim-treesitter.withPlugins (parsers: [
-        parsers.latex
-        parsers.bibtex
-      ]))
-    ];
-
+    plugins = [ pkgs.vimPlugins.lazy-nvim ];
     initLua = ''
-      vim.opt.number = true
-      vim.opt.relativenumber = true
-      vim.opt.expandtab = true
-      vim.opt.shiftwidth = 2
-      vim.opt.tabstop = 2
-      vim.opt.smartindent = true
-      vim.opt.termguicolors = true
-      vim.opt.signcolumn = "yes"
-      vim.opt.clipboard = "unnamedplus"
-      vim.opt.completeopt = { "menu", "menuone", "noselect" }
-      vim.g.mapleader = " "
-      vim.g.maplocalleader = "\\"
-
-      -- VimTeX owns the only continuous latexmk process. TexLab builds are off.
-      vim.g.vimtex_compiler_method = "latexmk"
-      vim.g.vimtex_compiler_latexmk = {
-        callback = 1,
-        continuous = 1,
-        executable = "latexmk",
-        options = {
-          "-verbose",
-          "-file-line-error",
-          "-synctex=1",
-          "-interaction=nonstopmode",
-        },
-      }
-      vim.g.vimtex_quickfix_mode = 2
-      vim.g.vimtex_quickfix_open_on_warning = 0
-      vim.g.vimtex_view_method = "zathura_simple"
-      vim.g.vimtex_view_automatic = 1
-      vim.g.vimtex_view_forward_search_on_start = 1
-      vim.g.vimtex_syntax_conceal = {
-        accents = 1,
-        cites = 1,
-        fancy = 1,
-        greek = 1,
-        ligatures = 1,
-        math_bounds = 1,
-        math_delimiters = 1,
-        math_fracs = 1,
-        math_super_sub = 1,
-        math_symbols = 1,
-        sections = 0,
-        styles = 1,
-      }
-
-      vim.diagnostic.config({
-        severity_sort = true,
-        signs = true,
-        underline = true,
-        update_in_insert = false,
-        virtual_text = {
-          source = "if_many",
-          spacing = 2,
-        },
-        float = {
-          border = "rounded",
-          source = true,
-        },
-      })
-
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-      local function latex_root_dir(bufnr, on_dir)
-        local filename = vim.api.nvim_buf_get_name(bufnr)
-        local file_dir = vim.fs.dirname(filename)
-        local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
-
-        for _, line in ipairs(lines) do
-          local main = line:lower():match(
-            "^%%%s*!?%s*tex%s+root%s*[:=]%s*(.-)%s*$"
-          )
-          if main and main ~= "" then
-            local main_path = vim.fs.normalize(vim.fs.joinpath(file_dir, main))
-            on_dir(vim.fs.dirname(main_path))
-            return
-          end
-        end
-
-        local root = vim.fs.root(bufnr, {
-          ".texlabroot",
-          "texlabroot",
-          ".latexmkrc",
-          "latexmkrc",
-          ".git",
-        })
-        if root then
-          on_dir(root)
-          return
-        end
-
-        local main = vim.fs.find("main.tex", {
-          path = file_dir,
-          upward = true,
-          type = "file",
-        })[1]
-        on_dir(main and vim.fs.dirname(main) or file_dir)
-      end
-
-      vim.lsp.config("texlab", {
-        cmd = { "${pkgs.texlab}/bin/texlab" },
-        capabilities = capabilities,
-        root_dir = latex_root_dir,
-        settings = {
-          texlab = {
-            build = {
-              onSave = false,
-              forwardSearchAfter = false,
-            },
-            chktex = {
-              onOpenAndSave = true,
-              onEdit = true,
-            },
-            completion = {
-              matcher = "fuzzy-ignore-case",
-            },
-            diagnosticsDelay = 300,
-          },
-        },
-      })
-
-      vim.lsp.config("ltex_plus", {
-        cmd = { "${pkgs.ltex-ls-plus}/bin/ltex-ls-plus" },
-        capabilities = capabilities,
-        root_dir = latex_root_dir,
-        settings = {
-          ltex = {
-            enabled = { "latex", "bibtex" },
-            language = "auto",
-          },
-        },
-      })
-
-      vim.lsp.enable({ "texlab", "ltex_plus" })
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          if vim.fn.maparg("gd", "n") == "" then
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, {
-              buffer = args.buf,
-              desc = "LSP: go to definition",
-            })
-          end
-        end,
-      })
-
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-
-      luasnip.config.setup({
-        history = true,
-        updateevents = "TextChanged,TextChangedI",
-      })
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = false }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-        }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "path" },
-        }, {
-          { name = "buffer" },
-        }),
-      })
-
-      cmp.setup.filetype({ "tex", "plaintex" }, {
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "vimtex" },
-          { name = "luasnip" },
-          { name = "path" },
-        }, {
-          { name = "buffer" },
-        }),
-      })
-
-      cmp.setup.filetype("bib", {
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "path" },
-        }, {
-          { name = "buffer" },
-        }),
-      })
-
-      local snippet = luasnip.snippet
-      local insert = luasnip.insert_node
-      local rep = require("luasnip.extras").rep
-      local fmta = require("luasnip.extras.fmt").fmta
-
-      luasnip.add_snippets("tex", {
-        snippet("beg", fmta([[
-          \begin{<>}
-            <>
-          \end{<>}
-        ]], { insert(1, "environment"), insert(0), rep(1) })),
-        snippet("frac", fmta([[\frac{<>}{<>}]], {
-          insert(1, "numerator"), insert(2, "denominator"),
-        })),
-        snippet("mk", fmta([[$<>$]], { insert(1) })),
-        snippet("eq", fmta([[
-          \begin{equation}
-            \label{eq:<>}
-            <>
-          \end{equation}
-        ]], { insert(1, "label"), insert(0) })),
-        snippet("fig", fmta([[
-          \begin{figure}[htbp]
-            \centering
-            \includegraphics[width=0.8\textwidth]{<>}
-            \caption{<>}
-            \label{fig:<>}
-          \end{figure}
-        ]], { insert(1, "path"), insert(2, "caption"), insert(3, "label") })),
-        snippet("sec", fmta([[
-          \section{<>}
-          \label{sec:<>}
-        ]], { insert(1, "title"), insert(2, "label") })),
-        snippet("cite", fmta([[\cite{<>}]], { insert(1) })),
-        snippet("ref", fmta([[\ref{<>}]], { insert(1) })),
-        snippet("item", fmta([[
-          \begin{itemize}
-            \item <>
-          \end{itemize}
-        ]], { insert(0) })),
-      })
-
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "tex", "plaintex" },
-        callback = function(args)
-          vim.opt_local.wrap = true
-          vim.opt_local.linebreak = true
-          vim.opt_local.breakindent = true
-          vim.opt_local.textwidth = 0
-          vim.opt_local.conceallevel = 2
-          vim.opt_local.concealcursor = "nc"
-          vim.opt_local.spell = true
-          vim.opt_local.spelllang = { "en_us", "ru" }
-
-          vim.keymap.set({ "n", "x" }, "<Down>", "gj", {
-            buffer = args.buf,
-            desc = "Move down by display line",
-          })
-          vim.keymap.set({ "n", "x" }, "<Up>", "gk", {
-            buffer = args.buf,
-            desc = "Move up by display line",
-          })
-          vim.keymap.set("i", "<Down>", "<C-o>gj", {
-            buffer = args.buf,
-            desc = "Move down by display line",
-          })
-          vim.keymap.set("i", "<Up>", "<C-o>gk", {
-            buffer = args.buf,
-            desc = "Move up by display line",
-          })
-        end,
-      })
-
-      -- Keep VimTeX syntax active for TeX; it powers conceal and text objects.
-      -- The LaTeX parser is installed, while BibTeX uses Treesitter highlighting.
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "bib",
-        callback = function()
-          pcall(vim.treesitter.start)
-        end,
-      })
+      require("config.lazy")
     '';
   };
 }

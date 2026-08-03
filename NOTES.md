@@ -1225,10 +1225,17 @@ Starship остается установленным и его config продо
 
 ## Neovim
 
-Файл: `home/ilya/nvim/nvim.nix`.
+Точка входа: `home/ilya/nvim/nvim.nix`; Lua-конфигурация разложена по
+`home/ilya/nvim/lua/config/` и `home/ilya/nvim/lua/plugins/`.
 
 Базовый слой редактора:
 
+- используется полноценный LazyVim, а не самостоятельный набор несвязанных
+  plugin setup;
+- LazyVim, все плагины и внешние инструменты берутся из Nix store. Mason и
+  фоновые проверки/загрузки lazy.nvim отключены;
+- тема `catppuccin-<variant>` автоматически берёт variant из общего
+  `home/ilya/appearance.nix`, сейчас это Catppuccin Macchiato;
 - line numbers
 - relative numbers
 - spaces, 2-space indent
@@ -1237,8 +1244,40 @@ Starship остается установленным и его config продо
 - sign column
 - system clipboard
 - leader: space
-- `nvim-cmp` + LSP/path/buffer completion и LuaSnip
-- Treesitter parsers для LaTeX и BibTeX
+- `nvim-cmp` + LSP/signature/path/buffer completion и LuaSnip;
+- Treesitter parsers для C, C++, CMake, Python, LaTeX, BibTeX и основных
+  config/markup-языков. Parser binaries объединены с plugin runtime явно,
+  поскольку LazyVim не использует Home Manager wrapper для plugins.
+
+C/C++ и Python IDE:
+
+- `clangd` работает с background index, clang-tidy, detailed completion,
+  include insertion, inlay hints и `compile_commands.json`; `clang-format`,
+  CMake, Ninja, Bear и `codelldb` установлены через Nix;
+- CMake Tools предоставляет configure/preset/build type/target/build/run/debug
+  и создаёт/линкует `compile_commands.json`;
+- одиночные C17/C++20 файлы собираются с `-Wall -Wextra -Wpedantic -g -O0`,
+  но эти флаги никогда не накладываются на CMake/Make проекты;
+- Python использует BasedPyright для типов/navigation/completion и Ruff для
+  lint/code actions/imports/format. Ruff hover отключён, чтобы не дублировать
+  BasedPyright;
+- `.venv`, `venv`, активное окружение и выбор через Venv Selector согласованы
+  с запуском, pytest, LSP и debugpy; выбор Venv Selector сохраняется по проекту;
+- Neotest настроен для pytest и CTest; CTest adapter понимает GoogleTest,
+  Catch2 и другие поддерживаемые CTest frameworks, но не навязывает framework;
+- DAP использует `codelldb` и `debugpy`; DAP UI открывается только на старте
+  debug session и закрывается при её завершении;
+- format-on-save ограничен C/C++ (`clang-format`) и Python (`ruff format`).
+  TeX/BibTeX намеренно не передаются Conform.
+
+Project runner mappings: `<leader>rr` run current, `<leader>rR` repeat,
+`<leader>ra` run with args, `<leader>rs` stop, `<leader>rp` arbitrary project
+command, `<leader>rm` Python module, visual `<leader>rx` Python selection,
+`<leader>cb` build and `<leader>df` debug current. CMake mappings use
+`<leader>m`: `mc/mb/mr/md/mt/mp/my` for configure/build/run/debug/target/preset/
+build type. Standard LazyVim LSP, DAP, Neotest and format mappings are retained.
+Дополнены только отсутствовавшие DAP actions: `<leader>dL` log point и
+`<leader>dR` restart текущей session.
 
 LaTeX-окружение:
 
