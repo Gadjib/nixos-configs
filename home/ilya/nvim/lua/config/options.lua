@@ -2,6 +2,7 @@ local nix = require("config.nix")
 
 vim.g.lazyvim_colorscheme = "catppuccin-" .. nix.theme
 vim.g.autoformat = true
+vim.g.trouble_lualine = false
 
 vim.opt.number = true
 vim.opt.relativenumber = true

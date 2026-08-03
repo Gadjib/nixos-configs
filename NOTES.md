@@ -1234,6 +1234,9 @@ Starship остается установленным и его config продо
   plugin setup;
 - LazyVim, все плагины и внешние инструменты берутся из Nix store. Mason и
   фоновые проверки/загрузки lazy.nvim отключены;
+- Trouble остаётся основным списком diagnostics/tests, но его необязательные
+  document-symbol breadcrumbs в Lualine отключены: текущие версии LazyVim и
+  Trouble имеют startup race при регистрации режима `symbols`;
 - тема `catppuccin-<variant>` автоматически берёт variant из общего
   `home/ilya/appearance.nix`, сейчас это Catppuccin Macchiato;
 - line numbers
