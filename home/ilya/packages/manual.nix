@@ -8,6 +8,7 @@
     fastfetch
     ffmpeg
     glow
+    mpv
     vlc
     stress-ng
     texliveFull
