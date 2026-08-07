@@ -100,6 +100,7 @@ in
     ./nvim/nvim.nix
     ./packages/hl2.nix
     ./packages/manual.nix
+    ./removable-media.nix
     ./rofi/rofi.nix
     ./scripts/network-menus.nix
     ./scripts/package-installer.nix

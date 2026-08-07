@@ -253,10 +253,12 @@ duf
 yazi /mnt
 ```
 
-USB block devices with a recognized filesystem are mounted automatically by
-`usb-automount@.service` below `/mnt/<label>` (or `/mnt/<device>` without a
-label). Mako reports both successful mounts and mount errors. Yazi itself does
-not mount devices; it only opens the resulting directory.
+UDisks and the user-level `udiskie` service automatically mount removable
+filesystems below `/run/media/ilya/<label>`. A lifecycle hook creates a
+compatibility symlink at `/mnt/<label>` and removes it after unmount, so the
+usual `yazi /mnt` workflow remains available. Safe unmount/eject should be done
+through Dolphin or the udiskie tray icon. Yazi itself does not mount devices;
+it only opens the compatibility path.
 
 The SMB share is a separate automount at `/vault`, so scans of `/mnt` never
 touch it. On Wi-Fi SSID `0xDEADBEEF48`, accessing `/vault` directly permits the

@@ -116,6 +116,7 @@ nixosConfigurations.thinkpad-nix
     ├── nvim/nvim.nix
     ├── packages/manual.nix
     ├── packages/spotify.nix
+    ├── removable-media.nix
     ├── rofi/rofi.nix
     ├── rofi/theme.rasi
     ├── scripts/network-menus.nix
@@ -238,18 +239,26 @@ Audio:
 USB removable media:
 
 - `modules/nixos/removable-media.nix` enables `udisks2` explicitly.
-- A udev rule starts `usb-automount@<device>.service` for each USB block device
-  with a recognized filesystem.
-- Filesystems mount immediately below `/mnt/<label>`; unlabeled filesystems use
-  `/mnt/<device>`. If that directory already exists, the device name is added
-  to avoid hiding an existing directory.
-- FAT, exFAT, and NTFS mounts use `ilya` ownership. All automatic mounts use
-  `nosuid,nodev,noexec`.
-- The service stays bound to the kernel device and unmounts/removes its
-  mountpoint when the device disappears.
-- Success and failure are sent to the active user D-Bus notification service,
-  so Mako shows the mount path or the mount error. Errors are also retained in
-  `journalctl -u 'usb-automount@*.service'`.
+- `home/ilya/removable-media.nix` enables the user-level `udiskie` daemon with
+  automounting, notifications and an auto-hiding tray icon. UDisks mounts
+  removable filesystems below `/run/media/ilya/<label>` and owns the complete
+  mount/unmount/eject lifecycle, so Dolphin and the tray can safely eject a
+  device without treating it as somebody else's root mount.
+- Automatic mounts request `nosuid,nodev,noexec` through udiskie. Hybrid ISO
+  images and multi-partition drives are handled by UDisks/udiskie instead of
+  racing separate whole-disk and partition systemd units.
+- A udiskie event hook creates compatibility symlinks such as
+  `/mnt/<label> -> /run/media/ilya/<label>`. On name collision it tries
+  `/mnt/<label>-<device>` and never overwrites an existing path. It records
+  ownership in `$XDG_RUNTIME_DIR/udiskie-mnt-links` and removes only its own
+  matching symlink after unmount or device removal.
+- `/mnt` remains the compatibility entrypoint for Yazi and scripts; its group
+  is `users` with mode `0775` so the user hook can maintain direct child
+  symlinks. The internal `/mnt/win_c` automount remains a real, separate
+  mountpoint and is ignored by the hook because it is outside `/run/media/ilya`.
+- At user-service start the hook reconciles already-mounted removable media;
+  at service stop it removes its compatibility links. Real mounts remain under
+  UDisks control at all times.
 
 Windows partition:
 
@@ -430,6 +439,7 @@ Fish включен системно через `programs.fish.enable = true`.
 - Mako
 - Neovim
 - ручных пакетов `manual.nix`
+- removable media through udiskie and `/mnt` compatibility links
 - Rofi
 - network menus
 - package installer
