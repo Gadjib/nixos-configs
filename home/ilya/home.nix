@@ -92,6 +92,7 @@ in
 
 {
   imports = [
+    ./codex.nix
     ./fish/fish.nix
     ./firefox/firefox.nix
     ./hypr/hyprland.nix

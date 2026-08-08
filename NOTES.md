@@ -447,6 +447,7 @@ Fish включен системно через `programs.fish.enable = true`.
 Он импортирует модули для:
 
 - Firefox Hyprland wrapper
+- Codex permission profile and writable user configuration
 - Fish
 - Hyprland
 - Kitty
@@ -461,6 +462,19 @@ Fish включен системно через `programs.fish.enable = true`.
 - VS Code и декларативных extensions/settings
 - Waybar
 - Wlogout
+
+`home/ilya/codex.nix` declaratively generates a writable
+`~/.codex/config.toml`. Codex uses the custom `workspace-full` permission
+profile with `approval_policy = "never"`: the active workspace root (including
+its `.git` and `.codex` directories), `/tmp`, and `$TMPDIR` are writable; the
+rest of the filesystem is read-only. Network access is enabled for all domains.
+Only the user D-Bus and Bitwarden SSH-agent Unix sockets are allowlisted; broad
+Unix-socket access is intentionally not enabled because services such as the
+Nix daemon or Docker could bypass the filesystem boundary. Because the active
+workspace comes from the launch directory, starting Codex in `$HOME` makes the
+whole home directory writable; normally launch it in the repository that should
+be editable. Disallowed operations fail immediately instead of displaying an
+approval prompt.
 
 Home Manager также задает session variables:
 
