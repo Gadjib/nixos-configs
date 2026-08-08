@@ -254,9 +254,11 @@ Fingerprint configuration in `modules/nixos/desktop.nix`:
 поддерживается штатным `libfprint`, поэтому модуль включает
 `services.fprintd` без TOD/проприетарного драйвера.
 
-Отпечаток используется для `sudo`, polkit (включая Bitwarden
-system authentication), KDE lock screen через создаваемый Plasma
-PAM service `kde-fingerprint` и Hyprlock. Hyprlock обращается к
+Отпечаток используется для polkit (включая Bitwarden system
+authentication), KDE lock screen через создаваемый Plasma PAM service
+`kde-fingerprint` и Hyprlock. Для `sudo` fingerprint PAM отключен,
+чтобы `sudo` сразу запрашивал пароль без ожидания таймаута
+`pam_fprintd`. Hyprlock обращается к
 `fprintd` напрямую параллельно парольному PAM, поэтому
 `hyprlock.fprintAuth = false` намеренно исключает двойной захват
 сканера. Пароль везде остается fallback-способом.

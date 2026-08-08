@@ -70,7 +70,7 @@ in
     sddm.fprintAuth = false;
     hyprlock.fprintAuth = false;
 
-    sudo.fprintAuth = true;
+    sudo.fprintAuth = false;
     polkit-1.fprintAuth = true;
   };
 
