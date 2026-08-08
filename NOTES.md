@@ -1090,9 +1090,20 @@ entry или DBus service, MIME association и Hyprland window rules. Прило
 Файл: `home/ilya/waybar/waybar.nix`.
 
 Waybar uses `programs.waybar.systemd.enable = true`. Its user service is tied
-to `graphical-session.target`, logs failures in the user journal and has
-`Restart=on-failure`; do not add a second direct `waybar` launch to Hyprland
-`exec-once`.
+directly to `hyprland-session.target`, logs failures in the user journal and
+has `Restart=on-failure`; do not add a second direct `waybar` launch to
+Hyprland `exec-once`.
+
+The Hyprland config runs `systemctl --user stop hyprland-session.target` from
+`exec-shutdown` and waits 100 ms before the compositor exits. The target adds
+`PropagatesStopTo=graphical-session.target`, matching the upstream Hyprland
+session lifecycle recommendation. Consequently Waybar, tray applets and other
+graphical-session services receive a normal systemd stop while the Wayland
+display is still alive. This prevents the previous failure mode where Waybar
+lost the display, `Restart=on-failure` rapidly retried six times with
+`cannot open display`, hit `start-limit-hit`, and stayed down in the next
+Hyprland session. Keep the restart policy: it still recovers a real Waybar
+crash while the current compositor session is healthy.
 
 Layout:
 

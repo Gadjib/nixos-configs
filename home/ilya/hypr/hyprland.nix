@@ -39,6 +39,11 @@ in
         "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent"
       ];
 
+      # Stop graphical-session services while the Wayland display is still
+      # alive. This prevents them from entering restart loops between
+      # consecutive Hyprland sessions.
+      "exec-shutdown" = "systemctl --user stop hyprland-session.target && sleep 0.1";
+
       input = {
         kb_layout = "us,ru";
         kb_options = "grp:alt_shift_toggle";
@@ -244,6 +249,11 @@ in
       ];
     };
   };
+
+  # Home Manager's target starts graphical-session.target through BindsTo.
+  # Propagate shutdown in the opposite direction as recommended by Hyprland,
+  # so session services are stopped before the compositor disappears.
+  systemd.user.targets.hyprland-session.Unit.PropagatesStopTo = [ "graphical-session.target" ];
 
   xdg.configFile."hypr/hypridle.conf".text = ''
     general {
