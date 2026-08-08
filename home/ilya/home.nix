@@ -180,6 +180,7 @@ in
     QT_QPA_PLATFORMTHEME = "kde";
     QT_QUICK_CONTROLS_STYLE = "org.kde.desktop";
     XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_MENU_PREFIX = "plasma-";
     XDG_SESSION_DESKTOP = "Hyprland";
     SSH_AUTH_SOCK = "/home/ilya/.bitwarden-ssh-agent.sock";
   };
@@ -460,12 +461,32 @@ in
       inactiveBlend=165,173,203
       inactiveForeground=165,173,203
     '';
+
+    # KDED 6 still uses the historical kded5rc name for module autoload
+    # overrides. Keep Plasma's GTK synchronizer disabled: Home Manager owns
+    # the GTK configuration, and gtkconfig rewriting CSS/dconf at runtime can
+    # crash every GTK process monitoring those files at the same time.
+    ".home-manager-kded5rc".text = ''
+      [Module-device_automounter]
+      autoload=false
+
+      [Module-gtkconfig]
+      autoload=false
+    '';
   };
 
   home.activation.installWritableKdeglobals = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm600 \
       "$HOME/.config/.home-manager-kdeglobals" \
       "$HOME/.config/kdeglobals"
+  '';
+
+  # KDED writes module state through KConfig, so give it a regular writable
+  # file rather than a read-only Home Manager symlink into the Nix store.
+  home.activation.installWritableKdedConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm600 \
+      "$HOME/.config/.home-manager-kded5rc" \
+      "$HOME/.config/kded5rc"
   '';
 
   dconf.settings = {

@@ -165,5 +165,7 @@ in
   systemd.user.services.udiskie.Service = {
     ExecStartPost = "${mntLink}/bin/udiskie-mnt-link sync";
     ExecStopPost = "${mntLink}/bin/udiskie-mnt-link cleanup";
+    Restart = "on-failure";
+    RestartSec = 1;
   };
 }

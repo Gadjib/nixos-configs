@@ -247,6 +247,8 @@ USB removable media:
 - Automatic mounts request `nosuid,nodev,noexec` through udiskie. Hybrid ISO
   images and multi-partition drives are handled by UDisks/udiskie instead of
   racing separate whole-disk and partition systemd units.
+- The udiskie user service uses `Restart=on-failure`, so an unexpected process
+  crash does not silently disable automounting for the rest of the session.
 - A udiskie event hook creates compatibility symlinks such as
   `/mnt/<label> -> /run/media/ilya/<label>`. On name collision it tries
   `/mnt/<label>-<device>` and never overwrites an existing path. It records
@@ -458,6 +460,9 @@ Home Manager также задает session variables:
 - Qt platform theme `kde`
 - Qt Quick Controls style `org.kde.desktop`
 - `XDG_CURRENT_DESKTOP = "Hyprland"`
+- `XDG_MENU_PREFIX = "plasma-"`; this makes KDE's `KService`/`KSycoca` use
+  `/etc/xdg/menus/plasma-applications.menu` outside a full Plasma session, so
+  Dolphin and the KDE portal AppChooser can discover installed applications
 - `XDG_SESSION_DESKTOP = "Hyprland"`
 
 Глобальные параметры оформления собраны в `home/ilya/appearance.nix`: scale,
@@ -509,6 +514,13 @@ Hyprland scale. Rofi, Mako, qt5ct/qt6ct и `kdeglobals` также получа�
   applications such as Telegram can abort when opening a file chooser.
 - GTK4 theme files are explicitly linked from Catppuccin into
   `~/.config/gtk-4.0/gtk.css`, `gtk-dark.css`, and `assets`.
+- KDED's `gtkconfig` module is disabled declaratively through a writable
+  `~/.config/kded5rc`. Home Manager already owns GTK settings; letting
+  `gtkconfig` rewrite GTK CSS, dconf and xsettingsd configuration at runtime
+  caused Waybar, udiskie, NetworkManager/Bluetooth applets and the GTK portal
+  to segfault together while their GLib file monitors handled those writes.
+  Plasma's `device_automounter` KDED module is disabled in the same file so it
+  cannot race the configured UDisks/udiskie removable-media stack.
 - Kitty, Rofi, Mako, Waybar, Wlogout, Starship, Hyprland borders and
   Hyprlock use the same Macchiato palette directly in their own modules.
 
