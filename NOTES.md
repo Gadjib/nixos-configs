@@ -772,7 +772,8 @@ class `firefox`.
 
 Autostart:
 
-- `waybar`
+- Waybar starts through its Home Manager systemd user service, not Hyprland
+  `exec-once`; the service records failures and restarts the bar after a crash.
 - `mako`
 - `awww-daemon`
 - `sleep 0.5 && awww img ...` sets the wallpaper from
@@ -976,6 +977,11 @@ entry или DBus service, MIME association и Hyprland window rules. Прило
 ## Waybar
 
 Файл: `home/ilya/waybar/waybar.nix`.
+
+Waybar uses `programs.waybar.systemd.enable = true`. Its user service is tied
+to `graphical-session.target`, logs failures in the user journal and has
+`Restart=on-failure`; do not add a second direct `waybar` launch to Hyprland
+`exec-once`.
 
 Layout:
 
@@ -1368,8 +1374,7 @@ hyprctl reload
 После изменения Waybar:
 
 ```bash
-pkill waybar
-waybar &
+systemctl --user restart waybar.service
 ```
 
 После изменения session variables, GTK/Qt env или autostart лучше перелогиниться

@@ -29,7 +29,6 @@ in
       ];
 
       exec-once = [
-        "waybar"
         "mako"
         "awww-daemon"
         "sleep 0.5 && awww img ${wallpaper} --resize crop --transition-type fade --transition-duration 1"
