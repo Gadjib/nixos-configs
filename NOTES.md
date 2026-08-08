@@ -248,6 +248,38 @@ Audio:
 - Polkit
 - dconf
 
+Fingerprint configuration in `modules/nixos/desktop.nix`:
+
+Сканер Synaptics Prometheus `06cb:00fc` в ThinkPad X1 Carbon Gen 10
+поддерживается штатным `libfprint`, поэтому модуль включает
+`services.fprintd` без TOD/проприетарного драйвера.
+
+Отпечаток используется для `sudo`, polkit (включая Bitwarden
+system authentication), KDE lock screen через создаваемый Plasma
+PAM service `kde-fingerprint` и Hyprlock. Hyprlock обращается к
+`fprintd` напрямую параллельно парольному PAM, поэтому
+`hyprlock.fprintAuth = false` намеренно исключает двойной захват
+сканера. Пароль везде остается fallback-способом.
+
+Fingerprint PAM отключен для `login` и `sddm`: вход по отпечатку
+не может разблокировать KDE Wallet и создает неоднозначный
+login flow. Bitwarden установлен через Home Manager, а polkit не
+сканирует user profile, поэтому модуль отдельно выводит в
+system profile только `com.bitwarden.Bitwarden.policy`, без второго
+desktop entry.
+
+Отпечатки не хранятся в Git/Nix store. После первого switch
+пользователь записывает и проверяет палец интерактивно:
+
+```text
+fprintd-enroll -f right-index-finger
+fprintd-verify
+```
+
+Шаблоны хранятся `fprintd` в `/var/lib/fprint`; для удаления
+всех отпечатков текущего пользователя используется
+`fprintd-delete`.
+
 USB removable media:
 
 - `modules/nixos/removable-media.nix` enables `udisks2` explicitly.
@@ -362,6 +394,7 @@ Networking and DNS:
 
 - `networking.networkmanager.enable = true`
 - `networking.enableIPv6 = false`
+- `boot.kernelParams = [ "ipv6.disable=1" ]`
 - `services.resolved.enable = true`
 
 `systemd-resolved` is enabled intentionally. On NixOS, enabling
@@ -378,14 +411,16 @@ and time out. GUI applications such as Firefox, Telegram, Discord, and Happ can
 then appear broken even while IPv4 `curl` and `ping` work. Keep IPv6 disabled
 until the upstream network or VPN path has working IPv6; then this can be
 revisited.
-`networking.enableIPv6 = false` sets global/default sysctls, but NetworkManager
-can still leave IPv6 enabled on an already active interface. A small
-NetworkManager dispatcher script therefore also sets
-`net.ipv6.conf.<interface>.disable_ipv6=1` and flushes IPv6 addresses/routes for
-non-loopback interfaces when they come up. This avoids declaring Wi-Fi
-connection secrets in Nix just to change `ipv6.method`. The dispatcher is not
-tied to a particular SSID or NetworkManager profile; it receives the interface
-name from NetworkManager and works for any Wi-Fi network using that interface.
+IPv6 is blocked at three layers. The kernel command line uses `ipv6.disable=1`,
+`networking.enableIPv6 = false` retains the global/default sysctl policy, and a
+oneshot service sets `ipv6.method=disabled` on every non-loopback NetworkManager
+profile. The latter is necessary because profiles with `ipv6.method=auto`
+otherwise keep asking an IPv6-disabled kernel to create link-local addresses
+and fill the journal with `failure 13` retries. The matching dispatcher applies
+the same setting to newly created Wi-Fi, Ethernet and VPN profiles and updates
+their active device immediately. Both scripts identify profiles by UUID and
+change only `ipv6.method`; Wi-Fi secrets remain in NetworkManager storage and
+are never copied into Nix or logs.
 
 Expected post-switch checks:
 
@@ -414,9 +449,17 @@ avoid changing which hidden root entries the wrapper enumerates.
 В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
-и `os-prober`, compiler/dev tools. `codex` берется из отдельного
-`nixpkgs-unstable` input, чтобы обновлять CLI точечно и не переводить всю
-систему на unstable.
+и `os-prober`, compiler/dev tools. `codex` и Bitwarden Desktop берутся из
+отдельного `nixpkgs-unstable` input, чтобы обновлять security-sensitive
+приложения точечно и не переводить всю систему на unstable. Home Manager
+получает тот же `pkgsUnstable` через `home-manager.extraSpecialArgs`.
+Bitwarden переведен на unstable после того, как stable-сборка `2026.5.0` и
+предыдущая unstable-сборка `2026.6.1` остались на EOL Electron 39. Текущая
+сборка использует поддерживаемый Electron 41, поэтому глобальное исключение
+`permittedInsecurePackages = [ "electron-39.8.10" ]` удалено. После обновления
+нужно проверить разблокировку vault, browser integration и Bitwarden SSH agent;
+при функциональной регрессии откатывать весь system generation, а не возвращать
+EOL Electron в allowlist.
 
 Версионно важные имена:
 
@@ -465,9 +508,11 @@ Fish включен системно через `programs.fish.enable = true`.
 
 `home/ilya/codex.nix` declaratively generates a writable
 `~/.codex/config.toml`. Codex uses the custom `workspace-full` permission
-profile with `approval_policy = "never"`: the active workspace root (including
-its `.git` and `.codex` directories), `/tmp`, and `$TMPDIR` are writable; the
-rest of the filesystem is read-only. Network access is enabled for all domains.
+profile with `approval_policy = "never"`: the active workspace root, its `.git`
+metadata, `/tmp`, and `$TMPDIR` are writable; the rest of the filesystem is
+read-only. `.git` needs an explicit rule because Codex protects repository
+metadata even under an otherwise writable workspace; `.codex` remains
+read-only. Network access is enabled for all domains.
 Only the user D-Bus and Bitwarden SSH-agent Unix sockets are allowlisted; broad
 Unix-socket access is intentionally not enabled because services such as the
 Nix daemon or Docker could bypass the filesystem boundary. Because the active
@@ -475,6 +520,13 @@ workspace comes from the launch directory, starting Codex in `$HOME` makes the
 whole home directory writable; normally launch it in the repository that should
 be editable. Disallowed operations fail immediately instead of displaying an
 approval prompt.
+
+The same module configures the `nix` MCP server using the pinned
+`pkgs.mcp-nixos` package rather than `uvx` or an unpinned `nix run`. It exposes
+live search and reference data for Nixpkgs packages, NixOS and Home Manager
+options, flakes, Nixvim, nix.dev and related Nix resources. MCP tools are
+approved automatically; the server remains query-only and does not replace
+local flake evaluation or authorize rebuild/activation commands.
 
 Home Manager также задает session variables:
 
@@ -683,6 +735,18 @@ policy-routing слой, пока штатный Happ работает без н
 `systemd-resolved.service`. Happ can recover from early DNS failures, but
 starting the daemon after the resolver is ready avoids boot-time
 `HostNotFound` noise and makes TUN/DNS setup less timing-sensitive.
+The daemon remains a root service because TUN mode, routing changes and
+cross-user process inspection are part of its upstream protocol, but its
+systemd unit is sandboxed: the capability bounding set retains network,
+process-inspection and child-process privileges while excluding unrestricted
+kernel administration, module loading, raw I/O, BPF and audit control.
+System and home paths are read-only to the daemon, `/var/lib/happd` is its
+private state directory, and device access is limited to `/dev/net/tun` plus
+systemd's standard pseudo-devices. The upstream hard-coded
+`/tmp/happd.sock` path remains shared with the desktop client, but an
+`ExecStartPost` guard changes it to `root:users 0660` after every daemon start;
+the service uses the existing `users` group so the current desktop session
+does not need a logout before it can reconnect.
 Этот же модуль создает compatibility symlink для HWID:
 `/var/lib/dbus/machine-id -> /etc/machine-id` через `systemd.tmpfiles.rules`.
 Happ получает machine id через Qt `machineUniqueId()`, а на NixOS с
@@ -720,18 +784,12 @@ TLauncher отдельно скачивает generic Linux JRE в
 TLauncher. Если upstream заменит jar на том же URL, сборка намеренно упадет на
 hash mismatch; тогда нужно отдельно проверить новый файл и обновить hash.
 
-`bitwarden-desktop` установлен через nixpkgs по явному решению пользователя.
-В текущем nixpkgs пакет тянет insecure EOL `electron-39.8.10`, поэтому в
-`hosts/nixos/configuration.nix` добавлено узкое исключение:
-
-```nix
-nixpkgs.config.permittedInsecurePackages = [
-  "electron-39.8.10"
-];
-```
-
-Не расширять этот список без отдельной причины. Если nixpkgs позже обновит
-Bitwarden Desktop на безопасный Electron, это исключение нужно удалить.
+`bitwarden-desktop` установлен по явному решению пользователя и берется из
+закрепленного `nixpkgs-unstable`: stable оставался на Bitwarden `2026.5.0` с
+EOL Electron 39, тогда как unstable предоставляет Bitwarden `2026.7.0` с
+поддерживаемым Electron 41. Не возвращать `electron-39.8.10` в
+`permittedInsecurePackages`; если будущий Bitwarden снова потребует insecure
+runtime, сначала искать обновление или откатывать generation.
 
 Bitwarden SSH Agent ожидается по native desktop socket:
 

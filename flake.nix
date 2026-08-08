@@ -37,6 +37,9 @@
           ({ pkgs, ... }: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {
+              inherit pkgsUnstable;
+            };
             home-manager.backupCommand = pkgs.writeShellScript "home-manager-timestamped-backup" ''
               set -euo pipefail
 

@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  pkgsUnstable,
+  lib,
+  ...
+}:
 
 let
   appearance = import ./appearance.nix { inherit pkgs; };
@@ -131,7 +136,7 @@ in
     wl-clipboard
     cliphist
     xdg-utils
-    bitwarden-desktop
+    pkgsUnstable.bitwarden-desktop
     telegram-desktop
     networkmanagerapplet
     catppuccinGtk

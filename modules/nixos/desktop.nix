@@ -1,5 +1,12 @@
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable, ... }:
 
+let
+  bitwardenPolkitPolicy = pkgs.runCommand "bitwarden-polkit-policy" { } ''
+    install -Dm444 \
+      ${pkgsUnstable.bitwarden-desktop}/share/polkit-1/actions/com.bitwarden.Bitwarden.policy \
+      $out/share/polkit-1/actions/com.bitwarden.Bitwarden.policy
+  '';
+in
 {
   services.xserver.enable = true;
 
@@ -54,6 +61,23 @@
   };
 
   security.polkit.enable = true;
+
+  services.fprintd.enable = true;
+  security.pam.services = {
+    # Display-manager login cannot unlock KWallet. Hyprlock talks to fprintd
+    # directly in parallel with its password-only PAM stack.
+    login.fprintAuth = false;
+    sddm.fprintAuth = false;
+    hyprlock.fprintAuth = false;
+
+    sudo.fprintAuth = true;
+    polkit-1.fprintAuth = true;
+  };
+
+  # A Home Manager package is not searched by system polkit. Expose only
+  # Bitwarden's action policy, without a second system-wide desktop entry.
+  environment.systemPackages = [ bitwardenPolkitPolicy ];
+
   programs.dconf.enable = true;
 
   fonts = {

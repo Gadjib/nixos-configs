@@ -265,6 +265,15 @@ in
   '';
 
   xdg.configFile."hypr/hyprlock.conf".text = ''
+    auth {
+      fingerprint {
+        enabled = true
+        ready_message = Scan fingerprint to unlock
+        present_message = Scanning fingerprint...
+        retry_delay = 250
+      }
+    }
+
     background {
       color = rgba(24273aff)
     }

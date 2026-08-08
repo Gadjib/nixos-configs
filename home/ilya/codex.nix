@@ -19,6 +19,7 @@
 
     [permissions.workspace-full.filesystem.":workspace_roots"]
     "." = "write"
+    ".git" = "write"
 
     [permissions.workspace-full.network]
     enabled = true
@@ -30,6 +31,13 @@
     [permissions.workspace-full.network.unix_sockets]
     "/run/user/1000/bus" = "allow"
     "/home/ilya/.bitwarden-ssh-agent.sock" = "allow"
+
+    [mcp_servers.nix]
+    command = "${pkgs.mcp-nixos}/bin/mcp-nixos"
+    enabled = true
+    startup_timeout_sec = 30
+    tool_timeout_sec = 60
+    default_tools_approval_mode = "approve"
 
     [projects."/home/ilya/nixos-config"]
     trust_level = "trusted"
