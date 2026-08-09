@@ -723,7 +723,7 @@ Rofi молча завершались с кодом 1. Это runtime cleanup, 
 
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
-`Happ-proxy/happ-desktop` версии `3.1.0`. Пакет использует upstream asset
+`Happ-proxy/happ-desktop` версии `3.3.6`. Пакет использует upstream asset
 `Happ.linux.x64.pkg.tar.zst` с pinned SHA-256, переносит bundled Qt desktop
 application в `/nix/store`, создает wrapper `happ` и desktop entry для launcher-а.
 OpenSSL добавлен в runtime dependencies намеренно: без него bundled Qt TLS
