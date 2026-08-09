@@ -457,6 +457,13 @@ host directories. This prevents an unavailable `/vault` from aborting Steam's
 `bubblewrap` startup; all other host directories retain the standard Nixpkgs
 Steam behavior. `dotglob` is disabled again after assigning `GLOBIGNORE` to
 avoid changing which hidden root entries the wrapper enumerates.
+Для встроенной Intel Iris Xe (Alder Lake-P) включен современный VA-API driver
+`intel-media-driver` (`iHD_drv_video.so`) и oneVPL/QSV runtime `vpl-gpu-rt` через
+`hardware.graphics.extraPackages`. `LIBVA_DRIVER_NAME=iHD` явно выбирает этот
+driver вместо устаревшего `i965`. Это необходимо для hardware video decoding в
+Moonlight; без `iHD` клиент сообщает, что не обнаружил functioning hardware
+accelerated video decoder. `libva-utils` установлен для проверки командой
+`vainfo` после system switch и нового входа в графическую сессию.
 В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
