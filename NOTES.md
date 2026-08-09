@@ -263,9 +263,18 @@ authentication), KDE lock screen через создаваемый Plasma PAM se
 `hyprlock.fprintAuth = false` намеренно исключает двойной захват
 сканера. Пароль везде остается fallback-способом.
 
-Fingerprint PAM отключен для `login` и `sddm`: вход по отпечатку
-не может разблокировать KDE Wallet и создает неоднозначный
-login flow. Bitwarden установлен через Home Manager, а polkit не
+SDDM делегирует authentication в PAM substack `login`, поэтому
+fingerprint включен как `login.fprintAuth = true`; отдельное
+`sddm.fprintAuth` остается `false`, потому что SDDM service использует
+`useDefaultRules = false` и сам это правило не читает. Для fingerprint
+login нужно выбрать user, оставить password пустым, нажать
+Enter и приложить палец. Password authentication остается fallback;
+`pam_fprintd` ограничен `timeout=10` и `max-tries=3`, чтобы SDDM не
+ждал стандартные 30 секунд перед password fallback. Вход по
+отпечатку не передает password в `pam_kwallet`, поэтому KDE Wallet
+после такого login может отдельно запросить пароль.
+
+Bitwarden установлен через Home Manager, а polkit не
 сканирует user profile, поэтому модуль отдельно выводит в
 system profile только `com.bitwarden.Bitwarden.policy`, без второго
 desktop entry.

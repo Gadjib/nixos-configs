@@ -64,9 +64,20 @@ in
 
   services.fprintd.enable = true;
   security.pam.services = {
-    # Display-manager login cannot unlock KWallet. Hyprlock talks to fprintd
-    # directly in parallel with its password-only PAM stack.
-    login.fprintAuth = false;
+    # SDDM delegates authentication to the login PAM substack. Keep the
+    # fingerprint wait bounded so password fallback is not delayed by the
+    # pam_fprintd default timeout of 30 seconds.
+    login = {
+      fprintAuth = true;
+      rules.auth.fprintd.args = [
+        "timeout=10"
+        "max-tries=3"
+      ];
+    };
+
+    # SDDM itself uses no default PAM rules; fingerprint authentication comes
+    # from its login substack above. Hyprlock talks to fprintd directly in
+    # parallel with its password-only PAM stack.
     sddm.fprintAuth = false;
     hyprlock.fprintAuth = false;
 
