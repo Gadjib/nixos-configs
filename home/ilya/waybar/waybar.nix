@@ -53,6 +53,7 @@
           "class<([Ss]team|steam_app_.*)>" = " ";
           "class<([Tt][Ll]auncher|Minecraft.*)>" = " ";
           "class<(org\\.prismlauncher\\.PrismLauncher|prismlauncher)>" = " ";
+          "class<(com\\.moonlight_stream\\.Moonlight|[Mm]oonlight)>" = " ";
           "class<(openmw|openmw-launcher|openmw-cs|org\\.openmw\\..*)>" = " 󰍳";
           "class<org\\.kde\\.gwenview>" = " ";
           "class<org\\.kde\\.okular>" = " ";

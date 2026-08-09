@@ -637,8 +637,15 @@ not a general image viewer.
 Базовые Home Manager пакеты лежат в `home/ilya/home.nix`.
 
 Туда входят Hyprland stack, CLI tools, Bitwarden Desktop, Telegram,
-`networkmanagerapplet`, Catppuccin GTK/KDE themes, `direnv`, `nix-direnv`,
+Moonlight Qt, `networkmanagerapplet`, Catppuccin GTK/KDE themes, `direnv`, `nix-direnv`,
 `lazygit`, `delta`, `gh`, `net-tools` (включая `ifconfig`) и прочее.
+
+Moonlight установлен как `pkgs.moonlight-qt` из закрепленного stable
+Nixpkgs. Это PC client для Sunshine/NVIDIA GameStream; отдельные
+udev/uinput rules на client side не добавлены. Waybar mapping учитывает
+upstream desktop ID `com.moonlight_stream.Moonlight` и Qt class-варианты
+`moonlight`/`Moonlight`; после первого запуска реальный class нужно
+сверить через `hyprctl clients`.
 
 Ручные пакеты, добавленные командой `nix-install`, лежат отдельно:
 

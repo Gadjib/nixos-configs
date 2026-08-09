@@ -138,6 +138,7 @@ in
     xdg-utils
     pkgsUnstable.bitwarden-desktop
     telegram-desktop
+    moonlight-qt
     networkmanagerapplet
     catppuccinGtk
     catppuccinKde
