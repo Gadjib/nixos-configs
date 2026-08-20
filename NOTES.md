@@ -902,18 +902,11 @@ EOL Electron 39, тогда как unstable предоставляет Bitwarden
 `permittedInsecurePackages`; если будущий Bitwarden снова потребует insecure
 runtime, сначала искать обновление или откатывать generation.
 
-Home Manager владеет `~/.config/autostart/bitwarden.desktop` и запускает
-desktop client с `--autostart`. Для Bitwarden 2026.7.0 это штатный
-autostart mode: процесс стартует скрытым и остается в трее,
-не открывая главное окно. Не включать/выключать `Start automatically
-on login` из UI: теперь этим файлом владеет Home Manager.
-
-Скрытый autostart не может одновременно показывать password dialog:
-процесс стартует заблокированным, а master password запрашивается
-при первом открытии окна. Account-specific setting `Lock with master
-password on restart` нужно один раз включить в `Settings -> Account
-security`; она связана с unlock keys/PIN конкретного account и
-не записывается Nix-конфигом во внутренний `data.json`.
+Bitwarden Desktop не имеет декларативного автозапуска: нет XDG autostart
+entry, user systemd service или Hyprland `exec-once`. Он запускается только
+вручную. Сам пакет, vault data, polkit policy и SSH-agent integration при этом
+остаются установленными. Не включать `Start automatically on login` в UI,
+иначе Bitwarden снова создаст runtime-autostart вне Home Manager.
 
 Bitwarden SSH Agent ожидается по native desktop socket:
 

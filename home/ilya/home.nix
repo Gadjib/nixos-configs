@@ -191,17 +191,6 @@ in
   };
 
   xdg.enable = true;
-  xdg.configFile."autostart/bitwarden.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Bitwarden
-    Comment=Start Bitwarden locked in the system tray
-    Exec=${pkgsUnstable.bitwarden-desktop}/bin/bitwarden --autostart
-    Terminal=false
-    StartupNotify=false
-    X-GNOME-Autostart-enabled=true
-  '';
-
   xdg.portal = {
     extraPortals = [
       pkgs.kdePackages.xdg-desktop-portal-kde
