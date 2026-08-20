@@ -652,7 +652,8 @@ keeps a runtime generic `~/.config/mimeapps.list` from coupling the sessions.
 
 Current default app policy:
 
-- web links and HTML: `firefox-hyprland.desktop`.
+- web links and HTML: `firefox.desktop`, whose Exec uses the shared-profile
+  wrapper in both desktops.
 - images: `org.kde.gwenview.desktop`.
 - video/audio: `vlc.desktop`.
 - PDFs and document-like files: Okular desktop entries.
@@ -661,10 +662,10 @@ Current default app policy:
 - plain text: `org.kde.kate.desktop`.
 - code/config formats: `code.desktop`.
 
-`firefox-hyprland.desktop` intentionally does not advertise image MIME types
-and has `NotShowIn=KDE`. It is the Hyprland entry point for browser
-keybindings and web links, not a Plasma browser override or general image
-viewer.
+`firefox.desktop` intentionally does not advertise image MIME types. The
+`firefox-hyprland` command remains the Hyprland keybinding/BROWSER entry point,
+but it is only a thin wrapper around the same launcher used by that canonical
+desktop entry.
 
 ### Hyprland / Plasma Session Isolation
 
@@ -1153,13 +1154,20 @@ extensions, preferences and session; the old `5fyajafy.default` directory is
 left untouched as a fallback and is not merged into the canonical profile.
 
 `firefox-shared` always launches
-`firefox --profile ~/.mozilla/firefox/hyprland`. `firefox-hyprland`, Hyprland
-MIME defaults, `BROWSER`, `SUPER+B`, the Plasma-only `firefox.desktop` override
-and the Fish `firefox` alias all lead to this shared launcher. A Home Manager
-activation helper registers `hyprland` as the default profile in `profiles.ini`
-and current `installs.ini` sections, backing up both files before their first
-change. This also makes otherwise plain Firefox launches select the shared
-profile.
+`firefox --profile ~/.mozilla/firefox/hyprland`. `firefox-hyprland`, the shared
+`firefox.desktop`, `BROWSER`, `SUPER+B` and the Fish `firefox` alias all lead to
+this shared launcher. A Home Manager activation helper registers `hyprland` as
+the default profile in `profiles.ini` and current `installs.ini` sections,
+backing up the metadata before its first change. This also makes otherwise
+plain Firefox launches select the shared profile.
+
+Both desktops use the canonical `firefox.desktop` ID for HTTP/HTTPS, HTML and
+XHTML. Do not restore a separate `firefox-hyprland.desktop`: Firefox's Linux
+default-browser check expects its canonical desktop ID and otherwise repeatedly
+creates `userapp-Firefox-*.desktop` while asking to become default. The
+activation helper normalizes only Firefox-related entries in the generic
+`mimeapps.list`, preserves unrelated associations, and moves old generated
+userapp files into the isolation backup directory.
 
 The existing `toolkit.legacyUserProfileCustomizations.stylesheets` and
 tabs-in-titlebar preferences live in a declarative `user.js`. The session

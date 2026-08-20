@@ -45,7 +45,7 @@ let
     "application/x-gzip" = [ "org.kde.ark.desktop" ];
     "application/x-shellscript" = [ "code.desktop" ];
     "application/x-tar" = [ "org.kde.ark.desktop" ];
-    "application/xhtml+xml" = [ "firefox-hyprland.desktop" ];
+    "application/xhtml+xml" = [ "firefox.desktop" ];
     "application/xml" = [ "code.desktop" ];
     "application/zip" = [ "org.kde.ark.desktop" ];
     "audio/aac" = [ "vlc.desktop" ];
@@ -69,7 +69,7 @@ let
     "inode/directory" = [ "org.kde.dolphin.desktop" ];
     "text/css" = [ "code.desktop" ];
     "text/csv" = [ "code.desktop" ];
-    "text/html" = [ "firefox-hyprland.desktop" ];
+    "text/html" = [ "firefox.desktop" ];
     "text/markdown" = [ "code.desktop" ];
     "text/plain" = [ "org.kde.kate.desktop" ];
     "text/x-c" = [ "code.desktop" ];
@@ -89,9 +89,9 @@ let
     "video/x-flv" = [ "vlc.desktop" ];
     "video/x-matroska" = [ "vlc.desktop" ];
     "video/x-msvideo" = [ "vlc.desktop" ];
-    "x-scheme-handler/chrome" = [ "firefox-hyprland.desktop" ];
-    "x-scheme-handler/http" = [ "firefox-hyprland.desktop" ];
-    "x-scheme-handler/https" = [ "firefox-hyprland.desktop" ];
+    "x-scheme-handler/chrome" = [ "firefox.desktop" ];
+    "x-scheme-handler/http" = [ "firefox.desktop" ];
+    "x-scheme-handler/https" = [ "firefox.desktop" ];
   };
   mimeApplicationSections = lib.mapAttrs (
     _mimeType: applications: "${lib.concatStringsSep ";" applications};"

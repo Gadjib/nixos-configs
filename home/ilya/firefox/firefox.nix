@@ -21,6 +21,8 @@ let
       profiles_ini="$firefox_root/profiles.ini"
       installs_ini="$firefox_root/installs.ini"
       backup_root="$HOME/.local/state/nixos-desktop-isolation/backups"
+      mimeapps="$HOME/.config/mimeapps.list"
+      userapp_backup="$backup_root/firefox-userapps-before-sharing"
 
       mkdir -p "$firefox_root" "$backup_root"
       if [[ ! -d "$firefox_root/hyprland" ]]; then
@@ -34,8 +36,11 @@ let
       if [[ -s "$installs_ini" && ! -e "$backup_root/firefox-installs-before-sharing.ini" ]]; then
         cp -- "$installs_ini" "$backup_root/firefox-installs-before-sharing.ini"
       fi
+      if [[ -f "$mimeapps" && ! -e "$backup_root/firefox-mimeapps-before-sharing.list" ]]; then
+        cp -- "$mimeapps" "$backup_root/firefox-mimeapps-before-sharing.list"
+      fi
 
-      python3 - "$profiles_ini" "$installs_ini" <<'PY'
+      python3 - "$profiles_ini" "$installs_ini" "$mimeapps" <<'PY'
       import configparser
       import os
       import re
@@ -45,6 +50,7 @@ let
 
       profiles_path = Path(sys.argv[1])
       installs_path = Path(sys.argv[2])
+      mimeapps_path = Path(sys.argv[3])
       shared_path = "hyprland"
 
       def read_ini(path):
@@ -100,7 +106,33 @@ let
               installs[section]["Default"] = shared_path
               installs[section]["Locked"] = "1"
           write_ini(installs_path, installs)
+
+      web_mime_types = (
+          "application/x-extension-htm",
+          "application/x-extension-html",
+          "application/x-extension-shtml",
+          "application/x-extension-xht",
+          "application/x-extension-xhtml",
+          "application/xhtml+xml",
+          "text/html",
+          "x-scheme-handler/chrome",
+          "x-scheme-handler/http",
+          "x-scheme-handler/https",
+      )
+      mimeapps = read_ini(mimeapps_path)
+      for section in ("Added Associations", "Default Applications"):
+          if section not in mimeapps:
+              mimeapps[section] = {}
+          for mime_type in web_mime_types:
+              mimeapps[section][mime_type] = "firefox.desktop;"
+      write_ini(mimeapps_path, mimeapps)
       PY
+
+      mkdir -p "$userapp_backup"
+      shopt -s nullglob
+      for desktop_file in "$HOME/.local/share/applications"/userapp-Firefox-*.desktop; do
+        mv --backup=numbered -- "$desktop_file" "$userapp_backup/"
+      done
     '';
   };
 in
@@ -154,35 +186,9 @@ in
   programs.fish.shellAliases.firefox = sharedLauncher;
 
   xdg.desktopEntries = {
-    firefox-hyprland = {
-      name = "Firefox Hyprland";
-      genericName = "Web Browser";
-      exec = "${sharedLauncher} --name firefox %U";
-      icon = "firefox";
-      terminal = false;
-      categories = [
-        "Network"
-        "WebBrowser"
-      ];
-      settings = {
-        NotShowIn = "KDE;";
-        StartupWMClass = "firefox";
-      };
-      mimeType = [
-        "text/html"
-        "text/xml"
-        "application/xhtml+xml"
-        "application/xml"
-        "application/rss+xml"
-        "application/rdf+xml"
-        "x-scheme-handler/http"
-        "x-scheme-handler/https"
-      ];
-    };
-
-    # This higher-priority entry replaces the package launcher only in Plasma.
-    # It keeps the familiar Firefox name and actions while selecting the same
-    # profile that Hyprland already uses.
+    # One canonical desktop ID is essential: Firefox's Linux default-browser
+    # check expects firefox.desktop. Session-specific UI is handled by CSS,
+    # not by a second desktop entry.
     firefox = {
       name = "Firefox";
       genericName = "Web Browser";
@@ -195,7 +201,6 @@ in
         "WebBrowser"
       ];
       settings = {
-        OnlyShowIn = "KDE;";
         StartupWMClass = "firefox";
       };
       mimeType = [
