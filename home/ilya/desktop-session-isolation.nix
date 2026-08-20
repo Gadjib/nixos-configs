@@ -8,6 +8,30 @@ let
     size = appearance.gtk.size;
   };
 
+  drkonqiDisplayAvailable = pkgs.writeShellApplication {
+    name = "drkonqi-display-available";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      set -euo pipefail
+
+      shopt -s nullglob
+      for socket in "''${XDG_RUNTIME_DIR:?}"/wayland-*; do
+        if [[ -S "$socket" ]]; then
+          exit 0
+        fi
+      done
+
+      # Keep the normal crash reporter available in an X11 Plasma session,
+      # but reject a stale DISPLAY left behind after its server has exited.
+      if [[ "''${DISPLAY:-}" =~ ^:([0-9]+)(\.[0-9]+)?$ ]]; then
+        [[ -S "/tmp/.X11-unix/X''${BASH_REMATCH[1]}" ]]
+        exit
+      fi
+
+      exit 1
+    '';
+  };
+
   desktopSessionProfile = pkgs.writeShellApplication {
     name = "desktop-session-profile";
     runtimeInputs = with pkgs; [
@@ -348,6 +372,15 @@ in
         unset XDG_MENU_PREFIX
       '';
     };
+
+    # Plasma installs this template for every graphical session. If a process
+    # dumps core while a Wayland compositor is already shutting down, the
+    # graphical launcher otherwise aborts for lack of a display and reports
+    # its own abort recursively. Skip only that display-less invocation.
+    "systemd/user/drkonqi-coredump-launcher@.service.d/10-live-display.conf".text = ''
+      [Service]
+      ExecCondition=${drkonqiDisplayAvailable}/bin/drkonqi-display-available
+    '';
   };
 
   systemd.user.services.hyprland-desktop-session-profile = {

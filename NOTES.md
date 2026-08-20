@@ -649,6 +649,9 @@ Hyprland default applications are managed declaratively in
 `~/.config/hyprland-mimeapps.list`. Plasma has no Home Manager MIME override
 and uses its normal defaults or settings chosen through System Settings. This
 keeps a runtime generic `~/.config/mimeapps.list` from coupling the sessions.
+The desktop-specific file contains only `[Default Applications]`: according to
+GIO, `[Added Associations]` belongs in the generic `mimeapps.list` and is
+ignored in a desktop-specific file.
 
 Current default app policy:
 
@@ -701,12 +704,23 @@ ordinary application data remains shared under the same Unix user and HOME.
   contain `NotShowIn=KDE` plus `X-systemd-skip=true`, preventing Plasma
   autostart duplicates while the supervised Hyprland services remain the only
   applet processes.
+- `awww-daemon` is also a supervised member of
+  `hyprland-session.target`; Hyprland only sends the unchanged wallpaper
+  command after startup. This gives the daemon `SIGTERM` during the existing
+  session-target shutdown instead of leaving it to abort when its Wayland
+  connection disappears.
 - Shared application data and config such as Steam, Proton, Telegram,
   Bitwarden, Discord, Obsidian, browsers, games, Git, Fish and Neovim are not
   moved into alternate XDG roots and remain common to both sessions.
 - Do not replace this with separate global `XDG_CONFIG_HOME` or
   `XDG_DATA_HOME` values: that would unnecessarily split ordinary application
   profiles, contrary to the intended design.
+- Plasma's package-provided `drkonqi-coredump-launcher@.service` has a Home
+  Manager `ExecCondition` drop-in. The graphical crash reporter starts only
+  while a real Wayland or local X11 socket exists. This preserves normal
+  DrKonqi behavior in a live Plasma session but prevents a compositor-shutdown
+  crash from making DrKonqi abort without a display and recursively report its
+  own aborts.
 
 ## Пользовательские Пакеты
 
@@ -1153,21 +1167,27 @@ desktops. It contains the pre-existing Hyprland history, cookies, logins,
 extensions, preferences and session; the old `5fyajafy.default` directory is
 left untouched as a fallback and is not merged into the canonical profile.
 
-`firefox-shared` always launches
-`firefox --profile ~/.mozilla/firefox/hyprland`. `firefox-hyprland`, the shared
-`firefox.desktop`, `BROWSER`, `SUPER+B` and the Fish `firefox` alias all lead to
-this shared launcher. A Home Manager activation helper registers `hyprland` as
+`firefox-shared` always launches the absolute Nix store Firefox binary with
+`--profile ~/.mozilla/firefox/hyprland`. `~/.local/bin/firefox` and
+`firefox-hyprland` are thin entry points to that shared launcher;
+`~/.local/bin` is explicitly first in the session `PATH`. `firefox.desktop`
+uses the bare command `firefox`, while `BROWSER` and `SUPER+B` use
+`firefox-hyprland`. A Home Manager activation helper registers `hyprland` as
 the default profile in `profiles.ini` and current `installs.ini` sections,
 backing up the metadata before its first change. This also makes otherwise
 plain Firefox launches select the shared profile.
 
 Both desktops use the canonical `firefox.desktop` ID for HTTP/HTTPS, HTML and
-XHTML. Do not restore a separate `firefox-hyprland.desktop`: Firefox's Linux
-default-browser check expects its canonical desktop ID and otherwise repeatedly
-creates `userapp-Firefox-*.desktop` while asking to become default. The
-activation helper normalizes only Firefox-related entries in the generic
-`mimeapps.list`, preserves unrelated associations, and moves old generated
-userapp files into the isolation backup directory.
+XHTML. Do not restore a separate `firefox-hyprland.desktop`. Firefox's Linux
+default-browser implementation compares the executable in GIO's handler
+command with `MOZ_APP_LAUNCHER`; the NixOS Firefox wrapper sets the latter to
+the relative name `firefox`. Therefore both the desktop entry and the first
+`PATH` match must remain `firefox`. Pointing the desktop entry directly at
+`firefox-shared` makes the comparison permanently fail even if every MIME
+default is correct. The activation helper normalizes only Firefox-related
+entries in the generic `mimeapps.list`, preserves unrelated associations, and
+moves old generated `userapp-Firefox-*.desktop` files into the isolation backup
+directory.
 
 The existing `toolkit.legacyUserProfileCustomizations.stylesheets` and
 tabs-in-titlebar preferences live in a declarative `user.js`. The session

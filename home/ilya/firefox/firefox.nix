@@ -138,6 +138,19 @@ let
 in
 {
   home.file = {
+    # Firefox's Linux default-browser check compares the first command in the
+    # registered desktop entry with MOZ_APP_LAUNCHER. The NixOS wrapper sets
+    # that variable to `firefox`, so this executable and the desktop entry must
+    # deliberately use that exact name. firefox-shared uses an absolute store
+    # path below, therefore this forwarding wrapper cannot recurse.
+    ".local/bin/firefox" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        exec ${sharedLauncher} "$@"
+      '';
+    };
+
     ".local/bin/firefox-shared" = {
       executable = true;
       text = ''
@@ -183,7 +196,9 @@ in
     $DRY_RUN_CMD ${registerSharedProfile}/bin/register-shared-firefox-profile
   '';
 
-  programs.fish.shellAliases.firefox = sharedLauncher;
+  # This also controls how Firefox resolves the relative MOZ_APP_LAUNCHER
+  # value. It must resolve to the same executable as firefox.desktop.
+  home.sessionPath = [ "/home/ilya/.local/bin" ];
 
   xdg.desktopEntries = {
     # One canonical desktop ID is essential: Firefox's Linux default-browser
@@ -192,7 +207,7 @@ in
     firefox = {
       name = "Firefox";
       genericName = "Web Browser";
-      exec = "${sharedLauncher} --name firefox %U";
+      exec = "firefox --name firefox %U";
       icon = "firefox";
       terminal = false;
       startupNotify = true;
@@ -214,11 +229,11 @@ in
       actions = {
         new-private-window = {
           name = "New Private Window";
-          exec = "${sharedLauncher} --private-window %U";
+          exec = "firefox --private-window %U";
         };
         new-window = {
           name = "New Window";
-          exec = "${sharedLauncher} --new-window %U";
+          exec = "firefox --new-window %U";
         };
       };
     };

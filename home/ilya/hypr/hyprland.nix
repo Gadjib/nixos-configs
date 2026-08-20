@@ -42,7 +42,6 @@ in
 
       exec-once = [
         "mako"
-        "awww-daemon"
         "sleep 0.5 && awww img ${wallpaper} --resize crop --transition-type fade --transition-duration 1"
         "hypridle"
         "wl-paste --type text --watch cliphist store"
@@ -329,6 +328,19 @@ in
       ExecStart = "${pkgs.systemd}/bin/loginctl lock-session";
     };
     Install.WantedBy = [ "sleep.target" ];
+  };
+
+  systemd.user.services.awww-daemon = {
+    Unit = {
+      Description = "Animated wallpaper daemon";
+      PartOf = [ "hyprland-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.awww}/bin/awww-daemon";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+    Install.WantedBy = [ "hyprland-session.target" ];
   };
 
   systemd.user.services.nm-applet = {

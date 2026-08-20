@@ -97,7 +97,6 @@ let
     _mimeType: applications: "${lib.concatStringsSep ";" applications};"
   ) defaultApplications;
   hyprlandMimeApps = lib.generators.toINI { } {
-    "Added Associations" = mimeApplicationSections;
     "Default Applications" = mimeApplicationSections;
   };
 in
