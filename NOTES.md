@@ -676,10 +676,14 @@ ordinary application data remains shared under the same Unix user and HOME.
   GTK3/GTK4 settings and GNOME interface dconf values, installs exact
   declarative Hyprland versions, then restores the saved Plasma state when the
   target stops.
-- Hyprland's active copies are saved separately at logout, so runtime KDE/GTK
-  changes made inside Hyprland survive normal relogins. A fingerprint of the
-  declarative sources reseeds that state only after the configured Hyprland
-  appearance actually changes, matching the old rebuild behavior.
+- The exact declarative Hyprland copies are reapplied at every Hyprland start,
+  even when a stale active-session marker remains after a crash or reboot.
+  Plasma's writable state is still saved and restored around the session, but
+  KDE/GTK appearance changes made interactively inside Hyprland must be moved
+  into `appearance.nix`/Home Manager to persist.
+- GTK4 assets copied from the Nix store are made owner-writable. The profile
+  also repairs permissions before removing managed trees, so logout cannot
+  fail halfway through and leave Plasma and Hyprland settings mixed.
 - A Plasma pre-start script at
   `~/.config/plasma-workspace/env/00-desktop-session-profile.sh` performs the
   same restore defensively before Plasma reads its workspace configuration.

@@ -21,7 +21,6 @@ let
 
       state_root="$HOME/.local/state/nixos-desktop-isolation"
       session_state="$state_root/active-hyprland"
-      hypr_state="$state_root/hyprland"
       initialized="$state_root/plasma-reset-v1"
       lock_file="''${XDG_RUNTIME_DIR:?}/nixos-desktop-isolation.lock"
 
@@ -122,67 +121,64 @@ let
         mkdir -p "$(dirname "$target")"
         if [[ -d "$source" ]]; then
           cp -aL -- "$source" "$target"
+          chmod -R u+rwX -- "$target"
         else
           install -m 0600 -- "$source" "$target"
         fi
       }
 
-      refresh_hyprland_defaults() {
-        local fingerprint index source
+      remove_writable_tree() {
+        local target="$1"
 
-        fingerprint="$({
-          for source in "''${managed_sources[@]}" "$hypr_root/dconf-interface.ini"; do
-            readlink -f -- "$source"
-          done
-        } | sha256sum | cut -d ' ' -f 1)"
-
-        if [[ -r "$hypr_state/source-fingerprint" ]] \
-          && [[ "$(< "$hypr_state/source-fingerprint")" == "$fingerprint" ]]; then
-          return 0
+        if [[ -e "$target" || -L "$target" ]]; then
+          chmod -R u+w -- "$target" 2>/dev/null || true
+          rm -rf -- "$target"
         fi
+      }
 
-        rm -rf -- "$hypr_state"
-        mkdir -p "$hypr_state/files"
+      apply_hyprland_defaults() {
+        local index target
+
         for index in "''${!managed_ids[@]}"; do
-          copy_hypr_source \
-            "''${managed_sources[$index]}" \
-            "$hypr_state/files/''${managed_ids[$index]}"
+          target="$HOME/''${managed_paths[$index]}"
+          remove_writable_tree "$target"
+          copy_hypr_source "''${managed_sources[$index]}" "$target"
         done
-        install -m 0600 -- \
-          "$hypr_root/dconf-interface.ini" \
-          "$hypr_state/dconf-interface.ini"
-        printf '%s\n' "$fingerprint" > "$hypr_state/source-fingerprint"
+
+        dconf reset -f /org/gnome/desktop/interface/
+        dconf load /org/gnome/desktop/interface/ < "$hypr_root/dconf-interface.ini"
       }
 
       activate_hyprland() {
-        local index id relative source target
+        local index id relative target
 
         initialize_plasma_defaults
-        [[ ! -e "$session_state/.active" ]] || return 0
-        refresh_hyprland_defaults
+        # Remove the pre-fix cache whose store-derived GTK assets may be
+        # read-only. It is no longer part of the session state machine.
+        remove_writable_tree "$state_root/hyprland"
+        if [[ ! -e "$session_state/.active" ]]; then
+          remove_writable_tree "$session_state"
+          mkdir -p "$session_state/files"
 
-        rm -rf -- "$session_state"
-        mkdir -p "$session_state/files"
+          for index in "''${!managed_ids[@]}"; do
+            id="''${managed_ids[$index]}"
+            relative="''${managed_paths[$index]}"
+            target="$HOME/$relative"
 
-        for index in "''${!managed_ids[@]}"; do
-          id="''${managed_ids[$index]}"
-          relative="''${managed_paths[$index]}"
-          source="$hypr_state/files/$id"
-          target="$HOME/$relative"
+            if [[ -e "$target" || -L "$target" ]]; then
+              mv -- "$target" "$session_state/files/$id"
+            else
+              touch "$session_state/files/$id.absent"
+            fi
+          done
 
-          if [[ -e "$target" || -L "$target" ]]; then
-            mv -- "$target" "$session_state/files/$id"
-          else
-            touch "$session_state/files/$id.absent"
-          fi
-          copy_hypr_source "$source" "$target"
-        done
+          dconf dump /org/gnome/desktop/interface/ > "$session_state/dconf-interface.ini"
+          touch "$session_state/.active"
+        fi
 
-        dconf dump /org/gnome/desktop/interface/ > "$session_state/dconf-interface.ini"
-        dconf reset -f /org/gnome/desktop/interface/
-        dconf load /org/gnome/desktop/interface/ < "$hypr_state/dconf-interface.ini"
-
-        touch "$session_state/.active"
+        # Always reapply the profile. This also repairs a stale .active marker
+        # left by a crash, reboot or an interrupted previous logout.
+        apply_hyprland_defaults
       }
 
       deactivate_hyprland() {
@@ -190,24 +186,19 @@ let
 
         initialize_plasma_defaults
         if [[ -e "$session_state/.active" ]]; then
-          mkdir -p "$hypr_state/files"
           for index in "''${!managed_ids[@]}"; do
             id="''${managed_ids[$index]}"
             relative="''${managed_paths[$index]}"
             target="$HOME/$relative"
             saved="$session_state/files/$id"
 
-            rm -rf -- "$hypr_state/files/$id"
-            if [[ -e "$target" || -L "$target" ]]; then
-              mv -- "$target" "$hypr_state/files/$id"
-            fi
+            remove_writable_tree "$target"
             if [[ -e "$saved" || -L "$saved" ]]; then
               mkdir -p "$(dirname "$target")"
               mv -- "$saved" "$target"
             fi
           done
 
-          dconf dump /org/gnome/desktop/interface/ > "$hypr_state/dconf-interface.ini"
           dconf reset -f /org/gnome/desktop/interface/
           if [[ -s "$session_state/dconf-interface.ini" ]]; then
             dconf load /org/gnome/desktop/interface/ < "$session_state/dconf-interface.ini"
