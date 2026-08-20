@@ -46,6 +46,7 @@
     exec = "/home/ilya/.local/bin/firefox-hyprland %U";
     terminal = false;
     categories = [ "Network" "WebBrowser" ];
+    settings.OnlyShowIn = "Hyprland;";
     mimeType = [
       "text/html"
       "text/xml"

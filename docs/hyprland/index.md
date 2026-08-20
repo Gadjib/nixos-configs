@@ -19,7 +19,8 @@ Hyprland - основная Wayland-сессия. KDE Plasma 6 остается 
 
 ## Компоненты
 
-- `waybar` стартует через `exec-once`.
+- `waybar` стартует через Home Manager systemd user service, привязанный к
+  `hyprland-session.target`.
 - `mako` стартует через `exec-once`.
 - `awww-daemon` стартует для wallpaper, затем `awww img` применяет
   `/home/ilya/nixos-config/assets/wallpapers/wallhaven-2eqpzm.png`.
@@ -28,6 +29,13 @@ Hyprland - основная Wayland-сессия. KDE Plasma 6 остается 
 - `rofi -show drun` вызывается по `SUPER+D`.
 - `grim`, `slurp`, `swappy` делают area screenshot по `Print`.
 - `cliphist` хранит clipboard history.
+- `nm-applet`, `blueman-applet` и `udiskie` стартуют только вместе с
+  `hyprland-session.target`; в Plasma используются штатные KDE-компоненты.
+
+GTK/KDE Catppuccin settings и Hyprland-specific environment variables также
+активируются только на время Hyprland session. После logout восстанавливаются
+настройки Plasma, поэтому изменение темы или app defaults в одном окружении не
+переопределяет другое.
 
 ## Как выбрать сессию
 

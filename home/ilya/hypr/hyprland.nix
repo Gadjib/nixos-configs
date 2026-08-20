@@ -21,11 +21,23 @@ in
         ",preferred,auto,${toString appearance.scale}"
       ];
 
-      env = [
+      # These values belong to the Hyprland session only. `envd` also imports
+      # them into the user service manager and D-Bus activation environment,
+      # without leaking them into the next Plasma login.
+      envd = [
+        "ADW_DEBUG_COLOR_SCHEME,prefer-dark"
+        "BROWSER,/home/ilya/.local/bin/firefox-hyprland"
+        "GTK_THEME,${appearance.gtk.name}"
         "XCURSOR_THEME,${appearance.cursor.name}"
         "XCURSOR_SIZE,${toString appearance.cursor.size}"
         "HYPRCURSOR_THEME,${appearance.cursor.name}"
         "HYPRCURSOR_SIZE,${toString appearance.cursor.size}"
+        "KDE_SESSION_VERSION,6"
+        "QT_QPA_PLATFORMTHEME,kde"
+        "QT_QUICK_CONTROLS_STYLE,org.kde.desktop"
+        "XDG_CURRENT_DESKTOP,Hyprland"
+        "XDG_MENU_PREFIX,plasma-"
+        "XDG_SESSION_DESKTOP,Hyprland"
       ];
 
       exec-once = [
@@ -253,7 +265,10 @@ in
   # Home Manager's target starts graphical-session.target through BindsTo.
   # Propagate shutdown in the opposite direction as recommended by Hyprland,
   # so session services are stopped before the compositor disappears.
-  systemd.user.targets.hyprland-session.Unit.PropagatesStopTo = [ "graphical-session.target" ];
+  systemd.user.targets.hyprland-session.Unit = {
+    Requires = [ "hyprland-desktop-session-profile.service" ];
+    PropagatesStopTo = [ "graphical-session.target" ];
+  };
 
   xdg.configFile."hypr/hypridle.conf".text = ''
     general {
@@ -319,28 +334,28 @@ in
   systemd.user.services.nm-applet = {
     Unit = {
       Description = "NetworkManager tray applet";
-      PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
+      PartOf = [ "hyprland-session.target" ];
+      After = [ "hyprland-session.target" ];
     };
     Service = {
       ExecStart = "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator";
       Restart = "on-failure";
       RestartSec = 2;
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+    Install.WantedBy = [ "hyprland-session.target" ];
   };
 
   systemd.user.services.blueman-applet = {
     Unit = {
       Description = "Bluetooth tray applet";
-      PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
+      PartOf = [ "hyprland-session.target" ];
+      After = [ "hyprland-session.target" ];
     };
     Service = {
       ExecStart = "${pkgs.blueman}/bin/blueman-applet";
       Restart = "on-failure";
       RestartSec = 2;
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+    Install.WantedBy = [ "hyprland-session.target" ];
   };
 }

@@ -119,6 +119,7 @@ nixosConfigurations.thinkpad-nix
 │   └── users.nix
 └── home/ilya/
     ├── appearance.nix
+    ├── desktop-session-isolation.nix
     ├── home.nix
     ├── firefox/firefox.nix
     ├── fish/fish.nix
@@ -294,8 +295,11 @@ fprintd-verify
 USB removable media:
 
 - `modules/nixos/removable-media.nix` enables `udisks2` explicitly.
-- `home/ilya/removable-media.nix` enables the user-level `udiskie` daemon with
-  automounting, notifications and an auto-hiding tray icon. UDisks mounts
+- `home/ilya/removable-media.nix` enables the user-level `udiskie` daemon only
+  for `hyprland-session.target`, with automounting, notifications and an
+  auto-hiding tray icon. Plasma uses its native device notifier and KDED device
+  automounter instead, so the two desktop environments never race each other.
+  UDisks mounts
   removable filesystems below `/run/media/ilya/<label>` and owns the complete
   mount/unmount/eject lifecycle, so Dolphin and the tray can safely eject a
   device without treating it as somebody else's root mount.
@@ -316,6 +320,9 @@ USB removable media:
 - At user-service start the hook reconciles already-mounted removable media;
   at service stop it removes its compatibility links. Real mounts remain under
   UDisks control at all times.
+- `/mnt/<label>` compatibility links therefore exist only while udiskie is
+  active in Hyprland. Plasma exposes removable media through its native
+  UDisks/Dolphin integration under `/run/media/ilya/<label>`.
 
 Windows partition:
 
@@ -507,6 +514,7 @@ Fish включен системно через `programs.fish.enable = true`.
 
 Он импортирует модули для:
 
+- desktop session isolation between Hyprland and Plasma
 - Firefox Hyprland wrapper
 - Codex permission profile and writable user configuration
 - Fish
@@ -546,13 +554,19 @@ options, flakes, Nixvim, nix.dev and related Nix resources. MCP tools are
 approved automatically; the server remains query-only and does not replace
 local flake evaluation or authorize rebuild/activation commands.
 
-Home Manager также задает session variables:
+Home Manager задает только общие для обеих desktop-сессий session variables:
 
 - `EDITOR = "nvim"`
 - `TERMINAL = "kitty"`
+- `SSH_AUTH_SOCK = "/home/ilya/.bitwarden-ssh-agent.sock"`
+
+Hyprland-specific variables live in `hyprland.nix` as `envd`, so they reach
+applications, D-Bus activation and Hyprland user services but are removed from
+the user service manager when that session stops:
+
 - `BROWSER = "/home/ilya/.local/bin/firefox-hyprland"`
 - cursor theme/size из единого `home/ilya/appearance.nix`
-- GTK dark preference
+- GTK dark preference and Catppuccin theme
 - Qt platform theme `kde`
 - Qt Quick Controls style `org.kde.desktop`
 - `XDG_CURRENT_DESKTOP = "Hyprland"`
@@ -561,24 +575,27 @@ Home Manager также задает session variables:
   Dolphin and the KDE portal AppChooser can discover installed applications
 - `XDG_SESSION_DESKTOP = "Hyprland"`
 
-Глобальные параметры оформления собраны в `home/ilya/appearance.nix`: scale,
-cursor theme/package/size, icon theme/package, UI и monospace fonts, GTK theme
-и Qt/KDE theme names. Остальные модули импортируют этот файл, поэтому смена
-курсора в нем автоматически обновляет Home Manager session variables,
-Hyprland/Hyprcursor, XWayland/Xresources, GTK, dconf и compatibility links
-`~/.icons`/`~/.local/share/icons`. Cursor size is `30`, matching the enlarged
-Hyprland scale. Rofi, Mako, qt5ct/qt6ct и `kdeglobals` также получают общие
-имена и шрифты из `appearance.nix`.
+Plasma receives none of these overrides. Its native SDDM/startplasma session
+sets the KDE environment and uses normal Plasma defaults.
 
-Глобальная тема задана без Stylix и без тяжелого theming framework.
+Параметры оформления Hyprland собраны в `home/ilya/appearance.nix`: scale,
+cursor theme/package/size, icon theme/package, UI и monospace fonts, GTK theme
+и Qt/KDE theme names. Hyprland modules import this file, so a change updates
+Hyprcursor/XCursor, GTK, dconf and the temporary Hyprland `kdeglobals`. Cursor
+size is `30`, matching the enlarged Hyprland scale. Rofi, Mako, qt5ct/qt6ct и
+Hyprland `kdeglobals` также получают имена и шрифты из `appearance.nix`.
+Plasma does not consume `appearance.nix` and owns its appearance settings.
+
+Тема Hyprland задана без Stylix и без тяжелого theming framework.
 Базовая палитра: Catppuccin Macchiato Blue. Это нежно-темно-синяя схема:
 темная база `#24273a`, основной текст `#cad3f5`, синий акцент `#8aadf4`,
 фиолетовый вторичный акцент `#c6a0f6`.
 
 - GTK: `catppuccin-macchiato-blue-standard`, пакет `catppuccin-gtk`
   с `variant = "macchiato"`, `accents = [ "blue" ]`, `size = "standard"`.
-- dconf: `org/gnome/desktop/interface color-scheme = prefer-dark` и тот же
-  GTK theme name.
+- During Hyprland, dconf uses
+  `org/gnome/desktop/interface color-scheme = prefer-dark` and the same GTK
+  theme name. The previous dconf state is restored at Hyprland logout.
 - Qt/KDE apps in Hyprland use `QT_QPA_PLATFORMTHEME=kde` and
   `QT_QUICK_CONTROLS_STYLE=org.kde.desktop`. This is intentional: KDE/Kirigami
   apps such as Plasma System Monitor need KDE platform integration to consume
@@ -599,30 +616,35 @@ Hyprland scale. Rofi, Mako, qt5ct/qt6ct и `kdeglobals` также получа�
 - KDE color scheme is also explicitly exposed through Home Manager at
   `~/.local/share/color-schemes/CatppuccinMacchiatoBlue.colors`; this matters
   for KDE apps such as Gwenview launched from Hyprland.
-- `~/.config/kdeglobals` embeds the full Catppuccin `[Colors:*]` sections, not
+- While Hyprland is active, `~/.config/kdeglobals` embeds the full Catppuccin
+  `[Colors:*]` sections, not
   only `ColorScheme=CatppuccinMacchiatoBlue`. KDE apps outside Plasma do not
   reliably expand the scheme name by themselves. Home Manager generates the
-  declarative source as `~/.config/.home-manager-kdeglobals`, then
-  `installWritableKdeglobals` copies it after `linkGeneration` to a regular
-  writable `~/.config/kdeglobals` with mode `0600`. Do not manage
+  declarative source as `~/.config/.home-manager-kdeglobals`; the session
+  profile copies it to a regular writable `~/.config/kdeglobals` with mode
+  `0600` at Hyprland login and restores Plasma's file at logout. Do not manage
   `kdeglobals` as a direct `xdg.configFile` symlink: KDE's `KConfig` resolves
   that symlink into `/nix/store`, fails to create `hm_kdeglobals.lock`, and Qt
   applications such as Telegram can abort when opening a file chooser.
-- GTK4 theme files are explicitly linked from Catppuccin into
-  `~/.config/gtk-4.0/gtk.css`, `gtk-dark.css`, and `assets`.
-- KDED's `gtkconfig` module is disabled declaratively through a writable
-  `~/.config/kded5rc`. Home Manager already owns GTK settings; letting
+- GTK3/GTK4 settings and GTK4 Catppuccin CSS/assets are copied into their
+  active paths only for the duration of a Hyprland session. Plasma gets its
+  own GTK settings and native theme synchronizer.
+- KDED's `gtkconfig` module is disabled in the temporary Hyprland
+  `~/.config/kded5rc`. Letting
   `gtkconfig` rewrite GTK CSS, dconf and xsettingsd configuration at runtime
   caused Waybar, udiskie, NetworkManager/Bluetooth applets and the GTK portal
   to segfault together while their GLib file monitors handled those writes.
-  Plasma's `device_automounter` KDED module is disabled in the same file so it
-  cannot race the configured UDisks/udiskie removable-media stack.
+  Plasma's `device_automounter` KDED module is disabled in the same temporary
+  file so it cannot race udiskie. Both modules are available normally in
+  Plasma, where udiskie is not started.
 - Kitty, Rofi, Mako, Waybar, Wlogout, Starship, Hyprland borders and
   Hyprlock use the same Macchiato palette directly in their own modules.
 
-XDG default applications are managed declaratively in `home/ilya/home.nix` via
-`xdg.mimeApps`. This is intentional because runtime `~/.config/mimeapps.list`
-previously made images open in Firefox from Yazi.
+Hyprland default applications are managed declaratively in
+`home/ilya/home.nix` through the desktop-specific
+`~/.config/hyprland-mimeapps.list`. Plasma has no Home Manager MIME override
+and uses its normal defaults or settings chosen through System Settings. This
+keeps a runtime generic `~/.config/mimeapps.list` from coupling the sessions.
 
 Current default app policy:
 
@@ -635,9 +657,46 @@ Current default app policy:
 - plain text: `org.kde.kate.desktop`.
 - code/config formats: `code.desktop`.
 
-`firefox-hyprland.desktop` intentionally does not advertise image MIME types.
-It is the common entry point for Hyprland browser keybindings and web links,
-not a general image viewer.
+`firefox-hyprland.desktop` intentionally does not advertise image MIME types
+and has `OnlyShowIn=Hyprland`. It is the Hyprland entry point for browser
+keybindings and web links, not a Plasma browser override or general image
+viewer.
+
+### Hyprland / Plasma Session Isolation
+
+`home/ilya/desktop-session-isolation.nix` keeps desktop behavior separate while
+ordinary application data remains shared under the same Unix user and HOME.
+
+- `desktop-session-profile` runs as a oneshot service before
+  `hyprland-session.target`. It saves Plasma's active `kdeglobals`, `kded5rc`,
+  GTK3/GTK4 settings and GNOME interface dconf values, installs exact
+  declarative Hyprland versions, then restores the saved Plasma state when the
+  target stops.
+- Hyprland's active copies are saved separately at logout, so runtime KDE/GTK
+  changes made inside Hyprland survive normal relogins. A fingerprint of the
+  declarative sources reseeds that state only after the configured Hyprland
+  appearance actually changes, matching the old rebuild behavior.
+- A Plasma pre-start script at
+  `~/.config/plasma-workspace/env/00-desktop-session-profile.sh` performs the
+  same restore defensively before Plasma reads its workspace configuration.
+- On the first desktop login after this change, the helper moves existing
+  Plasma workspace/theme/panel/shortcut/monitor files into a timestamped,
+  recoverable directory below
+  `~/.local/state/nixos-desktop-isolation/backups/`, resets the related dconf
+  interface keys and records `plasma-reset-v1`. It does not repeat the reset on
+  later logins, so Plasma remains writable and remembers future user changes.
+- `nm-applet`, `blueman-applet` and `udiskie` are wanted by and part of
+  `hyprland-session.target`, never the generic graphical target. User-level
+  overrides for the package-provided `nm-applet.desktop` and `blueman.desktop`
+  contain `OnlyShowIn=Hyprland` plus `X-systemd-skip=true`, preventing Plasma
+  autostart duplicates while the supervised Hyprland services remain the only
+  applet processes.
+- Shared application data and config such as Steam, Proton, Telegram,
+  Bitwarden, Discord, Obsidian, browsers, games, Git, Fish and Neovim are not
+  moved into alternate XDG roots and remain common to both sessions.
+- Do not replace this with separate global `XDG_CONFIG_HOME` or
+  `XDG_DATA_HOME` values: that would unnecessarily split ordinary application
+  profiles, contrary to the intended design.
 
 ## Пользовательские Пакеты
 
@@ -1196,10 +1255,11 @@ wlogout --protocol layer-shell
 ```
 
 Tray module присутствует. `nm-applet --indicator` запускается как Home Manager
-user service `nm-applet.service` with `Restart=on-failure`, поэтому сетевой
-индикатор должен жить в tray постоянно. `blueman-applet` запускается как Home
-Manager user service `blueman-applet.service` with `Restart=on-failure`,
-поэтому Bluetooth-индикатор тоже должен жить в tray постоянно.
+user service `nm-applet.service` with `Restart=on-failure`, wanted only by
+`hyprland-session.target`, поэтому сетевой индикатор должен жить в Hyprland
+tray постоянно и никогда не запускаться в Plasma. `blueman-applet` устроен так
+же: `blueman-applet.service` принадлежит только Hyprland target, а Plasma
+использует свой BlueDevil indicator.
 
 ## Wi-Fi И Bluetooth Меню
 

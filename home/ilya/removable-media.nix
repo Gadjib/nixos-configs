@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   mntLink = pkgs.writeShellApplication {
@@ -162,10 +162,20 @@ in
     };
   };
 
-  systemd.user.services.udiskie.Service = {
-    ExecStartPost = "${mntLink}/bin/udiskie-mnt-link sync";
-    ExecStopPost = "${mntLink}/bin/udiskie-mnt-link cleanup";
-    Restart = "on-failure";
-    RestartSec = 1;
+  systemd.user.services.udiskie = {
+    Unit = {
+      After = lib.mkForce [
+        "hyprland-session.target"
+        "tray.target"
+      ];
+      PartOf = lib.mkForce [ "hyprland-session.target" ];
+    };
+    Service = {
+      ExecStartPost = "${mntLink}/bin/udiskie-mnt-link sync";
+      ExecStopPost = "${mntLink}/bin/udiskie-mnt-link cleanup";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+    Install.WantedBy = lib.mkForce [ "hyprland-session.target" ];
   };
 }

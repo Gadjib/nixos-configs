@@ -93,11 +93,19 @@ let
     "x-scheme-handler/http" = [ "firefox-hyprland.desktop" ];
     "x-scheme-handler/https" = [ "firefox-hyprland.desktop" ];
   };
+  mimeApplicationSections = lib.mapAttrs (
+    _mimeType: applications: "${lib.concatStringsSep ";" applications};"
+  ) defaultApplications;
+  hyprlandMimeApps = lib.generators.toINI { } {
+    "Added Associations" = mimeApplicationSections;
+    "Default Applications" = mimeApplicationSections;
+  };
 in
 
 {
   imports = [
     ./codex.nix
+    ./desktop-session-isolation.nix
     ./fish/fish.nix
     ./firefox/firefox.nix
     ./hypr/hyprland.nix
@@ -180,39 +188,7 @@ in
   home.sessionVariables = {
     EDITOR = "nvim";
     TERMINAL = "kitty";
-    BROWSER = "/home/ilya/.local/bin/firefox-hyprland";
-    KDE_SESSION_VERSION = "6";
-    GTK_THEME = appearance.gtk.name;
-    ADW_DEBUG_COLOR_SCHEME = "prefer-dark";
-    QT_QPA_PLATFORMTHEME = "kde";
-    QT_QUICK_CONTROLS_STYLE = "org.kde.desktop";
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_MENU_PREFIX = "plasma-";
-    XDG_SESSION_DESKTOP = "Hyprland";
     SSH_AUTH_SOCK = "/home/ilya/.bitwarden-ssh-agent.sock";
-  };
-
-  home.pointerCursor = {
-    inherit (appearance.cursor) name package size;
-    gtk.enable = true;
-    hyprcursor.enable = true;
-    x11.enable = true;
-  };
-
-  gtk = {
-    enable = true;
-    iconTheme = {
-      inherit (appearance.icons) name package;
-    };
-    font = {
-      inherit (appearance.fonts.general) name size;
-    };
-    theme = {
-      name = appearance.gtk.name;
-      package = catppuccinGtk;
-    };
-    gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
-    gtk4.extraConfig.gtk-application-prefer-dark-theme = true;
   };
 
   xdg.enable = true;
@@ -243,12 +219,7 @@ in
   };
   xdg.dataFile."color-schemes/${appearance.kde.colorScheme}.colors".source =
     "${catppuccinKde}/share/color-schemes/${appearance.kde.colorScheme}.colors";
-
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = defaultApplications;
-    associations.added = defaultApplications;
-  };
+  xdg.configFile."hyprland-mimeapps.list".text = hyprlandMimeApps;
 
   home.activation.clearRofiDrunCache = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f \
@@ -257,13 +228,6 @@ in
   '';
 
   xdg.configFile = {
-    "gtk-4.0/gtk.css".source =
-      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/gtk.css";
-    "gtk-4.0/gtk-dark.css".source =
-      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/gtk-dark.css";
-    "gtk-4.0/assets".source =
-      "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/assets";
-
     "qt5ct/qt5ct.conf".text = ''
       [Appearance]
       color_scheme_path=/home/ilya/.config/qt5ct/colors/catppuccin-macchiato.conf
@@ -337,13 +301,18 @@ in
     "Kvantum/${appearance.kde.kvantumTheme}".source =
       "${catppuccinKvantum}/share/Kvantum/${appearance.kde.kvantumTheme}";
 
+    # Hyprland-only KDE palette source. The session profile copies it to a
+    # writable kdeglobals while Hyprland is active and restores Plasma's own
+    # file on logout.
     ".home-manager-kdeglobals".text = ''
       [ColorEffects:Disabled]
+      ChangeSelectionColor=
       Color=36, 39, 58
       ColorAmount=0.30000000000000004
       ColorEffect=2
       ContrastAmount=0.1
       ContrastEffect=0
+      Enable=
       IntensityAmount=-1
       IntensityEffect=0
 
@@ -458,6 +427,7 @@ in
 
       [General]
       ColorScheme=${appearance.kde.colorScheme}
+      ColorSchemeHash=8934f8d6cffa7bcd10144e9b73c3f5b47de91506
       Name=${appearance.kde.displayName}
       accentActiveTitlebar=false
       fixed=${appearance.fonts.monospace.name},${toString appearance.fonts.monospace.size},-1,5,50,0,0,0,0,0
@@ -469,7 +439,24 @@ in
 
       [KDE]
       contrast=4
+      frameContrast=0.2
       LookAndFeelPackage=org.kde.breezedark.desktop
+
+      [KFileDialog Settings]
+      Allow Expansion=false
+      Automatically select filename extension=true
+      Breadcrumb Navigation=true
+      Decoration position=2
+      Show Full Path=false
+      Show Inline Previews=true
+      Show Speedbar=true
+      Show hidden files=false
+      Sort by=Name
+      Sort directories first=true
+      Sort hidden files last=false
+      Sort reversed=false
+      Speedbar Width=142
+      View Style=DetailTree
 
       [WM]
       activeBackground=36,39,58
@@ -480,10 +467,10 @@ in
       inactiveForeground=165,173,203
     '';
 
-    # KDED 6 still uses the historical kded5rc name for module autoload
-    # overrides. Keep Plasma's GTK synchronizer disabled: Home Manager owns
-    # the GTK configuration, and gtkconfig rewriting CSS/dconf at runtime can
-    # crash every GTK process monitoring those files at the same time.
+    # This is a Hyprland-only source consumed by desktop-session-profile.
+    # Plasma gets its own writable/default kded5rc and may use its native GTK
+    # synchronizer and device automounter. Hyprland keeps both disabled to
+    # avoid the previously observed GTK rewrite crash and an udiskie race.
     ".home-manager-kded5rc".text = ''
       [Module-device_automounter]
       autoload=false
@@ -491,31 +478,6 @@ in
       [Module-gtkconfig]
       autoload=false
     '';
-  };
-
-  home.activation.installWritableKdeglobals = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm600 \
-      "$HOME/.config/.home-manager-kdeglobals" \
-      "$HOME/.config/kdeglobals"
-  '';
-
-  # KDED writes module state through KConfig, so give it a regular writable
-  # file rather than a read-only Home Manager symlink into the Nix store.
-  home.activation.installWritableKdedConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -Dm600 \
-      "$HOME/.config/.home-manager-kded5rc" \
-      "$HOME/.config/kded5rc"
-  '';
-
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-      font-name = "${appearance.fonts.general.name} ${toString appearance.fonts.general.size}";
-      gtk-theme = appearance.gtk.name;
-      icon-theme = appearance.icons.name;
-      monospace-font-name =
-        "${appearance.fonts.monospace.name} ${toString appearance.fonts.monospace.size}";
-    };
   };
 
   programs.home-manager.enable = true;

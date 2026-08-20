@@ -41,10 +41,11 @@ xdg.configFile."path".text = "...";
 - Fish-функция `nix-install`, которая вызывает `/home/ilya/.local/bin/nix-install-package` для проверяемого добавления и commit пакетов из `home/ilya/packages/manual.nix`;
 - `programs.delta` и git integration;
 - `programs.direnv.nix-direnv`;
-- `xdg.configFile` для qt5ct/qt6ct/kdeglobals и hyprlock/hypridle.
-- `xdg.mimeApps` для default applications. Если файл из Yazi открывается не той
-  программой, сначала смотреть `home/ilya/home.nix`, а не править
-  `~/.config/mimeapps.list` вручную.
+- `xdg.configFile` для qt5ct/qt6ct, Hyprland session profile и
+  hyprlock/hypridle. Активный `kdeglobals` переключается между отдельными
+  Hyprland и Plasma состояниями через `desktop-session-isolation.nix`.
+- `hyprland-mimeapps.list` для Hyprland default applications. Plasma не
+  получает этот override и управляет default applications самостоятельно.
 
 ## Команды
 

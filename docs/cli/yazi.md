@@ -253,12 +253,13 @@ duf
 yazi /mnt
 ```
 
-UDisks and the user-level `udiskie` service automatically mount removable
-filesystems below `/run/media/ilya/<label>`. A lifecycle hook creates a
-compatibility symlink at `/mnt/<label>` and removes it after unmount, so the
-usual `yazi /mnt` workflow remains available. Safe unmount/eject should be done
-through Dolphin or the udiskie tray icon. Yazi itself does not mount devices;
-it only opens the compatibility path.
+In Hyprland, UDisks and the user-level `udiskie` service automatically mount
+removable filesystems below `/run/media/ilya/<label>`. A lifecycle hook creates
+a compatibility symlink at `/mnt/<label>` and removes it after unmount, so the
+usual `yazi /mnt` workflow remains available. In Plasma, udiskie is stopped and
+the native KDE device notifier/automounter owns the same UDisks lifecycle;
+drives remain available below `/run/media/ilya/<label>`, but the Hyprland-only
+`/mnt/<label>` link is not created. Yazi itself does not mount devices.
 
 The SMB share is a separate automount at `/vault`, so scans of `/mnt` never
 touch it. On Wi-Fi SSID `0xDEADBEEF48`, accessing `/vault` directly permits the

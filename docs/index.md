@@ -25,6 +25,8 @@ glow docs/nixos/rebuild.md
 ## Что читать сначала
 
 - Новый обзор системы: [system-overview.md](system-overview.md).
+- Изоляция Hyprland и Plasma описана в разделе «Независимость Hyprland и
+  Plasma» файла [system-overview.md](system-overview.md).
 - Ежедневная работа: [daily-workflow.md](daily-workflow.md).
 - Срочный ремонт: [emergency.md](emergency.md).
 - Rebuild и rollback: [nixos/rebuild.md](nixos/rebuild.md), [nixos/rollback.md](nixos/rollback.md).

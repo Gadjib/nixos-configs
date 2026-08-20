@@ -72,9 +72,11 @@ Home Manager управляет пользовательским окружен�
 - `programs.kitty`, `programs.rofi`, `services.mako`, `programs.waybar`;
 - `wayland.windowManager.hyprland`;
 - `xdg.configFile` для Qt/KDE/Hyprland config files.
-- `xdg.mimeApps` задает default applications: images -> Gwenview,
+- `hyprland-mimeapps.list` задает Hyprland default applications: images -> Gwenview,
   video/audio -> VLC, PDFs/docs -> Okular, archives -> Ark,
   directories -> Dolphin, text -> Kate, code/config -> VSCode, web -> Firefox.
+  Эти associations теперь записываются в desktop-specific
+  `hyprland-mimeapps.list`; Plasma не наследует их.
 - KDE/Qt theme support includes `~/.config/kdeglobals`,
   `~/.local/share/color-schemes/CatppuccinMacchiatoBlue.colors`, qt5ct/qt6ct
   configs, Kvantum Catppuccin Macchiato Blue for Qt widgets/toolbars, and
@@ -85,6 +87,28 @@ Home Manager управляет пользовательским окружен�
   приложения и игры в масштабе `1` с физическим разрешением `1920x1200`.
 - Bundled Qt GUI Happ запускается через Wayland QPA с fallback на `xcb`, чтобы
   touchpad scrolling в Hyprland не проходил через XWayland wheel emulation.
+
+## Независимость Hyprland и Plasma
+
+Оба окружения работают под пользователем `ilya`, поэтому данные Steam,
+Telegram, браузеров и других обычных приложений остаются общими. Изолирован
+только слой desktop environment.
+
+`home/ilya/desktop-session-isolation.nix` временно устанавливает текущие
+Catppuccin GTK/KDE/dconf settings при старте `hyprland-session.target` и
+возвращает собственные writable settings Plasma при выходе. Hyprland-specific
+environment variables также задаются только из Hyprland config.
+
+При первом входе после применения конфигурации старые Plasma workspace/theme
+settings переносятся в timestamped backup под
+`~/.local/state/nixos-desktop-isolation/backups/`, после чего Plasma создаёт
+штатную конфигурацию Breeze. Сброс выполняется только один раз; дальнейшие
+изменения из Plasma System Settings сохраняются.
+
+`nm-applet`, `blueman-applet` и `udiskie` запускаются исключительно с
+`hyprland-session.target`. Plasma использует свои NetworkManager, BlueDevil и
+device-notifier applets, поэтому duplicate tray icons и конкурирующее
+автомонтирование исключены.
 
 ## CLI stack
 
