@@ -33,6 +33,7 @@ let
         gtk4-css
         gtk4-dark-css
         gtk4-assets
+        firefox-userchrome
       )
       managed_paths=(
         .config/kdeglobals
@@ -42,6 +43,7 @@ let
         .config/gtk-4.0/gtk.css
         .config/gtk-4.0/gtk-dark.css
         .config/gtk-4.0/assets
+        .mozilla/firefox/hyprland/chrome/userChrome.css
       )
       managed_sources=(
         "$HOME/.config/.home-manager-kdeglobals"
@@ -51,6 +53,7 @@ let
         "$hypr_root/gtk-4.0/gtk.css"
         "$hypr_root/gtk-4.0/gtk-dark.css"
         "$hypr_root/gtk-4.0/assets"
+        "$hypr_root/firefox/userChrome.css"
       )
 
       plasma_reset_paths=(
@@ -165,7 +168,12 @@ let
             relative="''${managed_paths[$index]}"
             target="$HOME/$relative"
 
-            if [[ -e "$target" || -L "$target" ]]; then
+            if [[ "$id" == firefox-userchrome ]]; then
+              # Plasma deliberately has no userChrome.css. Never capture the
+              # currently active Hyprland CSS as Plasma state during migration.
+              remove_writable_tree "$target"
+              touch "$session_state/files/$id.absent"
+            elif [[ -e "$target" || -L "$target" ]]; then
               mv -- "$target" "$session_state/files/$id"
             else
               touch "$session_state/files/$id.absent"
@@ -292,6 +300,20 @@ in
       "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/gtk-dark.css";
     ".desktop-profiles/hyprland/gtk-4.0/assets".source =
       "${catppuccinGtk}/share/themes/${appearance.gtk.name}/gtk-4.0/assets";
+
+    ".desktop-profiles/hyprland/firefox/userChrome.css".text = ''
+      @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+      .titlebar-buttonbox-container,
+      .titlebar-buttonbox,
+      .titlebar-button {
+        display: none !important;
+      }
+
+      #TabsToolbar .titlebar-spacer {
+        display: none !important;
+      }
+    '';
 
     ".desktop-profiles/hyprland/dconf-interface.ini".text = ''
       [/]

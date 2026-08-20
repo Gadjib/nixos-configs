@@ -674,7 +674,8 @@ ordinary application data remains shared under the same Unix user and HOME.
 - `desktop-session-profile` runs as a oneshot service before
   `hyprland-session.target`. It saves Plasma's active `kdeglobals`, `kded5rc`,
   GTK3/GTK4 settings and GNOME interface dconf values, installs exact
-  declarative Hyprland versions, then restores the saved Plasma state when the
+  declarative Hyprland versions plus the Firefox button-hiding `userChrome.css`,
+  then restores the saved Plasma state and removes that Firefox CSS when the
   target stops.
 - The exact declarative Hyprland copies are reapplied at every Hyprland start,
   even when a stale active-session marker remains after a crash or reboot.
@@ -1146,14 +1147,27 @@ Hyprland does not launch plain `firefox` from `SUPER+B`; it launches:
 
 Источник: `home/ilya/firefox/firefox.nix`.
 
-Этот wrapper:
+`~/.mozilla/firefox/hyprland` is the single canonical Firefox profile for both
+desktops. It contains the pre-existing Hyprland history, cookies, logins,
+extensions, preferences and session; the old `5fyajafy.default` directory is
+left untouched as a fallback and is not merged into the canonical profile.
 
-- создает/обновляет profile `~/.mozilla/firefox/hyprland`;
-- включает `toolkit.legacyUserProfileCustomizations.stylesheets`;
-- включает tabs-in-titlebar;
-- пишет `chrome/userChrome.css`;
-- скрывает Firefox titlebar window buttons through CSS;
-- запускает `firefox --profile ~/.mozilla/firefox/hyprland`.
+`firefox-shared` always launches
+`firefox --profile ~/.mozilla/firefox/hyprland`. `firefox-hyprland`, Hyprland
+MIME defaults, `BROWSER`, `SUPER+B`, the Plasma-only `firefox.desktop` override
+and the Fish `firefox` alias all lead to this shared launcher. A Home Manager
+activation helper registers `hyprland` as the default profile in `profiles.ini`
+and current `installs.ini` sections, backing up both files before their first
+change. This also makes otherwise plain Firefox launches select the shared
+profile.
+
+The existing `toolkit.legacyUserProfileCustomizations.stylesheets` and
+tabs-in-titlebar preferences live in a declarative `user.js`. The session
+profile installs the exact previous button-hiding `chrome/userChrome.css` only
+while Hyprland is active and removes it before Plasma starts. Thus all browser
+data and settings are shared, while Hyprland has no titlebar buttons and Plasma
+uses the normal Firefox buttons. Firefox must be restarted after switching
+desktops because userChrome is loaded at profile startup.
 
 HTTP/HTTPS links, HTML files, `BROWSER` and `SUPER+B` all use the same wrapper.
 Firefox remoting is left enabled, so a new URL is handed to an already running
@@ -1162,11 +1176,10 @@ the wrapper receives a URL and finds an existing Firefox window through
 `hyprctl -j clients`, it then runs `focuswindow class:^(firefox)$`; Hyprland
 therefore switches to workspace 2 and focuses Firefox after opening the link.
 
-Это сделано специально, чтобы в Hyprland убрать кнопки окна Firefox, но в KDE
-оставить обычный Firefox с обычным profile и обычными кнопками.
-
-Цена решения: Hyprland Firefox profile отдельный. Cookies, extensions и login
-state не общие с обычным KDE Firefox profile.
+Firefox remoting remains enabled and is now safe across both launchers because
+they always name the same profile. The same profile must not be opened by two
+simultaneous Firefox instances; normal sequential Plasma/Hyprland sessions are
+supported.
 
 ## Telegram
 
