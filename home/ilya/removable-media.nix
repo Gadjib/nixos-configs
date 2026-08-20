@@ -164,10 +164,12 @@ in
 
   systemd.user.services.udiskie = {
     Unit = {
-      After = lib.mkForce [
-        "hyprland-session.target"
-        "tray.target"
-      ];
+      # Home Manager normally orders udiskie after tray.target. Here both
+      # udiskie and Waybar are members of hyprland-session.target, so that
+      # ordering would create a target cycle. Udiskie's status notifier can
+      # register before Waybar and appear when the tray becomes available.
+      After = lib.mkForce [ ];
+      Requires = lib.mkForce [ ];
       PartOf = lib.mkForce [ "hyprland-session.target" ];
     };
     Service = {

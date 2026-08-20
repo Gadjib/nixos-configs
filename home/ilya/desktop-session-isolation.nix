@@ -263,7 +263,7 @@ in
       Type=Application
       Name=Blueman Applet (Hyprland service)
       Exec=blueman-applet
-      OnlyShowIn=Hyprland;
+      NotShowIn=KDE;
       X-systemd-skip=true
     '';
 
@@ -272,7 +272,7 @@ in
       Type=Application
       Name=NetworkManager Applet (Hyprland service)
       Exec=nm-applet --indicator
-      OnlyShowIn=Hyprland;
+      NotShowIn=KDE;
       X-systemd-skip=true
     '';
 

@@ -45,8 +45,11 @@
     genericName = "Web Browser";
     exec = "/home/ilya/.local/bin/firefox-hyprland %U";
     terminal = false;
-    categories = [ "Network" "WebBrowser" ];
-    settings.OnlyShowIn = "Hyprland;";
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
+    settings.NotShowIn = "KDE;";
     mimeType = [
       "text/html"
       "text/xml"

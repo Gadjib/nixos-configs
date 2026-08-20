@@ -335,7 +335,6 @@ in
     Unit = {
       Description = "NetworkManager tray applet";
       PartOf = [ "hyprland-session.target" ];
-      After = [ "hyprland-session.target" ];
     };
     Service = {
       ExecStart = "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator";
@@ -349,7 +348,6 @@ in
     Unit = {
       Description = "Bluetooth tray applet";
       PartOf = [ "hyprland-session.target" ];
-      After = [ "hyprland-session.target" ];
     };
     Service = {
       ExecStart = "${pkgs.blueman}/bin/blueman-applet";

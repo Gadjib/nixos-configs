@@ -308,6 +308,10 @@ USB removable media:
   racing separate whole-disk and partition systemd units.
 - The udiskie user service uses `Restart=on-failure`, so an unexpected process
   crash does not silently disable automounting for the rest of the session.
+  It deliberately has no ordering dependency on `tray.target`: both udiskie
+  and Waybar belong to `hyprland-session.target`, and ordering udiskie after
+  the tray would form a systemd target cycle. The `auto` status notifier can
+  register before Waybar and appears when the tray becomes available.
 - A udiskie event hook creates compatibility symlinks such as
   `/mnt/<label> -> /run/media/ilya/<label>`. On name collision it tries
   `/mnt/<label>-<device>` and never overwrites an existing path. It records
@@ -658,7 +662,7 @@ Current default app policy:
 - code/config formats: `code.desktop`.
 
 `firefox-hyprland.desktop` intentionally does not advertise image MIME types
-and has `OnlyShowIn=Hyprland`. It is the Hyprland entry point for browser
+and has `NotShowIn=KDE`. It is the Hyprland entry point for browser
 keybindings and web links, not a Plasma browser override or general image
 viewer.
 
@@ -688,7 +692,7 @@ ordinary application data remains shared under the same Unix user and HOME.
 - `nm-applet`, `blueman-applet` and `udiskie` are wanted by and part of
   `hyprland-session.target`, never the generic graphical target. User-level
   overrides for the package-provided `nm-applet.desktop` and `blueman.desktop`
-  contain `OnlyShowIn=Hyprland` plus `X-systemd-skip=true`, preventing Plasma
+  contain `NotShowIn=KDE` plus `X-systemd-skip=true`, preventing Plasma
   autostart duplicates while the supervised Hyprland services remain the only
   applet processes.
 - Shared application data and config such as Steam, Proton, Telegram,
