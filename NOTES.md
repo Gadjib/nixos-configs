@@ -371,17 +371,43 @@ Swap:
 - The root filesystem is ext4, so no Btrfs-specific swapfile handling is
   needed. NixOS creates and initializes a missing file through its generated
   `mkswap-*.service`, then activates the corresponding systemd swap unit.
-- Hibernation/resume is not configured; this is regular memory-pressure swap.
+- Hibernate/resume uses the systemd-based initrd and systemd 260's
+  `HibernateLocation` UEFI variable. Immediately before hibernation systemd
+  records the ext4 swapfile's backing device and current physical offset; the
+  initrd resume generator reads them on the next boot. Do not add a static
+  `resume_offset`: it would become invalid if `/swapfile` were recreated.
+- The machine has about 15.3 GiB RAM, while swap is 16 GiB and the kernel's
+  current hibernation image limit is about 6.1 GiB. `CanHibernate` and
+  `CanSuspendThenHibernate` both report `yes`.
+- `systemd.sleep.settings.Sleep` explicitly enables suspend, hibernate and
+  suspend-then-hibernate, uses `mem` + `deep` for suspend, `disk` + `platform`
+  for hibernate, and sets `HibernateDelaySec=2h` plus
+  `HibernateOnACPower=true`.
+- `boot.kernelParams` contains `mem_sleep_default=deep`. The ThinkPad firmware
+  advertises ACPI S3 and S4, and `/sys/power/mem_sleep` exposes both `s2idle`
+  and `deep`, so this is supported rather than a forced unavailable state.
 
-Закрытие крышки явно отправляет ноут в сон:
+Закрытие крышки запускает suspend-then-hibernate при питании от батареи, сети
+и в docked-режиме:
 
 ```nix
 services.logind.settings.Login = {
-  HandleLidSwitch = "suspend";
-  HandleLidSwitchExternalPower = "suspend";
-  HandleLidSwitchDocked = "suspend";
+  HandleLidSwitch = "suspend-then-hibernate";
+  HandleLidSwitchExternalPower = "suspend-then-hibernate";
+  HandleLidSwitchDocked = "suspend-then-hibernate";
 };
 ```
+
+In Hyprland, logind is the lid owner. Plasma 6.6 PowerDevil always takes a
+low-level `handle-lid-switch` inhibitor, which systemd intentionally cannot
+override. Therefore `configure-plasma-sleep-policy` converges only the relevant
+regular writable `powerdevilrc` keys for AC/Battery/LowBattery: `LidAction=1`
+(Sleep), `SleepMode=3` (SuspendThenHibernate), external-monitor inhibition off,
+and `AutoSuspendAction=0`. Thus Plasma remains the sole lid owner in its own
+session but requests the same systemd operation, including while docked, and it
+does not add an idle suspend timer. The helper runs at Home Manager activation
+and before Plasma startup; do not replace `powerdevilrc` with a read-only store
+symlink.
 
 Шрифты:
 
@@ -1142,6 +1168,11 @@ Sleep/lock:
 - after sleep: `hyprctl dispatch dpms on`;
 - additional user systemd service `lock-before-sleep` locks before
   `sleep.target`.
+- neither Hyprland nor Plasma automatically suspends on idle;
+- lid close and the Wlogout sleep action request
+  `systemctl suspend-then-hibernate`: resume is immediate when woken normally,
+  otherwise systemd wakes by RTC and hibernates no later than two hours later
+  (or earlier on a firmware low-battery alarm).
 
 ## Firefox
 
@@ -1362,7 +1393,7 @@ Manager и является полной Catppuccin Macchiato Blue схемой 
 
 - Lock
 - Logout
-- Suspend
+- Suspend → Hibernate (`systemctl suspend-then-hibernate`)
 - Reboot
 - Shutdown
 

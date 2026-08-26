@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 let
   appearance = import ./appearance.nix { inherit pkgs; };
@@ -29,6 +29,29 @@ let
       fi
 
       exit 1
+    '';
+  };
+
+  configurePlasmaSleepPolicy = pkgs.writeShellApplication {
+    name = "configure-plasma-sleep-policy";
+    runtimeInputs = [ pkgs.kdePackages.kconfig ];
+    text = ''
+      set -euo pipefail
+
+      export XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-$HOME/.config}"
+      for profile in AC Battery LowBattery; do
+        group_args=(
+          --file powerdevilrc
+          --group "$profile"
+          --group SuspendAndShutdown
+        )
+
+        kwriteconfig6 "''${group_args[@]}" --key AutoSuspendAction 0
+        kwriteconfig6 "''${group_args[@]}" --key LidAction 1
+        kwriteconfig6 "''${group_args[@]}" \
+          --key InhibitLidActionWhenExternalMonitorPresent --type bool false
+        kwriteconfig6 "''${group_args[@]}" --key SleepMode 3
+      done
     '';
   };
 
@@ -275,7 +298,15 @@ let
   };
 in
 {
-  home.packages = [ desktopSessionProfile ];
+  home.packages = [
+    configurePlasmaSleepPolicy
+    desktopSessionProfile
+  ];
+
+  home.activation.configurePlasmaSleepPolicy =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD ${configurePlasmaSleepPolicy}/bin/configure-plasma-sleep-policy
+    '';
 
   xdg.configFile = {
     # Override the package-provided XDG autostart entries. Plasma sees these
@@ -361,6 +392,7 @@ in
       executable = true;
       text = ''
         ${desktopSessionProfile}/bin/desktop-session-profile plasma
+        ${configurePlasmaSleepPolicy}/bin/configure-plasma-sleep-policy
 
         unset ADW_DEBUG_COLOR_SCHEME
         unset BROWSER

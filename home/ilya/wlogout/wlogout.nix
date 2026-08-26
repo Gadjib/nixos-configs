@@ -14,8 +14,8 @@
     }
     {
       "label" : "suspend",
-      "action" : "systemctl suspend",
-      "text" : "Suspend",
+      "action" : "systemctl suspend-then-hibernate",
+      "text" : "Suspend → Hibernate",
       "keybind" : "s"
     }
     {

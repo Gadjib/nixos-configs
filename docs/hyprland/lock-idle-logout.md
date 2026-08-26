@@ -48,13 +48,16 @@ SUPER+M -> wlogout
 
 Waybar power button вызывает `wlogout --protocol layer-shell`.
 
-## Suspend
+## Suspend / hibernate
 
 ```bash
-systemctl suspend
+systemctl suspend-then-hibernate
 ```
 
-Перед sleep hypridle вызывает lock.
+Пункт `Suspend → Hibernate` в Wlogout сначала переводит ноутбук в S3 `deep`,
+а через 2 часа без обычного пробуждения — в hibernate. Перед любым sleep
+hypridle вызывает lock. Автоматического suspend по idle нет; idle управляет
+только lock и DPMS.
 
 ## Troubleshooting
 
@@ -71,6 +74,6 @@ loginctl session-status
 hyprlock
 loginctl lock-session
 wlogout
-systemctl suspend
+systemctl suspend-then-hibernate
 pgrep -a hypridle
 ```

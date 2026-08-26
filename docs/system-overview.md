@@ -34,7 +34,11 @@ NixOS управляет системой декларативно: boot loader,
 - Hyprland включен как Wayland compositor;
 - PipeWire, Bluetooth, power-profiles-daemon и upower включены.
 - `/swapfile` управляется NixOS декларативно и имеет размер 16 GiB;
-  hibernation отдельно не настроена.
+  systemd initrd использует UEFI `HibernateLocation` для динамического resume
+  из swapfile без статического offset.
+- Suspend использует ACPI S3 (`deep`); крышка и пункт Wlogout запускают
+  suspend-then-hibernate с переходом в hibernate через 2 часа. Idle в
+  Hyprland по-прежнему управляет только lock/DPMS, без автоматического suspend.
 
 ## KDE fallback
 
