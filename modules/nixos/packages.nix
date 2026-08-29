@@ -54,6 +54,7 @@
     lshw
     pciutils
     usbutils
+    android-tools
     smartmontools
     nvme-cli
     lm_sensors

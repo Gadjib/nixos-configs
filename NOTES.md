@@ -501,6 +501,10 @@ driver вместо устаревшего `i965`. Это необходимо �
 Moonlight; без `iHD` клиент сообщает, что не обнаружил functioning hardware
 accelerated video decoder. `libva-utils` установлен для проверки командой
 `vainfo` после system switch и нового входа в графическую сессию.
+`android-tools` установлен системно и предоставляет `adb`/`fastboot`. Отдельный
+`programs.adb` и группа `adbusers` в NixOS 26.05 не нужны: systemd 258+ выдает
+доступ к подключенному Android-устройству через `uaccess` активному локальному
+пользователю.
 В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
