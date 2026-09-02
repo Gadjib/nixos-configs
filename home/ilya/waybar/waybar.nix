@@ -46,6 +46,7 @@
           "class<spotify>" = " ";
           "class<([Vv][Ll][Cc])>" = " ";
           "class<Happ>" = " 󰒍";
+          "class<Throne>" = " 󰒍";
           "class<([Cc]ode|code-url-handler)>" = " 󰨞";
           "class<org\\.kde\\.dolphin>" = " ";
           "class<([Tt]hunar)>" = " ";

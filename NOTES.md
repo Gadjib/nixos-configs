@@ -110,6 +110,7 @@ nixosConfigurations.thinkpad-nix
 ├── modules/nixos/
 │   ├── desktop.nix
 │   ├── happ.nix
+│   ├── throne.nix
 │   ├── nix.nix
 │   ├── packages.nix
 │   ├── removable-media.nix
@@ -452,6 +453,13 @@ NetworkManager to use `systemd-resolved`. This matters for VPN/TUN clients such
 as Happ/sing-box: IP routing through TUN can work while domain resolution fails
 if per-link DNS is not delivered to a resolver that understands systemd link
 DNS settings.
+
+`modules/nixos/throne.nix` enables Throne through the upstream NixOS module.
+`programs.throne.tunMode.enable = true` installs the `throne-core` capability
+wrapper and the narrow polkit integration needed for Throne to configure
+per-link DNS through `systemd-resolved` without repeated password prompts.
+The package is system-wide; its real Hyprland window class is `Throne` and has
+a dedicated Waybar workspace icon.
 
 IPv6 is disabled intentionally for now. The Wi-Fi network advertises IPv6 routes
 and DNS returns AAAA records, but real IPv6 TCP connections stay in `SYN-SENT`

@@ -42,6 +42,7 @@ in
     ../../modules/nixos/nix.nix
     ../../modules/nixos/desktop.nix
     ../../modules/nixos/happ.nix
+    ../../modules/nixos/throne.nix
     ../../modules/nixos/packages.nix
     ../../modules/nixos/removable-media.nix
     ../../modules/nixos/smb.nix
