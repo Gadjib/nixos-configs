@@ -57,8 +57,8 @@ in
 
       # Upstream explicitly requires an unrestricted privileged daemon: happd
       # launches and supervises sing-box/Xray processes that configure TUN,
-      # policy routing and DNS. NoNewPrivileges or a strict systemd sandbox
-      # makes sing-box-tun exit immediately after creating the interface.
+      # policy routing and DNS. NoNewPrivileges or a strict systemd sandbox is
+      # incompatible with those privileged child processes.
       NoNewPrivileges = false;
       StateDirectory = "happd";
       StateDirectoryMode = "0700";

@@ -61,7 +61,6 @@ in
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ "ipv6.disable=1" ];
 
   networking.hostName = "thinkpad-nix";
   networking.enableIPv6 = false;

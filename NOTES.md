@@ -443,7 +443,6 @@ Networking and DNS:
 
 - `networking.networkmanager.enable = true`
 - `networking.enableIPv6 = false`
-- `boot.kernelParams = [ "ipv6.disable=1" ]`
 - `services.resolved.enable = true`
 
 `systemd-resolved` is enabled intentionally. On NixOS, enabling
@@ -467,16 +466,24 @@ and time out. GUI applications such as Firefox, Telegram, Discord, and Happ can
 then appear broken even while IPv4 `curl` and `ping` work. Keep IPv6 disabled
 until the upstream network or VPN path has working IPv6; then this can be
 revisited.
-IPv6 is blocked at three layers. The kernel command line uses `ipv6.disable=1`,
-`networking.enableIPv6 = false` retains the global/default sysctl policy, and a
-oneshot service sets `ipv6.method=disabled` on every non-loopback NetworkManager
-profile. The latter is necessary because profiles with `ipv6.method=auto`
-otherwise keep asking an IPv6-disabled kernel to create link-local addresses
-and fill the journal with `failure 13` retries. The matching dispatcher applies
-the same setting to newly created Wi-Fi, Ethernet and VPN profiles and updates
-their active device immediately. Both scripts identify profiles by UUID and
-change only `ipv6.method`; Wi-Fi secrets remain in NetworkManager storage and
-are never copied into Nix or logs.
+IPv6 traffic is blocked at two configuration layers while IPv6 support remains
+loaded in the kernel. `networking.enableIPv6 = false` applies the global/default
+sysctl policy, and a oneshot service sets `ipv6.method=disabled` on every
+non-loopback NetworkManager profile. The latter is necessary because profiles
+with `ipv6.method=auto` otherwise keep trying to create link-local addresses and
+can fill the journal with retries. The matching dispatcher applies the same
+setting to newly created Wi-Fi, Ethernet and VPN profiles and updates their
+active device immediately. Both scripts identify profiles by UUID and change
+only `ipv6.method`; Wi-Fi secrets remain in NetworkManager storage and are never
+copied into Nix or logs.
+
+Do not add the kernel parameter `ipv6.disable=1` while Happ uses sing-box TUN
+mode. It removes the kernel AF_INET6 routing API and `/proc/sys/net/ipv6`
+entirely. Sing-box with `auto_route`/`strict_route` still initializes IPv6 route
+handling for an IPv4-only TUN; without that kernel API it creates `tun0` and
+then exits with code 1. Keeping the IPv6 kernel control plane available does not
+enable IPv6 traffic: the NixOS sysctls and NetworkManager profiles above remain
+disabled.
 
 Expected post-switch checks:
 
@@ -886,8 +893,11 @@ cross-user process inspection are part of its upstream protocol. Do not add
 `NoNewPrivileges`, a capability bounding set, `DevicePolicy=closed` or strict
 filesystem/address-family sandboxing to this unit: upstream explicitly states
 that `happd` must launch unrestricted privileged sing-box/Xray children. The
-previous hardening made `sing-box-tun` exit with code 1 immediately after
-creating `tun0` and also prevented Happ from writing `/var/log/happd.log`.
+previous filesystem sandbox also prevented Happ from writing
+`/var/log/happd.log`, which hid the useful daemon diagnostics. Independently,
+the `ipv6.disable=1` kernel parameter made `sing-box-tun` exit with code 1 just
+after creating `tun0`; the networking section documents why the kernel IPv6
+control plane must remain present even though IPv6 traffic stays disabled.
 `Restart=always` matches upstream because a newly upgraded GUI may ask an older
 daemon to exit successfully before systemd starts the matching binary.
 `/var/lib/happd` remains the daemon's private state directory. The upstream hard-coded
