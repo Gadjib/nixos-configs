@@ -882,17 +882,18 @@ policy-routing слой, пока штатный Happ работает без н
 starting the daemon after the resolver is ready avoids boot-time
 `HostNotFound` noise and makes TUN/DNS setup less timing-sensitive.
 The daemon remains a root service because TUN mode, routing changes and
-cross-user process inspection are part of its upstream protocol, but its
-systemd unit is sandboxed: the capability bounding set retains network,
-process-inspection and child-process privileges while excluding unrestricted
-kernel administration, module loading, raw I/O, BPF and audit control.
-System and home paths are read-only to the daemon, `/var/lib/happd` is its
-private state directory, and device access is limited to `/dev/net/tun` plus
-systemd's standard pseudo-devices. The upstream hard-coded
+cross-user process inspection are part of its upstream protocol. Do not add
+`NoNewPrivileges`, a capability bounding set, `DevicePolicy=closed` or strict
+filesystem/address-family sandboxing to this unit: upstream explicitly states
+that `happd` must launch unrestricted privileged sing-box/Xray children. The
+previous hardening made `sing-box-tun` exit with code 1 immediately after
+creating `tun0` and also prevented Happ from writing `/var/log/happd.log`.
+`Restart=always` matches upstream because a newly upgraded GUI may ask an older
+daemon to exit successfully before systemd starts the matching binary.
+`/var/lib/happd` remains the daemon's private state directory. The upstream hard-coded
 `/tmp/happd.sock` path remains shared with the desktop client, but an
 `ExecStartPost` guard changes it to `root:users 0660` after every daemon start;
-the service uses the existing `users` group so the current desktop session
-does not need a logout before it can reconnect.
+the desktop session therefore does not need a logout before it can reconnect.
 Этот же модуль создает compatibility symlink для HWID:
 `/var/lib/dbus/machine-id -> /etc/machine-id` через `systemd.tmpfiles.rules`.
 Happ получает machine id через Qt `machineUniqueId()`, а на NixOS с
