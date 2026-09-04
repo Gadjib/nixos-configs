@@ -1062,7 +1062,7 @@ Monitor scaling is set in Hyprland, not by manually increasing every app font:
 
 ```nix
 monitor = [
-  "HDMI-A-1,preferred,auto,1.25,mirror,eDP-1"
+  "HDMI-A-1,1920x1200@59.95,0x0,1.25,mirror,eDP-1"
   ",preferred,auto,1.25"
 ];
 ```
@@ -1075,11 +1075,13 @@ because it is preserved as a separate fallback session.
 
 The laptop panel is `eDP-1` and the physical HDMI connector is `HDMI-A-1`.
 Hyprland applies the explicit HDMI monitor rule automatically on hotplug and
-mirrors `eDP-1` onto it. The generic fallback rule remains in place for all
-other outputs, so the built-in panel and non-HDMI outputs retain their previous
-preferred-mode, automatic-position and `1.25` scale behavior. Mirroring uses
-the laptop panel's rendered image; an external display with a different aspect
-ratio may therefore show stretching, as expected for Hyprland mirroring.
+mirrors `eDP-1` onto it. The explicit `1920x1200@59.95` mode is supported by the
+tested EPSON projector and matches the laptop panel's 1920x1200 aspect ratio;
+do not use `preferred` here because that projector incorrectly advertises
+1024x768 as preferred, which also forces Hyprland away from the requested 1.25
+scale. The generic fallback rule remains in place for all other outputs, so the
+built-in panel and non-HDMI outputs retain their previous preferred-mode,
+automatic-position and `1.25` scale behavior.
 
 XWayland is intentionally kept at scale `1` independently of the Wayland scale:
 
@@ -1318,6 +1320,10 @@ Layout:
 
 Bar layout is tuned for the current Hyprland scale `1.25`:
 
+- `output = [ "!HDMI-A-1" "*" ]` excludes only the mirrored HDMI output.
+  The bar on `eDP-1` is already part of the mirrored image, so starting another
+  Waybar instance on `HDMI-A-1` causes redundant hotplug reconfiguration. Other
+  non-HDMI outputs remain eligible through the trailing `*` fallback.
 - `fixed-center = false`; the center is intentionally empty and date/time sits
   on the right between battery and power in `dd.mm.yy HH:MM` format.
 - height `36`, spacing `7`, readable module padding.

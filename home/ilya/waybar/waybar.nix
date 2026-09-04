@@ -4,6 +4,7 @@
     systemd.enable = true;
     systemd.targets = [ "hyprland-session.target" ];
     settings.mainBar = {
+      output = [ "!HDMI-A-1" "*" ];
       layer = "top";
       position = "top";
       height = 36;

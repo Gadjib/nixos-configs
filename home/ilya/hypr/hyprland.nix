@@ -18,7 +18,7 @@ in
       "$browser" = "/home/ilya/.local/bin/firefox-hyprland";
 
       monitor = [
-        "HDMI-A-1,preferred,auto,${toString appearance.scale},mirror,eDP-1"
+        "HDMI-A-1,1920x1200@59.95,0x0,${toString appearance.scale},mirror,eDP-1"
         ",preferred,auto,${toString appearance.scale}"
       ];
 
