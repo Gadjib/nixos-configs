@@ -1193,12 +1193,19 @@ Media keys:
 
 Sleep/lock:
 
-- `hypridle` locks after 300 seconds;
-- display off after 600 seconds;
+- without HDMI, `hypridle` locks after 300 seconds and turns displays off after
+  600 seconds;
+- while the physical `HDMI-A-1` connector reports `connected`, both idle screen
+  actions are skipped by the Nix-generated `allow-hypridle-screen-action`
+  helper. This keeps presentations visible without changing global timers or
+  adding polling. A missing connector status fails safe and allows normal idle
+  locking;
 - every fullscreen Hyprland window gets `idle_inhibit fullscreen`, so games
   controlled only by a gamepad do not trigger either timer; leaving fullscreen
   restores normal idle handling without polling or a helper process;
-- before sleep: `loginctl lock-session`;
+- manual/session D-Bus lock requests remain unconditional, and before sleep:
+  `loginctl lock-session`; HDMI therefore suppresses only automatic idle lock
+  and idle DPMS, never the security lock used for suspend/hibernate;
 - after sleep: `hyprctl dispatch dpms on`;
 - additional user systemd service `lock-before-sleep` locks before
   `sleep.target`.

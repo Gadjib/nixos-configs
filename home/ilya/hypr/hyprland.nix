@@ -3,6 +3,15 @@
 let
   appearance = import ../appearance.nix { inherit pkgs; };
   wallpaper = ../../../assets/wallpapers/wallhaven-2eqpzm.png;
+  allowIdleScreenAction = pkgs.writeShellScript "allow-hypridle-screen-action" ''
+    hdmi_status=disconnected
+
+    if [ -r /sys/class/drm/card1-HDMI-A-1/status ]; then
+      hdmi_status="$(${pkgs.coreutils}/bin/cat /sys/class/drm/card1-HDMI-A-1/status)"
+    fi
+
+    [ "$hdmi_status" != connected ]
+  '';
 in
 
 {
@@ -279,12 +288,12 @@ in
 
     listener {
       timeout = 300
-      on-timeout = loginctl lock-session
+      on-timeout = ${allowIdleScreenAction} && loginctl lock-session
     }
 
     listener {
       timeout = 600
-      on-timeout = hyprctl dispatch dpms off
+      on-timeout = ${allowIdleScreenAction} && hyprctl dispatch dpms off
       on-resume = hyprctl dispatch dpms on
     }
   '';
