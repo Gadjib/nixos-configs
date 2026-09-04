@@ -1062,6 +1062,7 @@ Monitor scaling is set in Hyprland, not by manually increasing every app font:
 
 ```nix
 monitor = [
+  "HDMI-A-1,preferred,auto,1.25,mirror,eDP-1"
   ",preferred,auto,1.25"
 ];
 ```
@@ -1071,6 +1072,14 @@ native Wayland applications and desktop components. Avoid also adding global
 `QT_SCALE_FACTOR`, `GDK_SCALE`, or manual font bumps, because that can
 double-scale parts of the UI. KDE may still have its own scaling behavior
 because it is preserved as a separate fallback session.
+
+The laptop panel is `eDP-1` and the physical HDMI connector is `HDMI-A-1`.
+Hyprland applies the explicit HDMI monitor rule automatically on hotplug and
+mirrors `eDP-1` onto it. The generic fallback rule remains in place for all
+other outputs, so the built-in panel and non-HDMI outputs retain their previous
+preferred-mode, automatic-position and `1.25` scale behavior. Mirroring uses
+the laptop panel's rendered image; an external display with a different aspect
+ratio may therefore show stretching, as expected for Hyprland mirroring.
 
 XWayland is intentionally kept at scale `1` independently of the Wayland scale:
 
