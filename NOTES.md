@@ -527,13 +527,12 @@ brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
 отдельного `nixpkgs-unstable` input, чтобы обновлять security-sensitive
 приложения точечно и не переводить всю систему на unstable. Home Manager
 получает тот же `pkgsUnstable` через `home-manager.extraSpecialArgs`.
-Bitwarden переведен на unstable после того, как stable-сборка `2026.5.0` и
-предыдущая unstable-сборка `2026.6.1` остались на EOL Electron 39. Текущая
-сборка использует поддерживаемый Electron 41, поэтому глобальное исключение
-`permittedInsecurePackages = [ "electron-39.8.10" ]` удалено. После обновления
-нужно проверить разблокировку vault, browser integration и Bitwarden SSH agent;
-при функциональной регрессии откатывать весь system generation, а не возвращать
-EOL Electron в allowlist.
+Текущий pin от `2026-09-05` предоставляет Codex CLI `0.151.0` и Bitwarden
+Desktop `2026.8.0`. Bitwarden использует поддерживаемый Electron `43.4.1`;
+глобального исключения `permittedInsecurePackages` для старого Electron нет.
+После обновления input нужно проверить запуск Codex, разблокировку vault,
+browser integration и Bitwarden SSH agent; при функциональной регрессии
+откатывать весь system generation, а не возвращать EOL Electron в allowlist.
 
 Версионно важные имена:
 
