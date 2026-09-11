@@ -523,12 +523,16 @@ accelerated video decoder. `libva-utils` установлен для прове�
 В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
-и `os-prober`, compiler/dev tools. `codex` и Bitwarden Desktop берутся из
-отдельного `nixpkgs-unstable` input, чтобы обновлять security-sensitive
-приложения точечно и не переводить всю систему на unstable. Home Manager
-получает тот же `pkgsUnstable` через `home-manager.extraSpecialArgs`.
-Текущий pin от `2026-09-05` предоставляет Codex CLI `0.151.0` и Bitwarden
-Desktop `2026.8.0`. Bitwarden использует поддерживаемый Electron `43.4.1`;
+и `os-prober`, compiler/dev tools. Codex берется из отдельного
+`nixpkgs-codex` input, закрепленного на `nixpkgs/master`, потому что
+`nixos-unstable` может отставать от самого свежего релиза Codex.
+Bitwarden Desktop остается на отдельном `nixpkgs-unstable` input.
+Так security-sensitive приложения обновляются точечно без перевода
+всей системы на unstable/master. Home Manager получает
+`pkgsUnstable` через `home-manager.extraSpecialArgs`.
+Текущий pin `nixpkgs-codex` от `2026-09-11` предоставляет Codex CLI
+`0.154.0`; pin `nixpkgs-unstable` от `2026-09-05` — Bitwarden Desktop
+`2026.8.0`. Bitwarden использует поддерживаемый Electron `43.4.1`;
 глобального исключения `permittedInsecurePackages` для старого Electron нет.
 После обновления input нужно проверить запуск Codex, разблокировку vault,
 browser integration и Bitwarden SSH agent; при функциональной регрессии

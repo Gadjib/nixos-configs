@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-codex.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,6 +16,7 @@
       self,
       nixpkgs,
       nixpkgs-unstable,
+      nixpkgs-codex,
       home-manager,
       ...
     }:
@@ -24,12 +26,15 @@
         inherit system;
         config.allowUnfree = true;
       };
+      pkgsCodex = import nixpkgs-codex {
+        inherit system;
+      };
     in
     {
       nixosConfigurations.thinkpad-nix = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit self pkgsUnstable;
+          inherit self pkgsUnstable pkgsCodex;
         };
         modules = [
           ./hosts/nixos/configuration.nix

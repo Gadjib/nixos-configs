@@ -1,4 +1,4 @@
-{ pkgs, pkgsUnstable, ... }:
+{ pkgs, pkgsCodex, ... }:
 
 {
   programs.firefox.enable = true;
@@ -81,6 +81,6 @@
     vulkan-tools
     libva-utils
 
-    pkgsUnstable.codex
+    pkgsCodex.codex
   ];
 }
