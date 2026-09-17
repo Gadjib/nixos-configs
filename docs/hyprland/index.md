@@ -24,7 +24,8 @@ Hyprland - основная Wayland-сессия. KDE Plasma 6 остается 
 - `mako` стартует через `exec-once`.
 - `awww-daemon` стартует для wallpaper, затем `awww img` применяет
   `/home/ilya/nixos-config/assets/wallpapers/wallhaven-2eqpzm.png`.
-- `hypridle` управляет idle lock и DPMS.
+- `hypridle.service` управляет idle lock и DPMS; запускается и останавливается
+  вместе с Hyprland, автоматически перезапускается при завершении процесса.
 - `wlogout` вызывается по `SUPER+M`.
 - `rofi -show drun` вызывается по `SUPER+D`.
 - `grim`, `slurp`, `swappy` делают area screenshot по `Print`.

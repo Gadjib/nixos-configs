@@ -1091,7 +1091,8 @@ Autostart:
 - `awww-daemon`
 - `sleep 0.5 && awww img ...` sets the wallpaper from
   `assets/wallpapers/wallhaven-2eqpzm.png`
-- `hypridle`
+- `hypridle` starts through the Home Manager user service, bound to
+  `hyprland-session.target`, with automatic restart after 10 seconds.
 - `wl-paste` watchers for text/image into `cliphist`
 - `swayosd-server`
 
@@ -1258,8 +1259,13 @@ Sleep/lock:
   `loginctl lock-session`; HDMI therefore suppresses only automatic idle lock
   and idle DPMS, never the security lock used for suspend/hibernate;
 - after sleep: `hyprctl dispatch dpms on`;
-- additional user systemd service `lock-before-sleep` locks before
-  `sleep.target`.
+- `services.hypridle` generates the config and user service; there is no
+  duplicate `exec-once` launch or user `sleep.target` hook. Hypridle handles
+  logind sleep notifications directly. `inhibit_sleep = 2` selects lock
+  notification waiting automatically for this hyprlock configuration, bounded
+  by logind’s inhibitor delay limit;
+- after migrating from `exec-once`, log out and back into Hyprland after
+  applying the configuration so the old unmanaged process is replaced.
 - neither Hyprland nor Plasma automatically suspends on idle;
 - lid close and the Wlogout sleep action request
   `systemctl suspend-then-hibernate`: resume is immediate when woken normally,

@@ -53,7 +53,6 @@ in
       exec-once = [
         "mako"
         "sleep 0.5 && awww img ${wallpaper} --resize crop --transition-type fade --transition-duration 1"
-        "hypridle"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "swayosd-server"
@@ -279,24 +278,31 @@ in
     PropagatesStopTo = [ "graphical-session.target" ];
   };
 
-  xdg.configFile."hypr/hypridle.conf".text = ''
-    general {
-      lock_cmd = pidof hyprlock || hyprlock
-      before_sleep_cmd = loginctl lock-session
-      after_sleep_cmd = hyprctl dispatch dpms on
-    }
-
-    listener {
-      timeout = 300
-      on-timeout = ${allowIdleScreenAction} && loginctl lock-session
-    }
-
-    listener {
-      timeout = 600
-      on-timeout = ${allowIdleScreenAction} && hyprctl dispatch dpms off
-      on-resume = hyprctl dispatch dpms on
-    }
-  '';
+  services.hypridle = {
+    enable = true;
+    systemdTarget = "hyprland-session.target";
+    settings = {
+      general = {
+        lock_cmd = "pidof hyprlock || hyprlock";
+        before_sleep_cmd = "loginctl lock-session";
+        after_sleep_cmd = "hyprctl dispatch dpms on";
+        # Auto mode waits for the compositor's lock notification when using
+        # hyprlock with loginctl lock-session, within logind's delay limit.
+        inhibit_sleep = 2;
+      };
+      listener = [
+        {
+          timeout = 300;
+          on-timeout = "${allowIdleScreenAction} && loginctl lock-session";
+        }
+        {
+          timeout = 600;
+          on-timeout = "${allowIdleScreenAction} && hyprctl dispatch dpms off";
+          on-resume = "hyprctl dispatch dpms on";
+        }
+      ];
+    };
+  };
 
   xdg.configFile."hypr/hyprlock.conf".text = ''
     auth {
@@ -327,18 +333,6 @@ in
       valign = center
     }
   '';
-
-  systemd.user.services.lock-before-sleep = {
-    Unit = {
-      Description = "Lock the session before system sleep";
-      Before = [ "sleep.target" ];
-    };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.systemd}/bin/loginctl lock-session";
-    };
-    Install.WantedBy = [ "sleep.target" ];
-  };
 
   systemd.user.services.awww-daemon = {
     Unit = {

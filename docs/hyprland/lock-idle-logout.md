@@ -17,7 +17,14 @@ Runtime:
 
 ## Текущие idle actions
 
-`hypridle`:
+`hypridle` запускается пользовательским `hypridle.service`, привязанным к
+`hyprland-session.target`. При завершении процесса systemd перезапускает его
+через 10 секунд; при выходе из Hyprland сервис останавливается.
+
+После первого применения перехода с `exec-once` нужно выйти и снова войти
+в Hyprland, чтобы завершить старый процесс и оставить запуск под systemd.
+
+Настройки:
 
 - `lock_cmd = pidof hyprlock || hyprlock`;
 - before sleep: `loginctl lock-session`;
@@ -25,6 +32,10 @@ Runtime:
 - через 300 секунд: `loginctl lock-session`;
 - через 600 секунд: `hyprctl dispatch dpms off`;
 - on resume: `hyprctl dispatch dpms on`.
+
+При подключённом HDMI автоматические lock и DPMS пропускаются. Полноэкранные
+окна подавляют idle-таймеры. Ручная блокировка и блокировка перед сном
+сохраняются независимо от этих исключений.
 
 ## Заблокировать экран
 
@@ -59,9 +70,16 @@ systemctl suspend-then-hibernate
 hypridle вызывает lock. Автоматического suspend по idle нет; idle управляет
 только lock и DPMS.
 
+Hypridle получает уведомления о сне непосредственно от logind. Режим
+`inhibit_sleep = 2` автоматически выбирает ожидание подтверждения блокировки
+от композитора для этой конфигурации с hyprlock. Ожидание ограничено таймаутом
+logind. Отдельный пользовательский `sleep.target` для этого не используется.
+
 ## Troubleshooting
 
 ```bash
+systemctl --user status hypridle.service
+journalctl --user -b -u hypridle.service
 command -v hyprlock hypridle wlogout
 pgrep -a hypridle
 journalctl --user -b | rg -i "hypridle|hyprlock|wlogout|loginctl"
