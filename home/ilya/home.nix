@@ -1,6 +1,7 @@
 {
   pkgs,
   pkgsUnstable,
+  pkgsTelegram,
   lib,
   ...
 }:
@@ -144,7 +145,7 @@ in
     cliphist
     xdg-utils
     pkgsUnstable.bitwarden-desktop
-    telegram-desktop
+    pkgsTelegram.telegram-desktop
     moonlight-qt
     networkmanagerapplet
     catppuccinGtk

@@ -5,6 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-codex.url = "github:NixOS/nixpkgs/master";
+    nixpkgs-telegram.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -17,6 +18,7 @@
       nixpkgs,
       nixpkgs-unstable,
       nixpkgs-codex,
+      nixpkgs-telegram,
       home-manager,
       ...
     }:
@@ -27,6 +29,9 @@
         config.allowUnfree = true;
       };
       pkgsCodex = import nixpkgs-codex {
+        inherit system;
+      };
+      pkgsTelegram = import nixpkgs-telegram {
         inherit system;
       };
     in
@@ -43,7 +48,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = {
-              inherit pkgsUnstable;
+              inherit pkgsUnstable pkgsTelegram;
             };
             home-manager.backupCommand = pkgs.writeShellScript "home-manager-timestamped-backup" ''
               set -euo pipefail

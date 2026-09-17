@@ -70,6 +70,8 @@ Push в remote не делать после каждого commit. Нормал�
 - Home Manager state version: `26.05`
 - Flake input Nixpkgs: `github:NixOS/nixpkgs/nixos-26.05`
 - Flake input Nixpkgs unstable: `github:NixOS/nixpkgs/nixos-unstable`
+- Telegram has its own `nixpkgs-telegram` input on `nixos-unstable`, pinned
+  independently of Bitwarden and the base system.
 - Flake input Home Manager: `github:nix-community/home-manager/release-26.05`
 - Основной рабочий desktop: Hyprland
 - Fallback desktop: KDE Plasma через SDDM
@@ -1325,7 +1327,14 @@ supported.
 
 ## Telegram
 
-Telegram установлен напрямую как `pkgs.telegram-desktop`. Для него нет
+Telegram установлен как `pkgsTelegram.telegram-desktop` из отдельного
+`nixpkgs-telegram` input (`nixos-unstable`). Версия 7.2.8 заменяет 6.8.1 из
+основного stable input. Этот input передаётся только в Home Manager; обновление
+Telegram не требует обновлять Bitwarden, Codex или всю систему. Для следующего
+обновления используется `nix flake update nixpkgs-telegram`, затем evaluation
+и dry-run. Остальные lock entries должны оставаться прежними.
+
+Для него нет
 локального wrapper-а, дополнительных environment variables, подмены desktop
 entry или DBus service, MIME association и Hyprland window rules. Приложение
 запускается с полностью upstream-конфигурацией пакета.
