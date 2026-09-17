@@ -261,11 +261,20 @@ the native KDE device notifier/automounter owns the same UDisks lifecycle;
 drives remain available below `/run/media/ilya/<label>`, but the Hyprland-only
 `/mnt/<label>` link is not created. Yazi itself does not mount devices.
 
-The SMB share is a separate automount at `/vault`, so scans of `/mnt` never
-touch it. On Wi-Fi SSID `0xDEADBEEF48`, accessing `/vault` directly permits the
-normal CIFS attempt. In any other network session, the first access sends one
-one-second ping to `192.168.0.10`; a failed result is cached until the network
-changes or reconnects, and later accesses do not retry the ping or CIFS.
+Домашние SMB-ресурсы автоматически подключаются только при подключении к
+Wi-Fi с SSID, начинающимся с `0xDEADBEEF` (регистр важен):
+
+- `/vault/home`;
+- `/vault/Downloads`;
+- `/vault/music`;
+- `/vault/video`;
+- `/vault/Store`.
+
+Это отдельные ресурсы `//192.168.0.10/<имя>`. В остальных сетях просмотр
+`/vault` не запускает подключение или проверку NAS. При выходе из домашней сети
+запрашивается обычное размонтирование; занятые ресурсы принудительно не
+отключаются. Закройте использующие их программы перед сменой сети.
+Содержимое прежнего `/vault` теперь доступно в `/vault/home`.
 
 ## Troubleshooting
 

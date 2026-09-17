@@ -344,26 +344,44 @@ Windows partition:
   volume. Such a partition is intentionally not force-mounted because that
   could damage it.
 
-SMB mount:
+SMB mounts:
 
-- `modules/nixos/smb.nix` mounts `//192.168.0.10/home` at `/vault` using
-  the standard SMB port.
-- It uses `x-systemd.automount`, `noauto`, `_netdev`, `nofail`, so boot should
-  not block if the NAS is offline.
-- The mount requires `home-smb-available.service`. On SSID `0xDEADBEEF48` the
-  preflight immediately permits the normal CIFS attempt without a ping. In
-  every other network session it sends exactly one one-second ping to
-  `192.168.0.10`, bound to the active Wi-Fi interface when present.
-- The non-home result is cached in `/run/home-smb-preflight/current`, keyed by
-  NetworkManager's `ActiveConnection` id. A failed probe blocks all further
-  probes and CIFS attempts for that connection session; reconnecting or
-  changing networks produces a new id and permits one new ping.
-- tmpfiles creates `/vault` and removes the obsolete `/mnt/home` directory only
-  when the old path is empty.
-- Auth uses `/etc/samba/vault.credentials`, which must stay outside git.
-  It should contain `username=...`, `password=...`, and optionally
-  `domain=WORKGROUP`.
-- `cifs-utils` is installed system-wide for `mount.cifs` diagnostics.
+- `modules/nixos/smb.nix` defines five independent native systemd mount units:
+  `/vault/home`, `/vault/Downloads`, `/vault/music`, `/vault/video`, `/vault/Store`.
+  Each maps to the identically named share at `//192.168.0.10/`; case matters.
+  `/vault` itself is now a local directory, not the old `home` share mount.
+  Existing paths into that share must be updated from `/vault/...` to
+  `/vault/home/...`. No remote files are moved.
+- Only an active Wi-Fi SSID starting with the exact, case-sensitive prefix
+  `0xDEADBEEF` permits automatic mounting. Merely seeing such an AP nearby is
+  insufficient. Ethernet-only and other Wi-Fi networks do not permit mounting.
+- `home-smb-network.sh` reads NetworkManager's cached ACTIVE/SSID list with
+  `--rescan no`. There are no pings, port probes, availability cache, periodic
+  retries, or access-triggered automounts outside the home network.
+- NetworkManager up/down/dhcp4-change/reapply events queue the short
+  `home-smb-refresh.service`; the same service runs at boot/activation. It reads
+  current network state rather than trusting an old event, then asynchronously
+  starts or stops `home-smb.target` and all five mount units. Failed mounts can
+  retry on the next qualifying event. Dispatcher execution never waits for CIFS.
+- All mount units require a fresh `home-smb-network-allowed.service` check before
+  starting, including manual starts. Each mount/unmount has a 10-second timeout.
+  One unavailable share does not prevent mounting the others.
+- On leaving home Wi-Fi, normal unmount is requested. ForceUnmount and
+  LazyUnmount are disabled: a busy filesystem can remain mounted until users
+  close its files and another stop succeeds. Existing CIFS mounts may still try
+  to reconnect; no new NAS probes or mount requests are initiated by the helper
+  outside home Wi-Fi. Stop explicitly after closing files if needed:
+  `sudo systemctl stop vault-{home,Downloads,music,video,Store}.mount` (Bash).
+- Auth remains `/etc/samba/vault.credentials`, outside Git, with the existing
+  username/password and optional domain. `cifs-utils` remains installed, and
+  `boot.supportedFilesystems = [ "cifs" ]` explicitly preserves the mount helper
+  integration previously inferred from `fileSystems`.
+- During the first switch, the old `/vault` mount/automount must be stopped
+  before using the new child mounts. A ConditionPathIsMountPoint guard refuses
+  child mounts while `/vault` itself is still mounted, avoiding creation of
+  mountpoint directories inside the old remote share. Close applications using
+  the old share; no forced unmount or remote data migration is performed.
+- Tests: `python3 -B -m unittest discover -s tests -p test_home_smb_network.py -v`.
 
 Swap:
 
@@ -504,8 +522,8 @@ broken IPv6 attempts.
 
 Системные программы: Firefox и Steam включены через собственные NixOS-модули.
 Steam package sets `GLOBIGNORE=/vault` in `extraPreBwrapCmds` so the generated
-FHS wrapper does not stat or bind the root-level SMB automount while enumerating
-host directories. This prevents an unavailable `/vault` from aborting Steam's
+FHS wrapper does not stat or bind the `/vault` tree while enumerating
+host directories. This prevents unavailable shares below `/vault` from delaying Steam's
 `bubblewrap` startup; all other host directories retain the standard Nixpkgs
 Steam behavior. `dotglob` is disabled again after assigning `GLOBIGNORE` to
 avoid changing which hidden root entries the wrapper enumerates.

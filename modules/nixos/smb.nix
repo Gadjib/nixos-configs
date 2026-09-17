@@ -1,115 +1,83 @@
 { pkgs, ... }:
 
 let
-  homeSmbAvailable = pkgs.writeShellApplication {
-    name = "home-smb-available";
-    runtimeInputs = with pkgs; [
-      coreutils
-      gawk
-      iputils
-      networkmanager
-    ];
-    text = ''
-      required_ssid="0xDEADBEEF48"
-      server="192.168.0.10"
-      state_dir="''${HOME_SMB_STATE_DIR:-/run/home-smb-preflight}"
-      state_file="$state_dir/current"
-
-      active_wifi="$(
-        LC_ALL=C nmcli --wait 1 --terse --fields DEVICE,ACTIVE,SSID \
-          device wifi list --rescan no |
-          awk -F: '$2 == "yes" { print; exit }'
-      )"
-      wifi_device="''${active_wifi%%:*}"
-      active_ssid="''${active_wifi#*:yes:}"
-
-      if [[ -n "$active_wifi" && "$active_ssid" == "$required_ssid" ]]; then
-        printf 'SMB preflight: home Wi-Fi is active; allowing direct CIFS attempt\n'
-        exit 0
-      fi
-
-      if [[ -n "$wifi_device" ]]; then
-        connection_path="$(
-          LC_ALL=C nmcli --wait 1 --get-values GENERAL.CON-PATH \
-            device show "$wifi_device"
-        )"
-        session_id="''${connection_path##*/}"
-      else
-        session_id="no-active-wifi"
-      fi
-
-      if [[ -z "$session_id" || ! "$session_id" =~ ^[A-Za-z0-9._-]+$ ]]; then
-        printf 'SMB preflight: cannot identify the active network session\n' >&2
-        exit 1
-      fi
-
-      mkdir -p "$state_dir"
-      if [[ -r "$state_file" ]]; then
-        read -r cached_session cached_result < "$state_file" || true
-        if [[ "''${cached_session:-}" == "$session_id" ]]; then
-          case "''${cached_result:-}" in
-            reachable)
-              printf 'SMB preflight: reusing successful probe for session %s\n' \
-                "$session_id"
-              exit 0
-              ;;
-            unreachable)
-              printf 'SMB preflight: probe already failed for session %s; not retrying\n' \
-                "$session_id" >&2
-              exit 1
-              ;;
-          esac
-        fi
-      fi
-
-      ping_args=( -n -c 1 -W 1 -w 1 )
-      if [[ -n "$wifi_device" ]]; then
-        ping_args+=( -I "$wifi_device" )
-      fi
-
-      if ping "''${ping_args[@]}" "$server"; then
-        printf '%s reachable\n' "$session_id" > "$state_file"
-        exit 0
-      fi
-
-      printf '%s unreachable\n' "$session_id" > "$state_file"
-      printf 'SMB preflight: %s did not answer the one allowed ping for session %s\n' \
-        "$server" "$session_id" >&2
-      exit 1
-    '';
+  shares = [ "home" "Downloads" "music" "video" "Store" ];
+  mountUnits = map (share: "vault-${share}.mount") shares;
+  homeNetwork = pkgs.writeShellApplication {
+    name = "home-smb-network";
+    runtimeInputs = [ pkgs.networkmanager ];
+    text = builtins.readFile ./home-smb-network.sh;
   };
+  refresh = pkgs.writeShellScript "home-smb-refresh" ''
+    set -eu
+    if ${homeNetwork}/bin/home-smb-network; then
+      # Queue all units explicitly so a new network event also retries failed
+      # mounts when the target itself is already active.
+      ${pkgs.systemd}/bin/systemctl --no-block start home-smb.target ${builtins.concatStringsSep " " mountUnits}
+    else
+      ${pkgs.systemd}/bin/systemctl --no-block stop home-smb.target ${builtins.concatStringsSep " " mountUnits}
+    fi
+  '';
+  dispatcher = pkgs.writeShellScript "home-smb-dispatcher" ''
+    case "''${2:-}" in
+      up|down|dhcp4-change|reapply)
+        # Don't wait for CIFS inside NetworkManager's dispatcher. Restarting
+        # the short reconciliation job makes the latest network state win.
+        ${pkgs.systemd}/bin/systemctl --no-block restart home-smb-refresh.service
+        ;;
+    esac
+  '';
 in
-
 {
-  environment.systemPackages = with pkgs; [
-    cifs-utils
-  ];
+  # Native mount units do not infer this as fileSystems entries would.
+  boot.supportedFilesystems = [ "cifs" ];
+  environment.systemPackages = [ pkgs.cifs-utils ];
 
   systemd.tmpfiles.rules = [
     "d /vault 0755 root root -"
     "r /mnt/home - - - -"
   ];
 
-  systemd.services.home-smb-available = {
-    description = "Check home Wi-Fi and SMB server reachability";
+  networking.networkmanager.dispatcherScripts = [
+    { type = "basic"; source = dispatcher; }
+  ];
+
+  systemd.services.home-smb-refresh = {
+    description = "Reconcile home SMB mounts with the current Wi-Fi network";
     after = [ "NetworkManager.service" ];
+    wants = [ "NetworkManager.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${homeSmbAvailable}/bin/home-smb-available";
-      TimeoutStartSec = "3s";
+      ExecStart = refresh;
+      TimeoutStartSec = "10s";
     };
   };
 
-  fileSystems."/vault" = {
-    device = "//192.168.0.10/home";
-    fsType = "cifs";
-    options = [
-      "x-systemd.automount"
-      "x-systemd.requires=home-smb-available.service"
-      "noauto"
-      "x-systemd.idle-timeout=10min"
+  # Recheck immediately before mounting, including manual unit starts and
+  # queued starts after a network change. No RemainAfterExit: never cache access.
+  systemd.services.home-smb-network-allowed = {
+    description = "Require a connected 0xDEADBEEF Wi-Fi network for SMB";
+    after = [ "NetworkManager.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${homeNetwork}/bin/home-smb-network";
+      TimeoutStartSec = "5s";
+    };
+  };
+
+  systemd.targets.home-smb = {
+    description = "SMB shares on the home Wi-Fi network";
+    wants = mountUnits;
+  };
+
+  systemd.mounts = map (share: {
+    description = "Home SMB share ${share}";
+    what = "//192.168.0.10/${share}";
+    where = "/vault/${share}";
+    type = "cifs";
+    options = builtins.concatStringsSep "," [
       "_netdev"
-      "nofail"
       "credentials=/etc/samba/vault.credentials"
       "vers=3.1.1"
       "iocharset=utf8"
@@ -118,5 +86,17 @@ in
       "file_mode=0660"
       "dir_mode=0770"
     ];
-  };
+    requires = [ "home-smb-network-allowed.service" ];
+    after = [ "home-smb-network-allowed.service" ];
+    partOf = [ "home-smb.target" ];
+    # A busy legacy /vault mount must not turn these mountpoints into remote
+    # directories inside the old home share during the first switch.
+    unitConfig.ConditionPathIsMountPoint = "!/vault";
+    mountConfig = {
+      TimeoutSec = "10s";
+      DirectoryMode = "0755";
+      ForceUnmount = false;
+      LazyUnmount = false;
+    };
+  }) shares;
 }
