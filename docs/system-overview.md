@@ -103,11 +103,21 @@ Catppuccin GTK/KDE/dconf settings при старте `hyprland-session.target` 
 возвращает собственные writable settings Plasma при выходе. Hyprland-specific
 environment variables также задаются только из Hyprland config.
 
-При первом входе после применения конфигурации старые Plasma workspace/theme
-settings переносятся в timestamped backup под
-`~/.local/state/nixos-desktop-isolation/backups/`, после чего Plasma создаёт
-штатную конфигурацию Breeze. Сброс выполняется только один раз; дальнейшие
-изменения из Plasma System Settings сохраняются.
+Переключением управляет `home/ilya/desktop-session-profile.sh`. Перед
+изменением активных файлов он сохраняет полный снимок Plasma; восстановление
+копирует файлы из снимка, поэтому его можно повторить после прерывания.
+Завершённые снимки остаются в
+`~/.local/state/nixos-desktop-isolation/backups/completed.*/snapshot`.
+Старый формат состояния сохраняется отдельно перед миграцией. Автоматической
+очистки этих резервных копий нет.
+
+При самом первом входе настройки Plasma сбрасываются к штатным, но сначала
+полностью сохраняются в `~/.local/state/nixos-desktop-isolation/initial-reset-v2`.
+Маркер `plasma-reset-v1` предотвращает повторный сброс; на уже настроенной машине
+он сохраняется. Последующие изменения из Plasma System Settings сохраняются.
+Одновременные сессии Plasma и Hyprland под одним пользователем не поддерживаются.
+Перед откатом на поколение со старым скриптом нужно нормально выйти из Hyprland,
+чтобы новый скрипт успел восстановить настройки Plasma.
 
 `nm-applet`, `blueman-applet` и `udiskie` запускаются исключительно с
 `hyprland-session.target`. Plasma использует свои NetworkManager, BlueDevil и

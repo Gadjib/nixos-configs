@@ -729,23 +729,51 @@ ordinary application data remains shared under the same Unix user and HOME.
   declarative Hyprland versions plus the Firefox button-hiding `userChrome.css`,
   then restores the saved Plasma state and removes that Firefox CSS when the
   target stops.
-- The exact declarative Hyprland copies are reapplied at every Hyprland start,
-  even when a stale active-session marker remains after a crash or reboot.
-  Plasma's writable state is still saved and restored around the session, but
-  KDE/GTK appearance changes made interactively inside Hyprland must be moved
-  into `appearance.nix`/Home Manager to persist.
-- GTK4 assets copied from the Nix store are made owner-writable. The profile
-  also repairs permissions before removing managed trees, so logout cannot
-  fail halfway through and leave Plasma and Hyprland settings mixed.
+- The implementation is `home/ilya/desktop-session-profile.sh`, included by
+  the Nix module through `builtins.readFile` and wrapped with its runtime tools.
+  It copies a complete Plasma snapshot into `session-v2.pending` before changing
+  any live file, then commits it by rename to `session-v2`. Phases are `saving`
+  (pending only), `saved`, `applying`, `active`, `restoring`, and `restored`.
+  Phase updates use rename and filesystem sync before destructive operations.
+- Restore copies from the snapshot; it never consumes saved originals. A
+  process interrupted during apply or restore can therefore run again. A
+  Hyprland start completes an interrupted restore before taking a new snapshot.
+  Missing snapshot entries or unknown phases cause a failure before live files
+  are changed. Concurrent desktop sessions under the same user remain unsupported.
+- Completed snapshots are retained under
+  `~/.local/state/nixos-desktop-isolation/backups/completed.*/snapshot`.
+  They are not automatically pruned. They contain desktop settings and dconf,
+  not browser profiles or other application data. Manually review old snapshots
+  before removing them if this directory grows significantly.
+- Existing `active-hyprland` v1 state is copied verbatim into the migration
+  snapshot and archived as `backups/legacy-v1.*/snapshot` only after v2 is
+  committed. Saved entries take precedence; entries already restored by v1
+  are recovered from HOME. Explicit `.absent` markers stay absent. If an active
+  legacy snapshot lacks dconf data, migration refuses to guess. Data already
+  deleted by an earlier v1 retry cannot be reconstructed automatically.
+- Exact declarative Hyprland settings are reapplied at every Hyprland start.
+  KDE/GTK changes made interactively inside Hyprland must still be moved into
+  Home Manager to persist. Firefox userChrome is absent in Plasma as before;
+  any current CSS discarded during capture is retained in the snapshot.
+- GTK4 assets copied from the store become owner-writable. Removing a live
+  symlink does not chmod its target. A failed operation may temporarily leave
+  mixed live settings, but the committed originals remain available for retry.
 - A Plasma pre-start script at
   `~/.config/plasma-workspace/env/00-desktop-session-profile.sh` performs the
-  same restore defensively before Plasma reads its workspace configuration.
-- On the first desktop login after this change, the helper moves existing
-  Plasma workspace/theme/panel/shortcut/monitor files into a timestamped,
-  recoverable directory below
-  `~/.local/state/nixos-desktop-isolation/backups/`, resets the related dconf
-  interface keys and records `plasma-reset-v1`. It does not repeat the reset on
-  later logins, so Plasma remains writable and remembers future user changes.
+  same restore before Plasma reads its workspace configuration.
+- The one-time initial Plasma reset still respects `plasma-reset-v1`. For a
+  fresh setup it first copies all affected originals and dconf to
+  `initial-reset-v2.pending`, commits `initial-reset-v2`, then resets settings.
+  That snapshot is retained and the marker records its location. Existing
+  installations with the marker do not repeat the reset.
+- Recovery tests: `python3 -B -m unittest discover -s tests -v`. They execute
+  the real shell script with temporary HOME/runtime directories and mocked
+  dconf/systemctl/sync, killing the process at mutation boundaries. They cover
+  both recovery destinations, legacy partial save/restore, initial reset,
+  missing snapshots/sources, symlinks, absent files and nested directories.
+  This checks process interruption, not physical power-loss durability.
+- Before rolling back to a generation with the old v1 implementation, log out
+  normally so v2 restores Plasma first; the old script cannot interpret v2 state.
 - `nm-applet`, `blueman-applet` and `udiskie` are wanted by and part of
   `hyprland-session.target`, never the generic graphical target. User-level
   overrides for the package-provided `nm-applet.desktop` and `blueman.desktop`
