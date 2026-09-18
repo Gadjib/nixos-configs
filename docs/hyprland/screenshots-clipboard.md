@@ -4,37 +4,20 @@
 
 Скриншоты и clipboard в Wayland делаются отдельными утилитами: `grim`, `slurp`, `swappy`, `wl-copy`, `wl-paste`, `cliphist`.
 
-## Текущий bind
+## Сочетания клавиш
 
-```text
-Print -> grim -g "$(slurp)" - | swappy -f -
-```
+Все четыре сочетания используют `home/ilya/hypr/screenshot.sh`:
 
-То есть `Print` выбирает область через `slurp`, делает screenshot через `grim` и открывает результат в `swappy`.
+| Сочетание | Действие |
+|---|---|
+| `Print` | Область в буфер |
+| `Shift+Print` | Весь экран в буфер |
+| `Ctrl+Print` | Область в Swappy |
+| `Ctrl+Shift+Print` | Весь экран в Swappy |
 
-## Screenshot whole screen
-
-```bash
-grim ~/Pictures/screenshot.png
-```
-
-## Screenshot area
-
-```bash
-grim -g "$(slurp)" ~/Pictures/area.png
-```
-
-## Screenshot to clipboard
-
-```bash
-grim -g "$(slurp)" - | wl-copy
-```
-
-## Screenshot edit in swappy
-
-```bash
-grim -g "$(slurp)" - | swappy -f -
-```
+Повторные вызовы игнорируются во время выделения, захвата и редактирования
+в Swappy. Закрой редактор перед следующим снимком. Escape и ошибка захвата
+не меняют буфер обмена. Временный PNG удаляется при завершении обработчика.
 
 ## Clipboard
 

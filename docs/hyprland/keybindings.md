@@ -15,7 +15,8 @@
 | `SUPER+E` | file manager | `dolphin` |
 | `SUPER+B` | browser | `firefox` |
 | `SUPER+V` | clipboard history | `cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy` |
-| `Print` | screenshot area | `grim -g "$(slurp)" - | swappy -f -` |
+| `Print` / `Shift+Print` | область / весь экран в буфер | общий screenshot handler |
+| `Ctrl+Print` / `Ctrl+Shift+Print` | область / весь экран в Swappy | общий screenshot handler |
 
 ## Layout/window
 

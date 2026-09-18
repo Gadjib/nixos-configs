@@ -1224,6 +1224,13 @@ SUPER+P           pseudo
 SUPER+O           layoutmsg togglesplit
 ```
 
+All four screenshot bindings use `home/ilya/hypr/screenshot.sh`, packaged with
+explicit runtime dependencies by `writeShellApplication`. A shared nonblocking
+`flock` in `XDG_RUNTIME_DIR` ignores repeated requests while selecting, capturing,
+or editing in Swappy. Cancellation leaves the clipboard unchanged; `grim` must
+succeed before the image is passed on. Temporary PNG files are removed on exit.
+Clipboard/editor children do not inherit the lock descriptor.
+
 Workspaces:
 
 - `SUPER+1..9,0` -> workspace 1..10

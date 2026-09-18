@@ -2,6 +2,11 @@
 
 let
   appearance = import ../appearance.nix { inherit pkgs; };
+  screenshot = pkgs.writeShellApplication {
+    name = "hyprland-screenshot";
+    runtimeInputs = with pkgs; [ coreutils util-linux grim slurp wl-clipboard swappy ];
+    text = builtins.readFile ./screenshot.sh;
+  };
   wallpaper = ../../../assets/wallpapers/wallhaven-2eqpzm.png;
   allowIdleScreenAction = pkgs.writeShellScript "allow-hypridle-screen-action" ''
     hdmi_status=disconnected
@@ -160,10 +165,10 @@ in
         "$mod, S, togglespecialworkspace, magic"
         "$mod SHIFT, S, movetoworkspace, special:magic"
         "$mod, V, exec, cliphist list | rofi -dmenu -p clipboard | cliphist decode | wl-copy"
-        ", Print, exec, grim -g \"$(slurp)\" - | wl-copy --type image/png"
-        "SHIFT, Print, exec, grim - | wl-copy --type image/png"
-        "CTRL, Print, exec, grim -g \"$(slurp)\" - | swappy -f -"
-        "CTRL SHIFT, Print, exec, grim - | swappy -f -"
+        ", Print, exec, ${screenshot}/bin/hyprland-screenshot area clipboard"
+        "SHIFT, Print, exec, ${screenshot}/bin/hyprland-screenshot screen clipboard"
+        "CTRL, Print, exec, ${screenshot}/bin/hyprland-screenshot area editor"
+        "CTRL SHIFT, Print, exec, ${screenshot}/bin/hyprland-screenshot screen editor"
 
         "$mod, F, fullscreen"
         "$mod, Space, togglefloating"

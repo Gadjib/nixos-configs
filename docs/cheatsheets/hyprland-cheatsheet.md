@@ -11,7 +11,7 @@
 | `SUPER+E` | dolphin |
 | `SUPER+B` | firefox |
 | `SUPER+V` | cliphist rofi menu |
-| `Print` | area screenshot to swappy |
+| `Print` | area screenshot to clipboard |
 | `SUPER+F` | fullscreen |
 | `SUPER+Space` | floating |
 | `SUPER+H/J/K/L` | focus |

@@ -28,7 +28,8 @@ Hyprland - основная Wayland-сессия. KDE Plasma 6 остается 
   вместе с Hyprland, автоматически перезапускается при завершении процесса.
 - `wlogout` вызывается по `SUPER+M`.
 - `rofi -show drun` вызывается по `SUPER+D`.
-- `grim`, `slurp`, `swappy` делают area screenshot по `Print`.
+- `Print` копирует область в буфер; `Ctrl+Print` открывает её в Swappy.
+  Общий обработчик предотвращает повторный запуск во время снятия/редактирования.
 - `cliphist` хранит clipboard history.
 - `nm-applet`, `blueman-applet` и `udiskie` стартуют только вместе с
   `hyprland-session.target`; в Plasma используются штатные KDE-компоненты.
@@ -70,7 +71,7 @@ systemctl --user status xdg-desktop-portal-hyprland
 SUPER+Enter  # kitty
 SUPER+D      # rofi drun
 SUPER+M      # wlogout
-Print        # area screenshot to swappy
+Print        # area screenshot to clipboard
 hyprctl reload
 hyprctl monitors
 ```
