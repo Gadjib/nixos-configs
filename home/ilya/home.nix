@@ -217,6 +217,18 @@ in
   '';
 
   xdg.configFile = {
+    # Replace the app-generated entry that can pin an obsolete store path.
+    # Hidden disables XDG autostart; the normal application launcher remains.
+    "autostart/bitwarden.desktop" = {
+      force = true;
+      text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Bitwarden
+        Hidden=true
+      '';
+    };
+
     "qt5ct/qt5ct.conf".text = ''
       [Appearance]
       color_scheme_path=/home/ilya/.config/qt5ct/colors/catppuccin-macchiato.conf

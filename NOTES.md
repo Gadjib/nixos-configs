@@ -990,18 +990,27 @@ hash mismatch; тогда нужно отдельно проверить нов�
 загрузки побайтово совпали, ZIP/JAR прошли проверку целостности, а подпись JAR
 валидна для `TLauncher Inc.` через Certum Code Signing 2021 CA.
 
-`bitwarden-desktop` установлен по явному решению пользователя и берется из
-закрепленного `nixpkgs-unstable`: stable оставался на Bitwarden `2026.5.0` с
-EOL Electron 39, тогда как unstable предоставляет Bitwarden `2026.7.0` с
-поддерживаемым Electron 41. Не возвращать `electron-39.8.10` в
-`permittedInsecurePackages`; если будущий Bitwarden снова потребует insecure
-runtime, сначала искать обновление или откатывать generation.
+`bitwarden-desktop` установлен через Home Manager из закреплённого
+`nixpkgs-unstable`: версия `2026.8.0`, Electron `43.4.1`. Не возвращать
+устаревший Electron в `permittedInsecurePackages`.
 
-Bitwarden Desktop не имеет декларативного автозапуска: нет XDG autostart
-entry, user systemd service или Hyprland `exec-once`. Он запускается только
-вручную. Сам пакет, vault data, polkit policy и SSH-agent integration при этом
-остаются установленными. Не включать `Start automatically on login` в UI,
-иначе Bitwarden снова создаст runtime-autostart вне Home Manager.
+Bitwarden запускается вручную через обычный desktop entry (`Exec=bitwarden %U`)
+и актуальный пользовательский профиль. Home Manager управляет
+`~/.config/autostart/bitwarden.desktop` с `Hidden=true` и `force=true`:
+при активации заменяет созданный приложением автозапуск, который мог ссылаться
+на старую версию в `/nix/store` (обнаружен путь к `2026.7.0`). Нет user systemd
+service или Hyprland `exec-once` для Bitwarden. Не включать
+`Start automatically on login` в UI: автозапуск намеренно отключён.
+Данные vault, настройки аккаунта, polkit policy и SSH-agent integration
+не изменяются. Применение конфигурации не закрывает уже работающий Bitwarden:
+для перехода на текущую версию нужно полностью завершить его и запустить снова.
+
+В Linux-реализации Bitwarden `2026.8.0` ключ для биометрической разблокировки
+держится в памяти процесса. После полного перезапуска сначала нужна
+разблокировка мастер-паролем, затем проверка через «Заблокировать» и отпечаток.
+Серая кнопка до первой разблокировки сама по себе не доказывает сбой fprintd.
+Исправление автозапуска устраняет запуск старого пакета; восстановление
+биометрии требует отдельной проверки в рабочем сеансе.
 
 Bitwarden SSH Agent ожидается по native desktop socket:
 
