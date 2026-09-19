@@ -1028,7 +1028,15 @@ D-Bus activation устраняет отсутствие запуска Secret S
 имени; причинная связь ошибки хранилища с падением ещё не подтверждена.
 После применения проверить через `busctl --user status org.freedesktop.secrets`
 при открытом Bitwarden, затем мастер-пароль → «Заблокировать» → отпечаток.
-Если сессия не подхватила файл активации, выйти и снова войти в рабочий стол.
+После первого применения работающий dbus-broker не подхватил новый файл:
+`ListActivatableNames` не содержал `org.freedesktop.secrets`. Вызов
+`busctl --user call org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus ReloadConfig`
+обновил список без выхода из сессии. Затем `StartServiceByName` для
+`org.freedesktop.secrets` успешно запустил сервис; проверка свойства `Locked`
+у `/org/freedesktop/secrets/collection/kdewallet` вернула `false`.
+В последующей попытке Bitwarden уже дошёл до polkit, но fprintd сообщил
+`Device was already claimed`, затем таймаут устройства. Причина занятости
+сканера не установлена; не считать этот отказ ошибкой запуска Secret Service.
 
 Bitwarden SSH Agent ожидается по native desktop socket:
 
