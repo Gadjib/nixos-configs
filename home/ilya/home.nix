@@ -210,6 +210,14 @@ in
     "${catppuccinKde}/share/color-schemes/${appearance.kde.colorScheme}.colors";
   xdg.configFile."hyprland-mimeapps.list".text = hyprlandMimeApps;
 
+  # KWallet ships activation for KDE-specific names, but clients such as
+  # Bitwarden request the standard Secret Service name directly.
+  xdg.dataFile."dbus-1/services/org.freedesktop.secrets.service".text = ''
+    [D-BUS Service]
+    Name=org.freedesktop.secrets
+    Exec=${pkgs.kdePackages.kwallet}/bin/ksecretd
+  '';
+
   home.activation.clearRofiDrunCache = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -f \
       "$HOME/.cache/rofi-drun-desktop.cache" \

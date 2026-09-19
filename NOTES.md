@@ -1012,6 +1012,24 @@ service или Hyprland `exec-once` для Bitwarden. Не включать
 Исправление автозапуска устраняет запуск старого пакета; восстановление
 биометрии требует отдельной проверки в рабочем сеансе.
 
+Secret Service для приложений предоставляет существующий KWallet (`ksecretd`).
+В `home/ilya/home.nix` Home Manager создаёт пользовательский D-Bus activation
+file `~/.local/share/dbus-1/services/org.freedesktop.secrets.service` с именем
+`org.freedesktop.secrets` и `Exec` из текущего `pkgs.kdePackages.kwallet`.
+Он действует в Hyprland и Plasma и запускает сервис по запросу. Дополнительный
+провайдер хранилища и отдельный постоянно работающий сервис не добавляются.
+Настройки и содержимое KWallet остаются пользовательскими; в установленном
+KWallet `6.26.0` Secret Service API включён по умолчанию. Если кошелёк закрыт,
+может понадобиться его пароль, особенно после входа в систему по отпечатку.
+
+При диагностике Bitwarden `2026.8.0` зарегистрированы ошибки Credential Storage
+`The name is not activatable` и падение renderer Electron с `SIGTRAP`.
+D-Bus activation устраняет отсутствие запуска Secret Service по стандартному
+имени; причинная связь ошибки хранилища с падением ещё не подтверждена.
+После применения проверить через `busctl --user status org.freedesktop.secrets`
+при открытом Bitwarden, затем мастер-пароль → «Заблокировать» → отпечаток.
+Если сессия не подхватила файл активации, выйти и снова войти в рабочий стол.
+
 Bitwarden SSH Agent ожидается по native desktop socket:
 
 ```text
