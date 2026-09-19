@@ -250,16 +250,15 @@ fd -t f . | xargs -r du -h | sort -h | tail
 ```bash
 lsblk
 duf
-yazi /mnt
+yazi ~/media
 ```
 
-In Hyprland, UDisks and the user-level `udiskie` service automatically mount
-removable filesystems below `/run/media/ilya/<label>`. A lifecycle hook creates
-a compatibility symlink at `/mnt/<label>` and removes it after unmount, so the
-usual `yazi /mnt` workflow remains available. In Plasma, udiskie is stopped and
-the native KDE device notifier/automounter owns the same UDisks lifecycle;
-drives remain available below `/run/media/ilya/<label>`, but the Hyprland-only
-`/mnt/<label>` link is not created. Yazi itself does not mount devices.
+В Hyprland UDisks и udiskie автоматически подключают съёмные носители в
+`/run/media/ilya/<label>`. Ссылка `~/media` ведёт в `/run/media/ilya` и доступна
+в обоих рабочих столах. До первого монтирования целевой каталог может
+отсутствовать. В Plasma устройствами управляет штатный механизм KDE.
+Дополнительных ссылок на отдельные флешки в `/mnt` нет. Yazi сам устройства
+не монтирует; безопасное извлечение доступно через Dolphin или трей udiskie.
 
 Домашние SMB-ресурсы автоматически подключаются только при подключении к
 Wi-Fi с SSID, начинающимся с `0xDEADBEEF` (регистр важен):

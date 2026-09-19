@@ -315,21 +315,16 @@ USB removable media:
   and Waybar belong to `hyprland-session.target`, and ordering udiskie after
   the tray would form a systemd target cycle. The `auto` status notifier can
   register before Waybar and appears when the tray becomes available.
-- A udiskie event hook creates compatibility symlinks such as
-  `/mnt/<label> -> /run/media/ilya/<label>`. On name collision it tries
-  `/mnt/<label>-<device>` and never overwrites an existing path. It records
-  ownership in `$XDG_RUNTIME_DIR/udiskie-mnt-links` and removes only its own
-  matching symlink after unmount or device removal.
-- `/mnt` remains the compatibility entrypoint for Yazi and scripts; its group
-  is `users` with mode `0775` so the user hook can maintain direct child
-  symlinks. The internal `/mnt/win_c` automount remains a real, separate
-  mountpoint and is ignored by the hook because it is outside `/run/media/ilya`.
-- At user-service start the hook reconciles already-mounted removable media;
-  at service stop it removes its compatibility links. Real mounts remain under
-  UDisks control at all times.
-- `/mnt/<label>` compatibility links therefore exist only while udiskie is
-  active in Hyprland. Plasma exposes removable media through its native
-  UDisks/Dolphin integration under `/run/media/ilya/<label>`.
+- Home Manager manages `~/media` as an out-of-store symlink to
+  `/run/media/ilya`, usable in both Hyprland and Plasma. UDisks creates the
+  target as needed; before the first mount it may not exist.
+- There are no custom mount event hooks, per-device compatibility links or
+  link-state files. Udiskie startup no longer depends on a link-sync script.
+- `/mnt` has normal `root:root` ownership and mode `0755`; the separate
+  Windows mount `/mnt/win_c` remains configured in `modules/nixos/windows.nix`.
+- At migration, the old service's stop hook can remove links it still tracks.
+  No blanket cleanup of `/mnt` is performed. Inspection before this change
+  found no top-level symlinks there.
 
 Windows partition:
 
@@ -595,7 +590,7 @@ Fish включен системно через `programs.fish.enable = true`.
 - Mako
 - Neovim
 - ручных пакетов `manual.nix`
-- removable media through udiskie and `/mnt` compatibility links
+- removable media through udiskie, available through `~/media`
 - Rofi
 - network menus
 - package installer
