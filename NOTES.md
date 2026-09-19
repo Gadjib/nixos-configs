@@ -957,11 +957,20 @@ Happ получает machine id через Qt `machineUniqueId()`, а на NixO
 этого сервер подписки может видеть пустой HWID и возвращать заглушки вроде
 `App not supported or HWID disabled in settings` вместо реальных узлов.
 
-Hyprland запускает `hyprpolkitagent` через `exec-once`. Это нужно программам,
-которые вызывают `pkexec`: вместо текстового prompt-а в терминале появляется
-графическое окно авторизации. Не возвращать KDE polkit agent для Hyprland без
-причины: KDE Plasma остается fallback-сессией, но Hyprland не должен зависеть
-от KDE agent-а для повседневной авторизации.
+Hyprland использует отдельный `hyprland-polkit-agent.service` с исполняемым
+файлом `pkgs.kdePackages.polkit-kde-agent-1`. Сервис привязан только к
+`hyprland-session.target`, запускается после него и требует
+`XDG_CURRENT_DESKTOP=Hyprland`. Он не запускает Plasma targets. При выходе
+из Hyprland останавливается; в Plasma остаётся штатный `plasma-polkit-agent`
+и KDE-only autostart. `hyprpolkitagent` удалён из пакетов и `exec-once`.
+Причина замены: в версии 0.1.3 сообщения PAM об отпечатке не показывались
+в окне, а ввод блокировался после отправки пароля до завершения проверки.
+
+В общем PAM service `polkit-1` отпечаток проверяется перед паролем;
+`timeout=10`, `max-tries=3` ограничивают обычное ожидание перед fallback.
+Это относится к запросам polkit в обоих рабочих столах. Зависание драйвера
+или fprintd этими параметрами не исправляется. При первом применении нужно
+выйти и снова войти в Hyprland, чтобы завершить старый агент из `exec-once`.
 
 `tlauncher` не приходит из nixpkgs: в текущем `nixos-26.05` есть
 `atlauncher` и `sqlauncher`, но нет пакета `tlauncher`. Поэтому он оформлен

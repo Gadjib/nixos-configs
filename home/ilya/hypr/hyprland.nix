@@ -61,7 +61,6 @@ in
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "swayosd-server"
-        "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent"
       ];
 
       # Stop graphical-session services while the Wayland display is still
@@ -338,6 +337,26 @@ in
       valign = center
     }
   '';
+
+  # Use KDE's standalone agent without starting the Plasma session or targets.
+  # Plasma retains its own plasma-polkit-agent.service and KDE-only autostart.
+  systemd.user.services.hyprland-polkit-agent = {
+    Unit = {
+      Description = "PolicyKit authentication agent for Hyprland";
+      After = [ "hyprland-session.target" ];
+      PartOf = [ "hyprland-session.target" ];
+      ConditionEnvironment = "XDG_CURRENT_DESKTOP=Hyprland";
+    };
+    Service = {
+      Type = "dbus";
+      BusName = "org.kde.polkit-kde-authentication-agent-1";
+      ExecStart = "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1";
+      Restart = "on-failure";
+      RestartSec = 2;
+      TimeoutStopSec = 5;
+    };
+    Install.WantedBy = [ "hyprland-session.target" ];
+  };
 
   systemd.user.services.awww-daemon = {
     Unit = {

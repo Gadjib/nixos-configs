@@ -82,7 +82,14 @@ in
     hyprlock.fprintAuth = false;
 
     sudo.fprintAuth = false;
-    polkit-1.fprintAuth = true;
+    polkit-1 = {
+      fprintAuth = true;
+      # PAM checks fingerprint before password; keep the fallback wait short.
+      rules.auth.fprintd.args = [
+        "timeout=10"
+        "max-tries=3"
+      ];
+    };
   };
 
   # A Home Manager package is not searched by system polkit. Expose only
