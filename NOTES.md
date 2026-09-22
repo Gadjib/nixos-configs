@@ -535,7 +535,7 @@ accelerated video decoder. `libva-utils` установлен для прове�
 `programs.adb` и группа `adbusers` в NixOS 26.05 не нужны: systemd 258+ выдает
 доступ к подключенному Android-устройству через `uaccess` активному локальному
 пользователю.
-В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Thunar,
+В `environment.systemPackages` находятся Kitty, Dolphin, Kate, Krita, Thunar,
 `nwg-look`, `qt5ct`, `qt6ct`, Papirus, Bibata, pavucontrol, blueman,
 brightness/audio helpers, hardware/network diagnostics including `efibootmgr`
 и `os-prober`, compiler/dev tools. Codex берется из отдельного

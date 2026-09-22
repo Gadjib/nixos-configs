@@ -38,6 +38,7 @@
     kdePackages.gwenview
     kdePackages.okular
     kdePackages.ark
+    krita
     thunar
     nwg-look
     libsForQt5.qt5ct
