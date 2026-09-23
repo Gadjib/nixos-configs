@@ -39,6 +39,7 @@
     kdePackages.okular
     kdePackages.ark
     krita
+    gimp
     thunar
     nwg-look
     libsForQt5.qt5ct
