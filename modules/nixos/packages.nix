@@ -33,6 +33,7 @@
     os-prober
 
     kitty
+    thunderbird
     kdePackages.dolphin
     kdePackages.kate
     kdePackages.gwenview
