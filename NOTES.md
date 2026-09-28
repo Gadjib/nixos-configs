@@ -1153,7 +1153,8 @@ Monitor scaling is set in Hyprland, not by manually increasing every app font:
 
 ```nix
 monitor = [
-  "HDMI-A-1,1920x1200@59.95,0x0,1.25,mirror,eDP-1"
+  "eDP-1,preferred,0x0,1.25"
+  "HDMI-A-1,1920x1080@60,1536x0,1.25"
   ",preferred,auto,1.25"
 ];
 ```
@@ -1164,15 +1165,20 @@ native Wayland applications and desktop components. Avoid also adding global
 double-scale parts of the UI. KDE may still have its own scaling behavior
 because it is preserved as a separate fallback session.
 
-The laptop panel is `eDP-1` and the physical HDMI connector is `HDMI-A-1`.
-Hyprland applies the explicit HDMI monitor rule automatically on hotplug and
-mirrors `eDP-1` onto it. The explicit `1920x1200@59.95` mode is supported by the
-tested EPSON projector and matches the laptop panel's 1920x1200 aspect ratio;
-do not use `preferred` here because that projector incorrectly advertises
-1024x768 as preferred, which also forces Hyprland away from the requested 1.25
-scale. The generic fallback rule remains in place for all other outputs, so the
-built-in panel and non-HDMI outputs retain their previous preferred-mode,
-automatic-position and `1.25` scale behavior.
+The laptop panel is `eDP-1` and remains at its native 1920x1200 (16:10). The
+physical `HDMI-A-1` connector sends the tested EPSON projector an explicit
+1920x1080@60 (16:9) signal; do not use `preferred` because the projector
+incorrectly advertises 1024x768 as preferred.
+
+Native Hyprland mirroring fits 16:10 into 16:9 but uses the full 1080-pixel
+height, which lets this projector's unavoidable HDMI overscan crop the top and
+bottom edges. Instead, `hyprland-projector-layout.service` keeps HDMI as a
+separate FHD output and starts `hyprland-projector-mirror.service` on hotplug.
+The latter runs `wl-mirror` on a dedicated `projector` workspace. Its logical
+1280x800 window becomes 1600x1000 physical pixels at scale 1.25, centered in
+the 1920x1080 signal. This preserves the laptop's 16:10 aspect ratio and leaves
+160-pixel side margins plus 40-pixel top/bottom margins for overscan. Normal
+workspaces are moved back to `eDP-1`; disconnecting HDMI stops the mirror.
 
 XWayland is intentionally kept at scale `1` independently of the Wayland scale:
 
