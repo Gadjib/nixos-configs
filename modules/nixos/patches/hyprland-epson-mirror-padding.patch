@@ -1,0 +1,29 @@
+diff --git a/src/render/Renderer.cpp b/src/render/Renderer.cpp
+--- a/src/render/Renderer.cpp
++++ b/src/render/Renderer.cpp
+@@ -1942,3 +1942,15 @@
++// Local Epson overscan compensation, shared by rendering and damage mapping.
++// Fit the complete 1920x1200 source into 1600x1000 within the 1920x1080
++// HDMI signal. Other displays and modes retain upstream behavior.
++static double mirrorSafeAreaScale(PHLMONITORREF monitor) {
++    if (monitor->m_name == "HDMI-A-1" && monitor->m_description.starts_with("Seiko Epson Corporation EPSON PJ") &&
++        monitor->m_transformedSize == Vector2D(1920, 1080) && monitor->m_mirrorOf && monitor->m_mirrorOf->m_name == "eDP-1" &&
++        monitor->m_mirrorOf->m_transformedSize == Vector2D(1920, 1200))
++        return 1000.0 / 1080.0;
++
++    return 1.0;
++}
++
+ void IHyprRenderer::renderMirrored() {
+     auto monitor  = m_renderData.pMonitor;
+     auto mirrored = monitor->m_mirrorOf;
+@@ -1951,2 +1963,2 @@
+-    const double scale  = std::min(monitor->m_transformedSize.x / mirrored->m_transformedSize.x, monitor->m_transformedSize.y / mirrored->m_transformedSize.y);
++    const double scale  = std::min(monitor->m_transformedSize.x / mirrored->m_transformedSize.x, monitor->m_transformedSize.y / mirrored->m_transformedSize.y) * mirrorSafeAreaScale(monitor);
+     CBox         monbox = {0, 0, mirrored->m_transformedSize.x * scale, mirrored->m_transformedSize.y * scale};
+@@ -2783,4 +2795,4 @@
+-        double scale  = std::min(monitor->m_transformedSize.x / pMonitor->m_transformedSize.x, monitor->m_transformedSize.y / pMonitor->m_transformedSize.y);
++        double scale  = std::min(monitor->m_transformedSize.x / pMonitor->m_transformedSize.x, monitor->m_transformedSize.y / pMonitor->m_transformedSize.y) * mirrorSafeAreaScale(monitor);
+         CBox   monbox = {0, 0, pMonitor->m_transformedSize.x * scale, pMonitor->m_transformedSize.y * scale};
+         monbox.x      = (monitor->m_transformedSize.x - monbox.w) / 2;
+         monbox.y      = (monitor->m_transformedSize.y - monbox.h) / 2;

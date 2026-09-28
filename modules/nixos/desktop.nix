@@ -8,6 +8,16 @@ let
   '';
 in
 {
+  # Keep native mirroring (no extra workspace/window), with overscan margins
+  # only for the connected Epson projector. Home Manager uses global pkgs too.
+  nixpkgs.overlays = [
+    (final: prev: {
+      hyprland = prev.hyprland.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./patches/hyprland-epson-mirror-padding.patch ];
+      });
+    })
+  ];
+
   services.xserver.enable = true;
 
   services.displayManager.sddm = {

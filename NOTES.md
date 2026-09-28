@@ -1154,7 +1154,7 @@ Monitor scaling is set in Hyprland, not by manually increasing every app font:
 ```nix
 monitor = [
   "eDP-1,preferred,0x0,1.25"
-  "HDMI-A-1,1920x1080@60,1536x0,1.25"
+  "HDMI-A-1,1920x1080@60,0x0,1.25,mirror,eDP-1"
   ",preferred,auto,1.25"
 ];
 ```
@@ -1170,15 +1170,26 @@ physical `HDMI-A-1` connector sends the tested EPSON projector an explicit
 1920x1080@60 (16:9) signal; do not use `preferred` because the projector
 incorrectly advertises 1024x768 as preferred.
 
-Native Hyprland mirroring fits 16:10 into 16:9 but uses the full 1080-pixel
-height, which lets this projector's unavoidable HDMI overscan crop the top and
-bottom edges. Instead, `hyprland-projector-layout.service` keeps HDMI as a
-separate FHD output and starts `hyprland-projector-mirror.service` on hotplug.
-The latter runs `wl-mirror` on a dedicated `projector` workspace. Its logical
-1280x800 window becomes 1600x1000 physical pixels at scale 1.25, centered in
-the 1920x1080 signal. This preserves the laptop's 16:10 aspect ratio and leaves
-160-pixel side margins plus 40-pixel top/bottom margins for overscan. Normal
-workspaces are moved back to `eDP-1`; disconnecting HDMI stops the mirror.
+HDMI uses native Hyprland mirroring: no additional logical desktop, mirror
+window, workspace or hotplug service. Laptop resolution, scale, workspaces,
+focus and pointer navigation retain their normal behavior. Waybar remains on
+eDP-1 and is included in the mirrored framebuffer.
+
+Hyprland 0.55.4 already fits mirrors proportionally, but offers no configurable
+extra padding. The local patch `modules/nixos/patches/hyprland-epson-mirror-padding.patch`
+adds a safe-area factor to both mirror rendering and damage mapping. Only an
+EPSON PJ on HDMI-A-1 at 1920x1080 mirroring eDP-1 at 1920x1200 is affected:
+the whole source is scaled to 1600x1000, centered with black margins of 160 px
+left/right and 40 px top/bottom. The signal remains FHD; the useful picture is
+1600x1000. Margin sufficiency must be verified visually on the projector.
+Other mirror destinations retain upstream rendering behavior.
+
+`modules/nixos/desktop.nix` applies the patch through a Hyprland package overlay
+shared with Home Manager. This requires compiling Hyprland and starting a new
+Hyprland session after switch; config reload alone cannot update the running
+renderer. Recheck patch application and both geometry paths on Hyprland updates.
+The previous wl-mirror services and projector-layout.sh have been removed;
+their earlier implementation is recoverable from commit b0c0238.
 
 XWayland is intentionally kept at scale `1` independently of the Wayland scale:
 

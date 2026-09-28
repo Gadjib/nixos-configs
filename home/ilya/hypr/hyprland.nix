@@ -7,12 +7,6 @@ let
     runtimeInputs = with pkgs; [ coreutils util-linux grim slurp wl-clipboard swappy ];
     text = builtins.readFile ./screenshot.sh;
   };
-  projectorX = builtins.floor (1920 / appearance.scale);
-  projectorLayout = pkgs.writeShellApplication {
-    name = "hyprland-projector-layout";
-    runtimeInputs = with pkgs; [ awww coreutils hyprland jq socat systemd ];
-    text = builtins.readFile ./projector-layout.sh;
-  };
   wallpaper = ../../../assets/wallpapers/wallhaven-2eqpzm.png;
   allowIdleScreenAction = pkgs.writeShellScript "allow-hypridle-screen-action" ''
     hdmi_status=disconnected
@@ -39,7 +33,7 @@ in
 
       monitor = [
         "eDP-1,preferred,0x0,${toString appearance.scale}"
-        "HDMI-A-1,1920x1080@60,${toString projectorX}x0,${toString appearance.scale}"
+        "HDMI-A-1,1920x1080@60,0x0,${toString appearance.scale},mirror,eDP-1"
         ",preferred,auto,${toString appearance.scale}"
       ];
 
@@ -272,17 +266,6 @@ in
 
       windowrule = [
         "match:class .*, idle_inhibit fullscreen"
-        "match:title ^(Projector Mirror)$, float on"
-        "match:title ^(Projector Mirror)$, monitor HDMI-A-1"
-        "match:title ^(Projector Mirror)$, workspace name:projector silent"
-        "match:title ^(Projector Mirror)$, size 1280 800"
-        "match:title ^(Projector Mirror)$, center on"
-        "match:title ^(Projector Mirror)$, no_initial_focus on"
-        "match:title ^(Projector Mirror)$, border_size 0"
-        "match:title ^(Projector Mirror)$, rounding 0"
-        "match:title ^(Projector Mirror)$, no_shadow on"
-        "match:title ^(Projector Mirror)$, no_anim on"
-        "match:title ^(Projector Mirror)$, opaque on"
         "match:class ^(pavucontrol)$, float on"
         "match:class ^(blueman-manager)$, float on"
         "match:class ^(firefox)$, workspace 2"
@@ -290,9 +273,6 @@ in
         "match:title ^(Picture-in-Picture)$, pin on"
       ];
 
-      workspace = [
-        "name:projector, monitor:HDMI-A-1, default:true"
-      ];
     };
   };
 
@@ -302,33 +282,6 @@ in
   systemd.user.targets.hyprland-session.Unit = {
     Requires = [ "hyprland-desktop-session-profile.service" ];
     PropagatesStopTo = [ "graphical-session.target" ];
-  };
-
-  systemd.user.services.hyprland-projector-layout = {
-    Unit = {
-      Description = "Configure the Hyprland projector layout on HDMI hotplug";
-      After = [ "hyprland-session.target" ];
-      PartOf = [ "hyprland-session.target" ];
-    };
-    Service = {
-      ExecStart = "${projectorLayout}/bin/hyprland-projector-layout ${toString appearance.scale} ${toString projectorX}";
-      Restart = "on-failure";
-      RestartSec = 2;
-    };
-    Install.WantedBy = [ "hyprland-session.target" ];
-  };
-
-  systemd.user.services.hyprland-projector-mirror = {
-    Unit = {
-      Description = "Mirror the laptop panel into the projector safe area";
-      After = [ "hyprland-session.target" ];
-      PartOf = [ "hyprland-session.target" ];
-    };
-    Service = {
-      ExecStart = "${pkgs.wl-mirror}/bin/wl-mirror --title 'Projector Mirror' --scaling fit eDP-1";
-      Restart = "on-failure";
-      RestartSec = 2;
-    };
   };
 
   services.hypridle = {
