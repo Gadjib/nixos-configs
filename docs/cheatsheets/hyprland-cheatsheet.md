@@ -13,13 +13,23 @@
 | `SUPER+V` | cliphist rofi menu |
 | `Print` | area screenshot to clipboard |
 | `SUPER+F` | fullscreen |
+| `SUPER+Shift+F` | maximize with Waybar visible |
 | `SUPER+Space` | floating |
+| `SUPER+C` | center floating window |
+| `SUPER+X` | pin floating window |
+| `SUPER+Tab` / `SUPER+Shift+Tab` | next / previous recent window |
 | `SUPER+H/J/K/L` | focus |
 | `SUPER+Shift+H/J/K/L` | move window |
+| `SUPER+Ctrl+H/J/K/L` | resize window |
+| `SUPER+[` / `SUPER+]` | previous / next existing workspace |
+| ``SUPER+` `` | previous workspace |
+| `SUPER+mouse wheel` | previous / next existing workspace |
 | `SUPER+1..0` | workspace 1..10 |
 | `SUPER+CTRL+1..0` | workspace 11..20 |
-| `SUPER+CTRL+Shift+1..0` | move to workspace 11..20 |
-| `SUPER+Shift+1..0` | move to workspace |
+| `SUPER+CTRL+Shift+1..0` | send to workspace 11..20 silently |
+| `SUPER+Shift+1..0` | send to workspace 1..10 silently |
+| `SUPER+S` | toggle special workspace `magic` |
+| `SUPER+Shift+S` | move window to `magic` |
 
 ## Waybar/Mako
 

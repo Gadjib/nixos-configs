@@ -111,6 +111,7 @@ nixosConfigurations.thinkpad-nix
 ├── hosts/nixos/configuration.nix
 ├── modules/nixos/
 │   ├── desktop.nix
+│   ├── docker.nix
 │   ├── happ.nix
 │   ├── throne.nix
 │   ├── nix.nix
@@ -568,12 +569,19 @@ browser integration и Bitwarden SSH agent; при функциональной 
 users.users.ilya = {
   isNormalUser = true;
   description = "ilya";
-  extraGroups = [ "networkmanager" "wheel" ];
+  extraGroups = [ "networkmanager" "wheel" "docker" ];
   shell = pkgs.fish;
 };
 ```
 
 Fish включен системно через `programs.fish.enable = true`.
+
+### `modules/nixos/docker.nix`
+
+Включает системный Docker daemon через `virtualisation.docker.enable = true`.
+Пользователь `ilya` состоит в группе `docker`, поэтому после следующего входа в
+графическую сессию может запускать Docker без `sudo`. Эта группа имеет доступ к
+привилегированному Docker daemon и по сути эквивалентна root-доступу.
 
 ## Home Manager
 
@@ -1280,9 +1288,19 @@ Shift+Print       copy the entire output to the clipboard
 Ctrl+Print        select an area and open it in Swappy
 Ctrl+Shift+Print  capture the entire output and open it in Swappy
 SUPER+F           fullscreen
+SUPER+Shift+F     maximize while keeping Waybar visible
 SUPER+Space       floating toggle
 SUPER+P           pseudo
 SUPER+O           layoutmsg togglesplit
+SUPER+C           center a floating window
+SUPER+X           pin a floating window on all workspaces
+SUPER+Tab         next window in focus history
+SUPER+Shift+Tab   previous window in focus history
+SUPER+Ctrl+arrows resize the active window
+SUPER+Ctrl+H/J/K/L resize the active window, Vim-style
+SUPER+[/]         previous/next existing workspace
+SUPER+`           previous workspace
+SUPER+mouse wheel previous/next existing workspace
 ```
 
 All four screenshot bindings use `home/ilya/hypr/screenshot.sh`, packaged with
@@ -1296,8 +1314,8 @@ Workspaces:
 
 - `SUPER+1..9,0` -> workspace 1..10
 - `SUPER+CTRL+1..9,0` -> workspace 11..20
-- `SUPER+CTRL+SHIFT+1..9,0` -> move window to workspace 11..20
-- `SUPER+Shift+1..9,0` -> move window to workspace 1..10
+- `SUPER+CTRL+SHIFT+1..9,0` -> send window to workspace 11..20 without following it
+- `SUPER+Shift+1..9,0` -> send window to workspace 1..10 without following it
 
 Mouse:
 

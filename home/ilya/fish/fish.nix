@@ -56,7 +56,7 @@ in
         fzf --fish | source
       end
 
-      set -gx SSH_AUTH_SOCK /home/ilya/.bitwarden-ssh-agent.sock
+      set -gx SSH_AUTH_SOCK "$HOME/.bitwarden-ssh-agent.sock"
     '';
     shellAliases = {
       ls = "eza --icons --group-directories-first";

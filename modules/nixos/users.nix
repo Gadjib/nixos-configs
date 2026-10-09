@@ -6,7 +6,7 @@
   users.users.ilya = {
     isNormalUser = true;
     description = "ilya";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.fish;
   };
 }

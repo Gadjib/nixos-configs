@@ -40,6 +40,7 @@ in
     ../../hardware-configuration.nix
     ../../modules/nixos/compat.nix
     ../../modules/nixos/nix.nix
+    ../../modules/nixos/docker.nix
     ../../modules/nixos/desktop.nix
     ../../modules/nixos/happ.nix
     ../../modules/nixos/throne.nix
