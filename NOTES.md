@@ -845,6 +845,11 @@ MPV установлен декларативно как `pkgs.mpv` в спис�
 Obsidian установлен обычным пакетом `pkgs.obsidian` из закрепленного nixpkgs;
 отдельный wrapper или системный модуль для него не используется.
 
+OpenTTD установлен как `pkgs.openttd` в списке ручных пользовательских пакетов.
+Пакет включает свободные базовые графику, звук и музыку; Waybar сопоставляет
+ожидаемый класс `OpenTTD` с иконкой поезда. После первого запуска класс нужно
+сверить через `hyprctl clients`.
+
 LibreOffice установлен как `pkgs.libreoffice-qt6`, чтобы использовать уже
 настроенную KDE/Qt6 integration в Hyprland. Declarative MIME associations
 направляют Word/RTF/ODT в Writer, Excel/ODS в Calc и PowerPoint/ODP в Impress.

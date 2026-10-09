@@ -20,5 +20,6 @@
     obsidian
     libreoffice-qt6
     openmw
+    openttd
   ];
 }

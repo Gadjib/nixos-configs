@@ -53,6 +53,7 @@
           "class<([Tt]hunar)>" = " ";
           "class<[Oo]bsidian>" = " 󰠮";
           "class<([Ss]team|steam_app_.*)>" = " ";
+          "class<([Oo]penTTD)>" = " ";
           "class<([Tt][Ll]auncher|Minecraft.*)>" = " ";
           "class<(org\\.prismlauncher\\.PrismLauncher|prismlauncher)>" = " ";
           "class<(com\\.moonlight_stream\\.Moonlight|[Mm]oonlight)>" = " ";
