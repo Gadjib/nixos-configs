@@ -490,8 +490,11 @@ with `ipv6.method=auto` otherwise keep trying to create link-local addresses and
 can fill the journal with retries. The matching dispatcher applies the same
 setting to newly created Wi-Fi, Ethernet and VPN profiles and updates their
 active device immediately. Both scripts identify profiles by UUID and change
-only `ipv6.method`; Wi-Fi secrets remain in NetworkManager storage and are never
-copied into Nix or logs.
+the IPv6 fields atomically: addresses, gateway, routes, routing rules and DNS
+settings are cleared before `ipv6.method=disabled` is applied. NetworkManager
+rejects the disabled method while a static address remains, which is especially
+relevant for imported WireGuard profiles. Wi-Fi secrets remain in NetworkManager
+storage and are never copied into Nix or logs.
 
 Do not add the kernel parameter `ipv6.disable=1` while Happ uses sing-box TUN
 mode. It removes the kernel AF_INET6 routing API and `/proc/sys/net/ipv6`

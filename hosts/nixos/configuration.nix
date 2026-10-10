@@ -30,7 +30,14 @@ let
 
     ipv6_method="$(${nmcli} -g ipv6.method connection show uuid "$connection_uuid" 2>/dev/null)" || ipv6_method=""
     if [ "$ipv6_method" != "disabled" ]; then
-      ${nmcli} connection modify uuid "$connection_uuid" ipv6.method disabled
+      ${nmcli} connection modify uuid "$connection_uuid" \
+        ipv6.addresses "" \
+        ipv6.gateway "" \
+        ipv6.routes "" \
+        ipv6.routing-rules "" \
+        ipv6.dns "" \
+        ipv6.dns-search "" \
+        ipv6.method disabled
       ${nmcli} device modify "$interface" ipv6.method disabled || true
     fi
   '';
@@ -92,7 +99,14 @@ in
 
         ipv6_method="$(${nmcli} -g ipv6.method connection show uuid "$connection_uuid" 2>/dev/null)" || ipv6_method=""
         if [ "$ipv6_method" != "disabled" ]; then
-          ${nmcli} connection modify uuid "$connection_uuid" ipv6.method disabled
+          ${nmcli} connection modify uuid "$connection_uuid" \
+            ipv6.addresses "" \
+            ipv6.gateway "" \
+            ipv6.routes "" \
+            ipv6.routing-rules "" \
+            ipv6.dns "" \
+            ipv6.dns-search "" \
+            ipv6.method disabled
         fi
       done < <(${nmcli} -t -f UUID,TYPE connection show)
 
