@@ -14,6 +14,7 @@
     texliveFull
     prismlauncher
     (callPackage ./tlauncher.nix { })
+    (callPackage ./artcraft-launcher.nix { })
     qbittorrent
     zip
     (callPackage ./spotify.nix { })

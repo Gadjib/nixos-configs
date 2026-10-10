@@ -1012,6 +1012,14 @@ hash mismatch; тогда нужно отдельно проверить нов�
 загрузки побайтово совпали, ZIP/JAR прошли проверку целостности, а подпись JAR
 валидна для `TLauncher Inc.` через Certum Code Signing 2021 CA.
 
+ArtCraft Launcher установлен локальным derivation
+`home/ilya/packages/artcraft-launcher.nix` из официального Linux `tar.gz`.
+Версия и SHA-256 закреплены в конфиге; self-update лаунчера в `/nix/store`
+работать не должен, поэтому новые версии обновляются через derivation. Сам
+ArtCraft на Linux без `apt`/`dnf` устанавливает приложения как AppImage в
+`~/Applications`. Для их запуска `modules/nixos/compat.nix` включает
+`programs.appimage.enable` и регистрацию binfmt.
+
 `bitwarden-desktop` установлен через Home Manager из закреплённого
 `nixpkgs-unstable`: версия `2026.8.0`, Electron `43.4.1`. Не возвращать
 устаревший Electron в `permittedInsecurePackages`.
