@@ -22,5 +22,6 @@
     libreoffice-qt6
     openmw
     openttd
+    zed-editor
   ];
 }

@@ -861,6 +861,9 @@ OpenTTD установлен как `pkgs.openttd` в списке ручных 
 ожидаемый класс `OpenTTD` с иконкой поезда. После первого запуска класс нужно
 сверить через `hyprctl clients`.
 
+Zed установлен как `pkgs.zed-editor` из закрепленного stable nixpkgs. Команда
+запуска пакета — `zeditor`; desktop entry добавляет Zed в графическое меню.
+
 LibreOffice установлен как `pkgs.libreoffice-qt6`, чтобы использовать уже
 настроенную KDE/Qt6 integration в Hyprland. Declarative MIME associations
 направляют Word/RTF/ODT в Writer, Excel/ODS в Calc и PowerPoint/ODP в Impress.
