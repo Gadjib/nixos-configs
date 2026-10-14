@@ -142,6 +142,19 @@ in
   };
 
   services.printing.enable = true;
+  services.printing.drivers = [ pkgs.splix ];
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "Samsung_SCX_4623";
+        description = "Samsung SCX-4623 Series";
+        deviceUri = "socket://192.168.0.35:9100";
+        model = "samsung/scx4623f.ppd";
+        ppdOptions.PageSize = "A4";
+      }
+    ];
+    ensureDefaultPrinter = "Samsung_SCX_4623";
+  };
 
   nixpkgs.config.allowUnfree = true;
 
