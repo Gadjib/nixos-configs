@@ -45,6 +45,7 @@
           "class<(org\\.qbittorrent\\.qBittorrent|[Qq][Bb]ittorrent)>" = " ";
           "class<([Dd]iscord|discordcanary)>" = " ";
           "class<spotify>" = " ";
+          "class<(REAPER|[Rr]eaper|cockos-reaper)>" = " ";
           "class<([Vv][Ll][Cc])>" = " ";
           "class<Happ>" = " 󰒍";
           "class<Throne>" = " 󰒍";

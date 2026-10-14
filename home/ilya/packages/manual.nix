@@ -23,5 +23,6 @@
     openmw
     openttd
     zed-editor
+    reaper
   ];
 }

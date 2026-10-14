@@ -876,6 +876,11 @@ OpenTTD установлен как `pkgs.openttd` в списке ручных 
 Zed установлен как `pkgs.zed-editor` из закрепленного stable nixpkgs. Команда
 запуска пакета — `zeditor`; desktop entry добавляет Zed в графическое меню.
 
+REAPER установлен как `pkgs.reaper` из закрепленного stable nixpkgs через
+`home/ilya/packages/manual.nix`. Запуск — `reaper` или ярлык REAPER в меню.
+Waybar использует музыкальную иконку для ожидаемых классов `REAPER`, `Reaper`,
+`reaper` и `cockos-reaper`; реальный класс проверить после первого запуска.
+
 LibreOffice установлен как `pkgs.libreoffice-qt6`, чтобы использовать уже
 настроенную KDE/Qt6 integration в Hyprland. Declarative MIME associations
 направляют Word/RTF/ODT в Writer, Excel/ODS в Calc и PowerPoint/ODP в Impress.
