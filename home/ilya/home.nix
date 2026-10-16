@@ -7,6 +7,18 @@
 }:
 
 let
+  # Upstream-supported workaround for memfd_secret blocking hibernation.
+  # Scope the backend to Bitwarden; mlock permits keys in a hibernation image.
+  bitwarden = pkgs.symlinkJoin {
+    name = "bitwarden-hibernate-${pkgsUnstable.bitwarden-desktop.version}";
+    paths = [ pkgsUnstable.bitwarden-desktop ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram "$out/bin/bitwarden" \
+        --set SECURE_KEY_CONTAINER_BACKEND mlock
+    '';
+    meta = pkgsUnstable.bitwarden-desktop.meta;
+  };
   appearance = import ./appearance.nix { inherit pkgs; };
   catppuccinGtk = pkgs.catppuccin-gtk.override {
     variant = appearance.gtk.variant;
@@ -144,7 +156,7 @@ in
     wl-clipboard
     cliphist
     xdg-utils
-    pkgsUnstable.bitwarden-desktop
+    bitwarden
     pkgsTelegram.telegram-desktop
     moonlight-qt
     networkmanagerapplet

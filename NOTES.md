@@ -1047,6 +1047,22 @@ ArtCraft на Linux без `apt`/`dnf` устанавливает приложе
 `nixpkgs-unstable`: версия `2026.8.0`, Electron `43.4.1`. Не возвращать
 устаревший Electron в `permittedInsecurePackages`.
 
+В `home/ilya/home.nix` пакет Bitwarden обёрнут через `symlinkJoin` и
+`makeWrapper`: только его процесс получает `SECURE_KEY_CONTAINER_BACKEND=mlock`.
+Это штатный обход upstream issue https://github.com/bitwarden/clients/issues/21661:
+backend `memfd_secret` блокировал гибернацию всего ноутбука даже при закрытом
+vault. После полного выхода из Bitwarden `/sys/power/disk` снова показывал
+`platform`, и пользователь проверил успешную гибернацию и восстановление.
+`mlock` предотвращает обычную выгрузку ключей в swap, но допускает их попадание
+в образ гибернации; текущий ext4-раздел со swapfile не зашифрован. Это
+осознанный компромисс совместимости, а не сохранение гарантий `memfd_secret`.
+`keyctl` не выбран из-за upstream сообщений о сбоях этого backend.
+Desktop entry (`Exec=bitwarden %U`) использует тот же wrapper, что и терминал;
+глобальная переменная окружения и отключение secretmem в ядре не нужны.
+После применения полностью выйти из старого Bitwarden и запустить заново,
+разблокировать vault, проверить `/sys/power/disk` и биометрию/SSH agent.
+В app.log ожидается `Forcing mlock secure key container via environment variable`.
+
 Bitwarden запускается вручную через обычный desktop entry (`Exec=bitwarden %U`)
 и актуальный пользовательский профиль. Home Manager управляет
 `~/.config/autostart/bitwarden.desktop` с `Hidden=true` и `force=true`:
