@@ -20,11 +20,11 @@
 
 stdenv.mkDerivation {
   pname = "happ";
-  version = "3.3.6";
+  version = "4.5.4";
 
   src = fetchurl {
-    url = "https://github.com/Happ-proxy/happ-desktop/releases/download/3.3.6/Happ.linux.x64.pkg.tar.zst";
-    hash = "sha256-MOr9mZrVqZx8uOp4DEJp9/5sTu2x31AjTk+0SqDH2Kc=";
+    url = "https://github.com/Happ-proxy/happ-desktop/releases/download/4.5.4/Happ.linux.x64.pkg.tar.zst";
+    hash = "sha256-KTn+5IPjRJ3AA4b1OQXKPvP+Mja4HjntWEYT6MZFjyo=";
   };
 
   nativeBuildInputs = [

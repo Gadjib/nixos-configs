@@ -76,6 +76,20 @@ Push в remote не делать после каждого commit. Нормал�
 - Основной рабочий desktop: Hyprland
 - Fallback desktop: KDE Plasma через SDDM
 
+Все пять flake inputs обновлены 2026-10-16 в пределах существующих веток:
+основная система остаётся на `nixos-26.05`, Home Manager — `release-26.05`.
+Обновление lock-файла само по себе не применяет систему; после проверки и
+commit пользователь выполняет `rebuild-switch`. В этом наборе Hyprland
+остаётся `0.55.4`; обновление пакетов не является подтверждённым исправлением
+проблемы кликов в медиапросмотрщике Telegram на native Wayland.
+Evaluation (`nix flake check --no-build`) и dry-run прошли. Online dry-run
+2026-10-16 показывает 3817 загружаемых store paths (10.4 GiB загрузки,
+28.2 GiB распакованных данных) и 1086 derivations для сборки, включая
+локально патченный Hyprland, Happ и ArtCraft, wrappers и системные файлы.
+Полная сборка и runtime-проверка новых версий до применения пользователем
+не выполнены. Offline dry-run не учитывает доступность бинарного кэша и
+сильно завышает число локальных сборок.
+
 ## Инварианты
 
 `hardware-configuration.nix` не трогать без крайней необходимости. Если кажется,
@@ -561,9 +575,9 @@ Bitwarden Desktop остается на отдельном `nixpkgs-unstable` in
 Так security-sensitive приложения обновляются точечно без перевода
 всей системы на unstable/master. Home Manager получает
 `pkgsUnstable` через `home-manager.extraSpecialArgs`.
-Текущий pin `nixpkgs-codex` от `2026-09-11` предоставляет Codex CLI
-`0.154.0`; pin `nixpkgs-unstable` от `2026-09-05` — Bitwarden Desktop
-`2026.8.0`. Bitwarden использует поддерживаемый Electron `43.4.1`;
+Текущий pin `nixpkgs-codex` от `2026-10-16` предоставляет Codex CLI
+`0.162.1`; pin `nixpkgs-unstable` от `2026-10-14` — Bitwarden Desktop
+`2026.9.1`. Версию Electron выбирает upstream derivation Bitwarden;
 глобального исключения `permittedInsecurePackages` для старого Electron нет.
 После обновления input нужно проверить запуск Codex, разблокировку vault,
 browser integration и Bitwarden SSH agent; при функциональной регрессии
@@ -933,7 +947,7 @@ Rofi молча завершались с кодом 1. Это runtime cleanup, 
 
 `happ` не приходит из nixpkgs и установлен локальным derivation
 `home/ilya/packages/happ.nix` из official GitHub release
-`Happ-proxy/happ-desktop` версии `3.3.6`. Пакет использует upstream asset
+`Happ-proxy/happ-desktop` версии `4.5.4`. Пакет использует upstream asset
 `Happ.linux.x64.pkg.tar.zst` с pinned SHA-256, переносит bundled Qt desktop
 application в `/nix/store`, создает wrapper `happ` и desktop entry для launcher-а.
 OpenSSL добавлен в runtime dependencies намеренно: без него bundled Qt TLS
@@ -1034,9 +1048,14 @@ hash mismatch; тогда нужно отдельно проверить нов�
 Текущий seed `2026-08-14` повторно загружен и проверен 2026-08-20: обе
 загрузки побайтово совпали, ZIP/JAR прошли проверку целостности, а подпись JAR
 валидна для `TLauncher Inc.` через Certum Code Signing 2021 CA.
+При обновлении 2026-10-16 upstream ZIP повторно загружен: SHA-256 остался
+прежним, поэтому версия seed и hash не изменены. Пользовательский self-update
+JAR отдельно от Nix этим обновлением не затрагивается.
 
 ArtCraft Launcher установлен локальным derivation
-`home/ilya/packages/artcraft-launcher.nix` из официального Linux `tar.gz`.
+`home/ilya/packages/artcraft-launcher.nix` из официального Linux `tar.gz`,
+версия `0.4.1`. Архивы ArtCraft и Happ загружены при обновлении 2026-10-16;
+их SHA-256 совпали с digest соответствующих GitHub release assets.
 Версия и SHA-256 закреплены в конфиге; self-update лаунчера в `/nix/store`
 работать не должен, поэтому новые версии обновляются через derivation. Сам
 ArtCraft на Linux без `apt`/`dnf` устанавливает приложения как AppImage в
@@ -1044,7 +1063,7 @@ ArtCraft на Linux без `apt`/`dnf` устанавливает приложе
 `programs.appimage.enable` и регистрацию binfmt.
 
 `bitwarden-desktop` установлен через Home Manager из закреплённого
-`nixpkgs-unstable`: версия `2026.8.0`, Electron `43.4.1`. Не возвращать
+`nixpkgs-unstable`: версия `2026.9.1`. Не возвращать
 устаревший Electron в `permittedInsecurePackages`.
 
 В `home/ilya/home.nix` пакет Bitwarden обёрнут через `symlinkJoin` и
@@ -1467,8 +1486,8 @@ supported.
 ## Telegram
 
 Telegram установлен как `pkgsTelegram.telegram-desktop` из отдельного
-`nixpkgs-telegram` input (`nixos-unstable`). Версия 7.2.8 заменяет 6.8.1 из
-основного stable input. Этот input передаётся только в Home Manager; обновление
+`nixpkgs-telegram` input (`nixos-unstable`), версия `7.2.9`.
+Этот input передаётся только в Home Manager; обновление
 Telegram не требует обновлять Bitwarden, Codex или всю систему. Для следующего
 обновления используется `nix flake update nixpkgs-telegram`, затем evaluation
 и dry-run. Остальные lock entries должны оставаться прежними.

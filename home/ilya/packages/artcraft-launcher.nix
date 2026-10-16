@@ -37,11 +37,11 @@ let
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "artcraft-launcher";
-  version = "0.2.0";
+  version = "0.4.1";
 
   src = fetchurl {
     url = "https://github.com/storytold/craft-launcher/releases/download/v${finalAttrs.version}/artcraft-launcher-${finalAttrs.version}-linux-x86_64.tar.gz";
-    hash = "sha256-SlbDgi1JyroQZ+u7M52LeU5yV0I2+Tzr7l/BoyZUbPU=";
+    hash = "sha256-Ki7lHWm9uBdKKkjzApf9v6RgtuhzfDVmobbsRvgx+kA=";
   };
 
   nativeBuildInputs = [
