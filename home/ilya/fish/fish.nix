@@ -71,5 +71,17 @@ in
     functions.nix-install = ''
       /home/ilya/.local/bin/nix-install-package $argv
     '';
+    functions.yazi = ''
+      set -l cwd_file (${pkgs.coreutils}/bin/mktemp -t yazi-cwd.XXXXXX)
+      or return 1
+      command yazi $argv --cwd-file="$cwd_file"
+      set -l yazi_status $status
+      set -l cwd (string collect < "$cwd_file")
+      ${pkgs.coreutils}/bin/rm -f -- "$cwd_file"
+      if test -n "$cwd"; and test "$cwd" != "$PWD"
+        builtin cd -- "$cwd"
+      end
+      return $yazi_status
+    '';
   };
 }

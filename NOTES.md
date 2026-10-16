@@ -1747,6 +1747,12 @@ nix-install <pkgname> [pkgname...]
 
 Стандартная команда coreutils `install` не переопределяется.
 
+Fish-функция `yazi` запускает `command yazi` с временным `--cwd-file`,
+после обычного выхода (`q`) читает последний каталог и выполняет `builtin cd`.
+Пути с пробелами сохраняются целиком; временный файл удаляется, код выхода
+Yazi сохраняется. `command yazi` позволяет выйти без смены каталога shell.
+Определение находится в `home/ilya/fish/fish.nix`.
+
 ## Starship
 
 Файл: `home/ilya/starship/starship.nix`.
