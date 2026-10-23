@@ -73,7 +73,7 @@
     cmake
     pkg-config
     nodejs
-    python3
+    (python3.withPackages (ps: [ ps.pip ]))
     uv
     go
     rustup
