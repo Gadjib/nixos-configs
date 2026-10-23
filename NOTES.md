@@ -484,6 +484,10 @@ Bootloader:
 Networking and DNS:
 
 - `networking.networkmanager.enable = true`
+- `networking.firewall.allowedTCPPorts = [ 6767 ]` разрешает входящий TCP
+  на порт 6767 на всех интерфейсах; UDP этим правилом не открывается.
+  Правило находится в `hosts/nixos/configuration.nix` и вступает в силу
+  только после применения конфигурации.
 - `networking.enableIPv6 = false`
 - `services.resolved.enable = true`
 

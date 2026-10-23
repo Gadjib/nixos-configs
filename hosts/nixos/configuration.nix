@@ -71,6 +71,7 @@ in
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "thinkpad-nix";
+  networking.firewall.allowedTCPPorts = [ 6767 ];
   networking.enableIPv6 = false;
   networking.networkmanager.enable = true;
   networking.networkmanager.dispatcherScripts = [
