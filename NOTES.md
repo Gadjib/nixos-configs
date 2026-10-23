@@ -199,9 +199,16 @@ config и системные модули.
 
 ## Системный Слой NixOS
 
-В `modules/nixos/packages.nix` системный Python установлен как
-`python3.withPackages (ps: [ ps.pip ps.pygame ps.tkinter ])`: pip, pygame
-и Tkinter входят в одно Python-окружение после применения конфигурации.
+Общее Python-окружение описано в `lib/python-environment.nix` через
+`python3.withPackages`: pip, pygame, tkinter, debugpy и pytest.
+`modules/nixos/packages.nix` и `home/ilya/nvim/nvim.nix` импортируют один
+и тот же derivation: системный и пользовательский профили, запускатель Neovim
+и debugpy используют одинаковый Python с одинаковыми библиотеками.
+Отдельное окружение Neovim только с debugpy/pytest больше не должно
+перекрывать системный Python в PATH: это вызывало `No module named '_tkinter'`.
+Новые общие библиотеки добавляются только в `lib/python-environment.nix`.
+Проектные `.venv`/`venv` и активный `VIRTUAL_ENV` сохраняют приоритет в
+запускателе Neovim; их зависимости управляются отдельно.
 `turtle` используется из стандартной библиотеки Python; для его графических
 окон добавлен `tkinter`, отдельный PyPI-пакет `turtle` не нужен.
 pip доступен также через `python3 -m pip`.

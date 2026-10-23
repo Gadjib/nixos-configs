@@ -35,10 +35,7 @@ let
     name = "nvim-treesitter";
     paths = [ treesitter ] ++ treesitter.dependencies;
   };
-  debugPython = pkgs.python3.withPackages (pythonPackages: [
-    pythonPackages.debugpy
-    pythonPackages.pytest
-  ]);
+  pythonEnvironment = import ../../../lib/python-environment.nix { inherit pkgs; };
   vscodeLldb = pkgs.vscode-extensions.vadimcn.vscode-lldb;
   neotestPython = pkgs.symlinkJoin {
     # neotest-python locates its helper by the literal path suffix
@@ -126,8 +123,8 @@ in
           clang_format = ${builtins.toJSON "${pkgs.clang-tools}/bin/clang-format"},
           clangxx = ${builtins.toJSON "${pkgs.clang}/bin/clang++"},
           codelldb = ${builtins.toJSON "${codelldb}/bin/codelldb"},
-          debugpy_adapter = ${builtins.toJSON "${debugPython}/bin/debugpy-adapter"},
-          python = ${builtins.toJSON "${debugPython}/bin/python"},
+          debugpy_adapter = ${builtins.toJSON "${pythonEnvironment}/bin/debugpy-adapter"},
+          python = ${builtins.toJSON "${pythonEnvironment}/bin/python"},
           ruff = ${builtins.toJSON "${pkgs.ruff}/bin/ruff"},
           texlab = ${builtins.toJSON "${pkgs.texlab}/bin/texlab"},
           ltex = ${builtins.toJSON "${pkgs.ltex-ls-plus}/bin/ltex-ls-plus"},
@@ -148,7 +145,7 @@ in
     clang-tools
     cmake
     codelldb
-    debugPython
+    pythonEnvironment
     ltex-ls-plus
     neocmakelsp
     neovim-remote

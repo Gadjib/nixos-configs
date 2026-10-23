@@ -1,5 +1,8 @@
 { pkgs, pkgsCodex, ... }:
 
+let
+  pythonEnvironment = import ../../lib/python-environment.nix { inherit pkgs; };
+in
 {
   programs.firefox.enable = true;
   programs.steam = {
@@ -73,11 +76,7 @@
     cmake
     pkg-config
     nodejs
-    (python3.withPackages (ps: [
-      ps.pip
-      ps.pygame
-      ps.tkinter
-    ]))
+    pythonEnvironment
     uv
     go
     rustup
