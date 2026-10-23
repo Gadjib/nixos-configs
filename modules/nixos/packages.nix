@@ -73,7 +73,11 @@
     cmake
     pkg-config
     nodejs
-    (python3.withPackages (ps: [ ps.pip ]))
+    (python3.withPackages (ps: [
+      ps.pip
+      ps.pygame
+      ps.tkinter
+    ]))
     uv
     go
     rustup
