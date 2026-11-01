@@ -37,7 +37,9 @@ xdg.configFile."path".text = "...";
 - `programs.fish` с Oh My Fish/Agnoster, zoxide, direnv и fzf; Starship
   установлен, но его Fish-интеграция отключена;
 - `programs.vscode` с декларативным Markdown Preview Enhanced и настройкой
-  `.md` открывать сразу в отдельных preview-вкладках;
+  `.md` открывать сразу в отдельных preview-вкладках. `settings.json` создаётся
+  обычным записываемым файлом при первом применении; дальнейшие изменения из
+  VS Code сохраняются при пересборках;
 - Fish-функция `nix-install`, которая вызывает `/home/ilya/.local/bin/nix-install-package` для проверяемого добавления и commit пакетов из `home/ilya/packages/manual.nix`;
 - `programs.delta` и git integration;
 - `programs.direnv.nix-direnv`;
